@@ -1,0 +1,11 @@
+#!/bin/sh
+
+gitbook build -g ochrons/diode
+cd _book
+git init
+git commit --allow-empty -m 'update book'
+git checkout -b gh-pages
+touch .nojekyll
+git add .
+git commit -am "update book"
+git push git@github.com:ochrons/diode gh-pages --force
