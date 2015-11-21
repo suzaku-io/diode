@@ -9,11 +9,11 @@ predictable behaviour, are easy to test and debug and are type safe.
 
 Add following dependency declaration to your Scala project.
 
-<pre><code class="lang-scala">"me.chrons" %% "diode" % "{{ book.version }}"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %% "diode" % "0.1.0-SNAPSHOT"</code></pre>
 
 On a Scala.js project the dependency looks like this.
 
-<pre><code class="lang-scala">"me.chrons" %%% "diode" % "{{ book.version }}"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.1.0-SNAPSHOT"</code></pre>
 
 ### The Model
 
