@@ -1,4 +1,6 @@
-package diode
+package diode.util
+
+import diode._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -25,15 +27,15 @@ trait PotAction[A, T <: PotAction[A, T]] {
 
 object PotAction {
   def handler[A, M, T <: PotAction[A, T]](retries: Int = 0, progressDelta: Int = 0)(implicit runner: RunAfter, ec: ExecutionContext) =
-    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], state: PotState, loader: () => Future[T]) => {
+    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], state: PotState, updateFunc: () => Future[T]) => {
       import PotState._
       import handler._
       state match {
         case PotEmpty =>
           if (progressDelta > 0) {
-            updatePar(value.pending(retries), loader(), runAfter(progressDelta)(action.pending))
+            updatePar(value.pending(retries), updateFunc, runAfter(progressDelta)(action.pending))
           } else {
-            update(value.pending(retries), loader())
+            update(value.pending(retries), updateFunc)
           }
         case PotPending =>
           if (value.isPending && progressDelta > 0) {
@@ -45,7 +47,7 @@ object PotAction {
           update(action.model)
         case PotFailed =>
           if (value.canRetry) {
-            update(value.retry, loader())
+            update(value.retry, updateFunc)
           } else {
             update(action.model)
           }

@@ -2,6 +2,12 @@ package diode
 
 import scala.concurrent._
 
+trait Dispatcher {
+  def dispatch(action: AnyRef): Unit
+
+  def apply(action: AnyRef) = dispatch(action)
+}
+
 trait Circuit[M <: AnyRef] extends Dispatcher {
 
   type Listener = () => Unit
@@ -48,14 +54,14 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
           implicit val exCon = ec
           update(newModel)
           // run effects serially
-          effects.foldLeft(Future.successful(())) { (prevEffect, effect) =>
-            prevEffect.flatMap(_ => effect.map(dispatch))
+          effects.foldLeft(Future.successful(())) { (prev, effect) =>
+            prev.flatMap(_ => effect().map(dispatch))
           }
         case ActionResult.ModelUpdateEffectPar(newModel, effects, ec) =>
           implicit val exCon = ec
           update(newModel)
           // run effects in parallel
-          effects.foreach(_.map(dispatch))
+          effects.foreach(effect => effect().map(dispatch))
       }
     }
   }

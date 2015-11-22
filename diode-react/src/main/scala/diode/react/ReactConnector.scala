@@ -5,7 +5,7 @@ import japgolly.scalajs.react._
 import scala.language.existentials
 
 case class ComponentModel[S] private[diode] (modelReader: ModelR[S], dispatch: AnyRef => Callback, connector: ReactConnector[_ <: AnyRef]) {
-  def model = modelReader.value
+  def value = modelReader.value
 
   def apply() = modelReader.value
 
@@ -48,7 +48,7 @@ trait ReactConnector[M <: AnyRef] {
       def render(s: S) = compB(ComponentModel(modelReader, action => Callback(circuit.dispatch(action)), ReactConnector.this))
     }
 
-    ReactComponentB[Unit]("ModelWrapper")
+    ReactComponentB[Unit]("DiodeWrapper")
       .initialState(modelReader.value)
       .renderBackend[Backend]
       .componentDidMount(scope => scope.backend.didMount)

@@ -1,8 +1,10 @@
-package diode
+package diode.util
 
 import java.util.Date
 
-import scala.util.{Success, Failure, Try}
+import diode.util
+
+import scala.util.{Failure, Success, Try}
 
 sealed trait PotState
 
@@ -21,9 +23,9 @@ object PotState {
 /**
   * Represents a potential value that may be in different states.
   *
-  * @define pot [[diode.Pot]]
-  * @define ready [[diode.Ready]]
-  * @define empty [[diode.Empty]]
+  * @define pot [[util.Pot]]
+  * @define ready [[Ready]]
+  * @define empty [[Empty]]
   */
 sealed abstract class Pot[+A] extends Product {
   self =>

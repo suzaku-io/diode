@@ -1,9 +1,7 @@
 package diode.react
 
-import diode._
+import diode.util._
 import japgolly.scalajs.react.vdom._
-import scala.concurrent.Promise
-import scalajs.js.timers._
 
 object ReactPot {
 
@@ -28,5 +26,3 @@ object ReactPot {
   }
 
 }
-
-
