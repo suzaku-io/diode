@@ -20,7 +20,7 @@ trait RunAfter {
   def runAfter[A](millis: Int)(f: => A): Future[A]
 }
 
-abstract class ActionHandler[M, T](modelRW: ModelRW[M, T]) {
+abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
 
   import ActionResult._
 

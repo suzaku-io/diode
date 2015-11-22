@@ -1,6 +1,6 @@
 package diode
 
-trait ModelR[S] {
+trait ModelR[+S] {
   def value: S
 
   def zoom[T](get: S => T): ModelR[T]
@@ -18,7 +18,7 @@ class RootModelR[M](get: => M) extends ModelR[M] {
   override def zoom[T](get: M => T) = new ZoomModelR[M, T](this, get)
 }
 
-class ZoomModelR[M, T](root: ModelR[M], get: M => T) extends ModelR[T] {
+class ZoomModelR[M, +T](root: ModelR[M], get: M => T) extends ModelR[T] {
   override def value = get(root.value)
 
   override def zoom[U](get: T => U) = new ZoomModelR[M, U](root, get compose this.get)
