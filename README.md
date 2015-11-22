@@ -1,9 +1,13 @@
 # ![Diode](./doc/images/diode-logo-big.png)
 
-Diode is a Scala/Scala.js library for managing immutable application state with unidirectional changes. It is heavily influenced and inspired by
+> /ˈdʌɪəʊd/
+>
+> a semiconductor device with two terminals, typically allowing the flow of current in one direction only
+
+Diode is a Scala/Scala.js library for managing immutable application state with unidirectional data flow. It is heavily influenced and inspired by
 [Flux](https://facebook.github.io/flux/) and [Elm](https://github.com/evancz/elm-architecture-tutorial/) architectures, and libraries like
 [Om](https://github.com/omcljs/om) and [Redux](https://github.com/rackt/redux). Diode helps you build applications that are easy to reason about, have
-predictable behaviour, are easy to test and debug and are type safe.
+predictable behaviour, are easy to test and debug and are type safe. It's a compact, high performing and easy to extend library with no external dependencies.
 
 ## Getting Started
 
@@ -37,7 +41,7 @@ Actions in Diode can be anything (that extends `AnyRef`), but typically case cla
 
 ### The Circuit
 
-Application state is stored in a `Circuit[M]` which also takes care of all of the action handling. In the application you'll typically define a singleton object
+Application state is stored in a `Circuit[M]` which also takes care of all of the action handling. In your application you'd typically define a singleton object
 extending the Circuit. Your only responsibilities are to define the `model` variable and an `actionHandler`, everything else is taken care by Diode's Circuit.
  
 ```scala
@@ -52,7 +56,7 @@ object AppModel extends Circuit[RootModel] {
 ```
 
 The `actionHandler` is a partial function receiving the action and returning a result of type `ActionResult[RootModel]`. Each action must return a new copy of
-the (root)model so we use the convenient `copy` function of the case class. Note that we are not updating the `model` variable here, just returning a copy. The
+the (root)model so we use the convenient case class `copy` function. Note that we are _not updating_ the `model` variable here, just returning a copy. The
 actual update is performed by the Circuit.
 
 Because we want to keep the code clean and DRY, let's use the `ActionHandler` helper class to define our actions instead.
@@ -96,8 +100,8 @@ class CounterView(counter: ModelR[Int], dispatch: Dispatcher) {
 ```
 
 The view receives a _model reader_ to access the part of the model we are interested in and a `Dispatcher` to dispatch actions. Because we use a model reader
-instead of direct counter value, we don't need to create a new instance of the view when the counter changes. The reader always returns an up-to-date value. If
-we had a more complex model, the reader would also allow us to zoom further into the model, to provide subviews only a partial model.
+instead of a direct counter value, we don't need to create a new instance of the view when the counter changes. The reader always returns an up-to-date value.
+If we had a more complex model, the reader would also allow us to zoom further into the model, to provide subviews only a partial model.
 
 For interaction we define three buttons for increasing, decreasing and resetting the counter. Clicking one of the buttons dispatches an appropriate action, to
 be handled by the `counterHandler` we defined before.
