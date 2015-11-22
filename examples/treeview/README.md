@@ -1,3 +1,3 @@
-# Simple Diode Example
+# Tree view Diode Example
 
-This is a very simple example application using Diode. See the Diode documentation for further information.
+This is a bit more complex example application using Diode. It features a hierarchical data structure representing a directory tree. 
