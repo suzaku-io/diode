@@ -18,7 +18,9 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   protected def actionHandler: HandlerFunction
 
   private val baseHandler: HandlerFunction = {
-    case action => ActionResult.ModelUpdate(model) // always return current model
+    case action =>
+      logError(s"Action $action was not handled by and action handler")
+      ActionResult.ModelUpdate(model) // always return current model
   }
 
   private val modelRW = new RootModelRW[M](model)
@@ -38,6 +40,10 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     handlers.foldLeft(PartialFunction.empty[AnyRef, ActionResult[M]])((a, b) => a orElse b.handle)
   }
 
+  def logFatal(e: Throwable): Unit = throw e
+
+  def logError(msg: String): Unit = ()
+
   private def update(newModel: M) = {
     if (newModel ne model) {
       model = newModel
@@ -47,21 +53,26 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
 
   def dispatch(action: AnyRef): Unit = {
     this.synchronized {
-      (actionHandler orElse baseHandler) (action) match {
-        case ActionResult.ModelUpdate(newModel) =>
-          update(newModel)
-        case ActionResult.ModelUpdateEffect(newModel, effects, ec) =>
-          implicit val exCon = ec
-          update(newModel)
-          // run effects serially
-          effects.foldLeft(Future.successful(())) { (prev, effect) =>
-            prev.flatMap(_ => effect().map(dispatch))
-          }
-        case ActionResult.ModelUpdateEffectPar(newModel, effects, ec) =>
-          implicit val exCon = ec
-          update(newModel)
-          // run effects in parallel
-          effects.foreach(effect => effect().map(dispatch))
+      try {
+        (actionHandler orElse baseHandler) (action) match {
+          case ActionResult.ModelUpdate(newModel) =>
+            update(newModel)
+          case ActionResult.ModelUpdateEffect(newModel, effects, ec) =>
+            implicit val exCon = ec
+            update(newModel)
+            // run effects serially
+            effects.foldLeft(Future.successful(())) { (prev, effect) =>
+              prev.flatMap(_ => effect().map(dispatch))
+            }
+          case ActionResult.ModelUpdateEffectPar(newModel, effects, ec) =>
+            implicit val exCon = ec
+            update(newModel)
+            // run effects in parallel
+            effects.foreach(effect => effect().map(dispatch))
+        }
+      } catch {
+        case e: Throwable =>
+          logFatal(e)
       }
     }
   }
