@@ -3,7 +3,7 @@ package example
 import diode._
 import scalatags.JsDom.all._
 
-class TreeView(root: ModelR[FileNode], parent: Seq[String], selection: Seq[String], dispatcher: Dispatcher) {
+class TreeView(root: ModelR[FileNode], parent: Seq[String], selection: ModelR[Seq[String]], dispatcher: Dispatcher) {
   val id = root.value.id
   val path = parent :+ id
   val childSeq = build
@@ -16,7 +16,7 @@ class TreeView(root: ModelR[FileNode], parent: Seq[String], selection: Seq[Strin
   }
 
   def render: Frag = {
-    val isSelected = if(selection.nonEmpty && selection.last == id) "active" else ""
+    val isSelected = if(selection.value.nonEmpty && selection.value.last == id) "active" else ""
 
     def renderName(name: String) =
       a(href := "#", cls := isSelected, onclick := {() => dispatcher(Select(path))}, name)

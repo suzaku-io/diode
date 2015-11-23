@@ -24,6 +24,9 @@ object SimpleApp extends JSApp {
     id
   }
 
+  var currentModel = AppModel.zoom(_.tree.root).value
+  var treeView = new TreeView(AppModel.zoom(_.tree.root), Seq.empty, AppModel.zoom(_.tree.selected), AppModel)
+
   @JSExport
   override def main(): Unit = {
     val root = dom.document.getElementById("root")
@@ -34,10 +37,13 @@ object SimpleApp extends JSApp {
   }
 
   def render(root: dom.Element) = {
-    // rebuild the tree view
-    val selectionLoc = AppModel.zoom(_.tree.selected).value
-    val treeView = new TreeView(AppModel.zoom(_.tree.root), Seq.empty, selectionLoc, AppModel)
+    // rebuild the tree view if the model has changed
+    if(AppModel.zoom(_.tree.root).value ne currentModel) {
+      currentModel = AppModel.zoom(_.tree.root).value
+      treeView = new TreeView(AppModel.zoom(_.tree.root), Seq.empty, AppModel.zoom(_.tree.selected), AppModel)
+    }
 
+    val selectionLoc = AppModel.zoom(_.tree.selected).value
     def renderButtons(selected: Boolean) = {
       div(
         button(if(!selected) disabled else "", cls := "btn",

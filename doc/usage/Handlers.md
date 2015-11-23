@@ -101,14 +101,15 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
 ### Deep Diving
 
 The handler for `ReplaceTree` was trivial, since there was no need to dive into the directory hierarchy, but how would something like `AddNode` be handled? It
-gets a location as a parameter, defining the directory we are interested in. This is actually a sequence of identifiers we need to walk down the hierarchy to
+gets a path as a parameter, defining the directory we are interested in. This is actually a sequence of identifiers, so we need to walk down the hierarchy to
 reach our goal. Because the same is needed in the other actions as well, let's define a common function to perform this traversal.
 
 We are actually interested in the `children` sequence of the directory, not the directory itself, so our traversal function should return a `ModelRW` that
-allows us to manipulate that indexed sequence directly. It may also fail to find a valid location, so we should wrap the result in an `Option`.
+allows us to manipulate that indexed sequence directly. It may also fail to find a valid path, so we should wrap the result in an `Option`.
 
 ```scala
-def zoomToChildren[M](path: Seq[String], rw: ModelRW[M, Directory]): Option[ModelRW[M, IndexedSeq[FileNode]]] = {
+def zoomToChildren[M](path: Seq[String], rw: ModelRW[M, Directory])
+  : Option[ModelRW[M, IndexedSeq[FileNode]]] = {
   if (path.isEmpty) {
     Some(rw.zoomRW(_.children)((m, v) => m.copy(children = v)))
   } else {
@@ -116,12 +117,13 @@ def zoomToChildren[M](path: Seq[String], rw: ModelRW[M, Directory]): Option[Mode
   }
 }
 ```
-In the trivial case (and at the end of the recursion) the location path is empty and we'll return a `ModelRW` for the current directory's `children`.
+In the trivial case (and at the end of the recursion) the path is empty and we'll return a `ModelRW` for the current directory's `children`.
 
 Let's take a look at the full implementation.
 
 ```scala
-def zoomToChildren[M](path: Seq[String], rw: ModelRW[M, Directory]): Option[ModelRW[M, IndexedSeq[FileNode]]] = {
+def zoomToChildren[M](path: Seq[String], rw: ModelRW[M, Directory])
+  : Option[ModelRW[M, IndexedSeq[FileNode]]] = {
   if (path.isEmpty) {
     Some(rw.zoomRW(_.children)((m, v) => m.copy(children = v)))
   } else {
@@ -141,7 +143,7 @@ def zoomToChildren[M](path: Seq[String], rw: ModelRW[M, Directory]): Option[Mode
 ```
 
 First we try to find the index to the `children` sequence, where the next directory in our path resides and depending on the result we either return `None` for 
-failure, or five deeper into the hierarchy by recursively calling the same function again with an updated reader/writer and path. The writer function copies all
+failure, or dive deeper into the hierarchy by recursively calling the same function again with updated reader/writer and path. The writer function copies all
 nodes preceding the one we are interested in, then adds a new node and then any nodes succeeding the original node.
  
 Now we are ready to write action handlers for rest of the tree manipulation functions.

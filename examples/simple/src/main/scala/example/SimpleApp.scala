@@ -1,5 +1,6 @@
 package example
 
+
 import scala.scalajs.js.JSApp
 import scala.scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
