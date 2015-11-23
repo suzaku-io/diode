@@ -1,12 +1,13 @@
 package diode
 
+import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 
 sealed trait ActionResult[M]
 
 object ActionResult {
 
-  type Effect[A] = () => Future[A]
+  type Effect[Action <: AnyRef] = () => Future[Action]
 
   case class ModelUpdate[M](newValue: M) extends ActionResult[M]
 
@@ -17,7 +18,7 @@ object ActionResult {
 }
 
 trait RunAfter {
-  def runAfter[A](millis: Int)(f: => A): Future[A]
+  def runAfter[A](delay: FiniteDuration)(f: => A): Future[A]
 }
 
 abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
@@ -41,5 +42,5 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
   def effectOnly[A <: AnyRef](effects: Effect[A]*)(implicit ec: ExecutionContext): ActionResult[M] =
     ModelUpdateEffect(modelRW.update(value), effects, ec)
 
-  def runAfter[A <: AnyRef](millis: Int)(f: => A)(implicit runner: RunAfter): Effect[A] = () => runner.runAfter(millis)(f)
+  def runAfter[A <: AnyRef](delay: FiniteDuration)(f: => A)(implicit runner: RunAfter): Effect[A] = () => runner.runAfter(delay)(f)
 }

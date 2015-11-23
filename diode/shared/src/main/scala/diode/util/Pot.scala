@@ -43,6 +43,11 @@ sealed abstract class Pot[+A] extends Product {
   def fail(exception: Throwable): Pot[A]
   def state: PotState
 
+  /** Returns false if the pot is Empty, true otherwise.
+    * @note   Implemented here to avoid the implicit conversion to Iterable.
+    */
+  final def nonEmpty = !isEmpty
+
   @inline final def getOrElse[B >: A](default: => B): B =
     if (isEmpty) default else this.get
 
@@ -104,11 +109,6 @@ sealed abstract class Pot[+A] extends Product {
   @inline final def filterNot(p: A => Boolean): Pot[A] =
     if (isEmpty || !p(this.get)) this else Empty
 
-  /** Returns false if the pot is Empty, true otherwise.
-    * @note   Implemented here to avoid the implicit conversion to Iterable.
-    */
-  final def nonEmpty = !isEmpty
-
   /** Necessary to keep Pot from being implicitly converted to
     * [[scala.collection.Iterable]] in `for` comprehensions.
     */
@@ -132,14 +132,14 @@ sealed abstract class Pot[+A] extends Product {
     *
     * @example
     * {{{
-    * // Returns true because Ready instance contains string "something" which equals "something".
-    * Ready("something") contains "something"
+    *  // Returns true because Ready instance contains string "something" which equals "something".
+    *  Ready("something") contains "something"
     *
-    * // Returns false because "something" != "anything".
-    * Ready("something") contains "anything"
+    *  // Returns false because "something" != "anything".
+    *  Ready("something") contains "anything"
     *
-    * // Returns false when method called on Empty.
-    * Empty contains "anything"
+    *  // Returns false when method called on Empty.
+    *  Empty contains "anything"
     * }}}
     *
     * @param elem the element to test.
@@ -184,14 +184,14 @@ sealed abstract class Pot[+A] extends Product {
     *
     * @example
     * {{{
-    * // Returns Ready(HTTP) because the partial function covers the case.
-    * Ready("http") collect {case "http" => "HTTP"}
+    *  // Returns Ready(HTTP) because the partial function covers the case.
+    *  Ready("http") collect {case "http" => "HTTP"}
     *
-    * // Returns Empty because the partial function doesn't cover the case.
-    * Ready("ftp") collect {case "http" => "HTTP"}
+    *  // Returns Empty because the partial function doesn't cover the case.
+    *  Ready("ftp") collect {case "http" => "HTTP"}
     *
-    * // Returns Empty because Empty is passed to the collect method.
-    * Empty collect {case value => value}
+    *  // Returns Empty because Empty is passed to the collect method.
+    *  Empty collect {case value => value}
     * }}}
     *
     * @param  pf   the partial function.
@@ -328,7 +328,11 @@ final case class Pending(retriesLeft: Int = 0, startTime: Long = new Date().getT
   def isFailed = false
   def isStale = false
 
-  override def retry: Pot[Nothing] = if (canRetry) copy(retriesLeft = retriesLeft - 1) else Failed(new IllegalStateException("No more retries left"))
+  override def retry: Pot[Nothing] =
+    if (canRetry)
+      copy(retriesLeft = retriesLeft - 1)
+    else
+      Failed(new IllegalStateException("No more retries left"))
   override def pending(retries: Int) = copy(retries)
   override def fail(exception: Throwable) = Failed(exception)
 }
@@ -340,7 +344,7 @@ final case class PendingStale[+A](x: A, retriesLeft: Int = 0, startTime: Long = 
   def isStale = true
 
   override def retry: Pot[A] =
-    if(canRetry)
+    if (canRetry)
       copy(retriesLeft = retriesLeft - 1)
     else
       FailedStale(x, new IllegalStateException("No more retries left"))
@@ -371,7 +375,11 @@ final case class Failed(exception: Throwable, retriesLeft: Int = 0) extends Pot[
 
   override def recover[B](f: PartialFunction[Throwable, B]): Pot[B] = this
 
-  override def retry = if (canRetry) Pending(retriesLeft - 1) else Failed(new IllegalStateException("No more retries left"))
+  override def retry =
+    if (canRetry)
+      Pending(retriesLeft - 1)
+    else
+      Failed(new IllegalStateException("No more retries left"))
   override def pending(retries: Int) = Pending(retries)
   override def fail(exception: Throwable) = Failed(exception)
 }
@@ -392,7 +400,11 @@ final case class FailedStale[+A](x: A, exception: Throwable, retriesLeft: Int = 
 
   override def recover[B >: A](f: PartialFunction[Throwable, B]): Pot[B] = this
 
-  override def retry = if (canRetry) PendingStale(x, retriesLeft - 1) else FailedStale(x, new IllegalStateException("No more retries left"))
+  override def retry =
+    if (canRetry)
+      PendingStale(x, retriesLeft - 1)
+    else
+      FailedStale(x, new IllegalStateException("No more retries left"))
   override def pending(retries: Int) = PendingStale(x, retries)
   override def fail(exception: Throwable) = FailedStale(x, exception)
 }

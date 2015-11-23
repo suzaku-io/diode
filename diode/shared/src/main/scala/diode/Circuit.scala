@@ -18,6 +18,13 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   protected def actionHandler: HandlerFunction
 
   private val baseHandler: HandlerFunction = {
+    case seq: Seq[_] =>
+      // dispatch all actions in the sequence
+      seq.asInstanceOf[Seq[AnyRef]].foreach(dispatch)
+      ActionResult.ModelUpdate(model)
+    case None =>
+      // ignore
+      ActionResult.ModelUpdate(model)
     case action =>
       logError(s"Action $action was not handled by and action handler")
       ActionResult.ModelUpdate(model) // always return current model
@@ -52,28 +59,26 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   }
 
   def dispatch(action: AnyRef): Unit = {
-    this.synchronized {
-      try {
-        (actionHandler orElse baseHandler) (action) match {
-          case ActionResult.ModelUpdate(newModel) =>
-            update(newModel)
-          case ActionResult.ModelUpdateEffect(newModel, effects, ec) =>
-            implicit val exCon = ec
-            update(newModel)
-            // run effects serially
-            effects.foldLeft(Future.successful(())) { (prev, effect) =>
-              prev.flatMap(_ => effect().map(dispatch))
-            }
-          case ActionResult.ModelUpdateEffectPar(newModel, effects, ec) =>
-            implicit val exCon = ec
-            update(newModel)
-            // run effects in parallel
-            effects.foreach(effect => effect().map(dispatch))
-        }
-      } catch {
-        case e: Throwable =>
-          logFatal(e)
+    try {
+      (actionHandler orElse baseHandler) (action) match {
+        case ActionResult.ModelUpdate(newModel) =>
+          update(newModel)
+        case ActionResult.ModelUpdateEffect(newModel, effects, ec) =>
+          implicit val exCon = ec
+          update(newModel)
+          // run effects serially
+          effects.foldLeft(Future.successful(())) { (prev, effect) =>
+            prev.flatMap(_ => effect().map(dispatch))
+          }
+        case ActionResult.ModelUpdateEffectPar(newModel, effects, ec) =>
+          implicit val exCon = ec
+          update(newModel)
+          // run effects in parallel
+          effects.foreach(effect => effect().map(dispatch))
       }
+    } catch {
+      case e: Throwable =>
+        logFatal(e)
     }
   }
 }

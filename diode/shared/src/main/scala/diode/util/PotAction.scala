@@ -1,19 +1,21 @@
 package diode.util
 
+import diode.ActionResult.Effect
 import diode._
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.duration._
 
 trait PotAction[A, T <: PotAction[A, T]] {
-  def model: Pot[A]
-  def next(value: Pot[A]): T
+  def value: Pot[A]
+  def next(newValue: Pot[A]): T
 
-  def state = model.state
+  def state = value.state
 
   def handle[M](pf: PartialFunction[PotState, ActionResult[M]]) = pf(state)
 
-  def handleWith[M, S](handler: ActionHandler[M, S], loader: () => Future[T])
-    (f: (PotAction[A, T], ActionHandler[M, S], PotState, () => Future[T]) => ActionResult[M]) = f(this, handler, state, loader)
+  def handleWith[M, S](handler: ActionHandler[M, S], updateEffect: Effect[T])
+    (f: (PotAction[A, T], ActionHandler[M, S], PotState, Effect[T]) => ActionResult[M]) = f(this, handler, state, updateEffect)
 
   def pending = next(Pending())
 
@@ -21,35 +23,35 @@ trait PotAction[A, T <: PotAction[A, T]] {
 
   def failed(ex: Throwable) = next(Failed(ex))
 
-  def from[B](f: Future[B])(success: B => A, failure: Throwable => Throwable = identity)(implicit ec: ExecutionContext): () => Future[T] =
+  def effect[B](f: Future[B])(success: B => A, failure: Throwable => Throwable = identity)(implicit ec: ExecutionContext): Effect[T] =
     () => f.map(x => ready(success(x))).recover { case e: Throwable => failed(failure(e)) }
 }
 
 object PotAction {
-  def handler[A, M, T <: PotAction[A, T]](retries: Int = 0, progressDelta: Int = 0)(implicit runner: RunAfter, ec: ExecutionContext) =
-    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], state: PotState, updateFunc: () => Future[T]) => {
+  def handler[A, M, T <: PotAction[A, T]](retries: Int = 0, progressDelta: FiniteDuration = Duration.Zero)(implicit runner: RunAfter, ec: ExecutionContext) =
+    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], state: PotState, updateEffect: Effect[T]) => {
       import PotState._
       import handler._
       state match {
         case PotEmpty =>
-          if (progressDelta > 0) {
-            updatePar(value.pending(retries), updateFunc, runAfter(progressDelta)(action.pending))
+          if (progressDelta > Duration.Zero) {
+            updatePar(value.pending(retries), updateEffect, runAfter(progressDelta)(action.pending))
           } else {
-            update(value.pending(retries), updateFunc)
+            update(value.pending(retries), updateEffect)
           }
         case PotPending =>
-          if (value.isPending && progressDelta > 0) {
+          if (value.isPending && progressDelta > Duration.Zero) {
             update(value.pending(), runAfter(progressDelta)(action.pending))
           } else {
             noChange
           }
         case PotReady =>
-          update(action.model)
+          update(action.value)
         case PotFailed =>
           if (value.canRetry) {
-            update(value.retry, updateFunc)
+            update(value.retry, updateEffect)
           } else {
-            update(action.model)
+            update(action.value)
           }
       }
     }
