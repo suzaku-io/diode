@@ -17,8 +17,8 @@ straightforward implementation:
 type Effect[Action <: AnyRef] = () => Future[Action]
 ```
 
-It's just a function returning a `Future[A]`. The action returned by the `Future` is automatically dispatched. If your effect doesn't need anything dispatched,
-return a `None`.
+It's just a function returning a `Future[Action]`. The action returned by the `Future` is automatically dispatched. If your effect doesn't need anything
+dispatched, return a `None`.
 
 ### Using Effects
 
@@ -33,8 +33,8 @@ def loadMessagesEffect(user: String) =
   () => Ajax.get(s"/user/messages?id=$user").map(r => NewMessages(r.responseText))
 ```
 
-Here the `loadMessagesEffect` doesn't actually execute the Ajax call immediately, but just provides a function to do so. Once the call has completed, the result
-is mapped into a `NewMessages` action that gets automatically dispatched.
+Here the `loadMessagesEffect` doesn't actually execute the Ajax call immediately, but just provides a function to do so. Once the future does complete, the
+result is mapped into a `NewMessages` action that gets automatically dispatched.
 
 To return the effects alongside the new model, use one of the helper functions provided by `ActionHandler`.
 
@@ -56,12 +56,12 @@ we might want to get periodic notifications (using `runAfter`) while the message
 
 ```scala
     case LoadMessages(user) =>
-      updatePar(value.copy(loadTime = 0), loadMessagesEffect(user), runAfter(500)(StillLoading))
+      updatePar(value.copy(loadTime = 0), loadMessagesEffect(user), runAfter(500.millis)(StillLoading))
     case NewMessages(msgs) =>
       update(Messages(msgs, -1))
     case StillLoading =>
       if(value.loadTime != -1)
-        update(value.copy(loadTime = value.loadTime + 500), runAfter(500)(StillLoading)) 
+        update(value.copy(loadTime = value.loadTime + 500), runAfter(500.millis)(StillLoading)) 
       else
         noChange
 ```

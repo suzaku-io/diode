@@ -138,7 +138,7 @@ Further updates due to user clicking the buttons are handled similarly.
 
 # Documentation
 
-Coming soon to a repo near you!
+Early preview [available here](http://ochrons.github.io/diode/index.html).
 
 # Change history
 
