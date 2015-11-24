@@ -3,17 +3,23 @@ package diode
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 
-sealed trait ActionResult[M]
+sealed trait ActionResult[+M]
+
+sealed trait ModelUpdated[+M] extends ActionResult[M] {
+  def newValue: M
+}
 
 object ActionResult {
 
   type Effect[Action <: AnyRef] = () => Future[Action]
 
-  case class ModelUpdate[M](newValue: M) extends ActionResult[M]
+  case object NoChange extends ActionResult[Nothing]
 
-  case class ModelUpdateEffect[M, A <: AnyRef](newValue: M, effects: Seq[Effect[A]], ec: ExecutionContext) extends ActionResult[M]
+  case class ModelUpdate[M](newValue: M) extends ModelUpdated[M]
 
-  case class ModelUpdateEffectPar[M, A <: AnyRef](newValue: M, effects: Seq[Effect[A]], ec: ExecutionContext) extends ActionResult[M]
+  case class ModelUpdateEffect[M, A <: AnyRef](newValue: M, effects: Seq[Effect[A]], ec: ExecutionContext) extends ModelUpdated[M]
+
+  case class ModelUpdateEffectPar[M, A <: AnyRef](newValue: M, effects: Seq[Effect[A]], ec: ExecutionContext) extends ModelUpdated[M]
 
 }
 
@@ -37,7 +43,7 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
   def updatePar[A <: AnyRef](newValue: T, effects: Effect[A]*)(implicit ec: ExecutionContext): ActionResult[M] =
     ModelUpdateEffectPar(modelRW.update(newValue), effects, ec)
 
-  def noChange: ActionResult[M] = ModelUpdate(modelRW.update(value))
+  def noChange = NoChange
 
   def effectOnly[A <: AnyRef](effects: Effect[A]*)(implicit ec: ExecutionContext): ActionResult[M] =
     ModelUpdateEffect(modelRW.update(value), effects, ec)
