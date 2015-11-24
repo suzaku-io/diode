@@ -2,6 +2,6 @@
 
 These topics cover advanced usage of Diode.
 
-* [Async Model Data](advanced/Pot.md)
-* [Stateful Actions](advanced/PotActions.md)
-* [Action Processors](advanced/ActionProcessors.md)
+* [Async Model Data](Pot.md)
+* [Stateful Actions](PotActions.md)
+* [Action Processors](ActionProcessors.md)
