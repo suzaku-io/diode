@@ -71,7 +71,7 @@ to indicate its relative position in the tree.
 In the render method the name of the node is rendered as a clickable element that dispatches a `Select` action when clicked. Currently selected node is 
 highlighted. If the node is a directory, its children are recursively rendered. 
 
-## Listening for Changes
+## Listening to Changes
 
 Views should update when the model changes. To get notified, subscribe to changes using `Circuit.subscribe(listener)`. The call returns an unsubscribing
 function you can later call to stop receiving notifications.
@@ -94,3 +94,18 @@ if(AppModel.zoom(_.tree.root).value ne currentModel) {
 If only `selected` is changed, we don't need to rebuild the tree as its structure has stayed the same. We do, however, need to re-render the tree to reflect
 this change.
 
+### Listening to partial Changes
+
+If your view is only interested in a small part of the model, you can register a listener to be called only when that part changes. To indicate what you are
+interested in, supply a _cursor_ function (`(M) => AnyRef`). This cursor function returns a part of the model for reference equality checking. 
+
+```scala
+AppModel.subscribe(listener, _.tree.root)
+```
+
+Note that you cannot transform the values with, for example, `Option.map` because they must return the original reference within the model. If you do have an
+`Option` in your path, use `getOrNull` to get the underlying value.
+
+```scala
+AppModel.subscribe(listener, _.optValue.map(_.data).getOrNull)
+```

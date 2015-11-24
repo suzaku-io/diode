@@ -1,6 +1,5 @@
 package diode
 
-import diode.ActionResult.NoChange
 import utest._
 
 import scala.collection.mutable
@@ -42,8 +41,8 @@ object CircuitTests extends TestSuite {
     var lastFatal: (AnyRef, Throwable) = ("", null)
     var lastError = ""
 
-    override def logFatal(action: AnyRef, e: Throwable): Unit = lastFatal = (action, e)
-    override def logError(msg: String): Unit = lastError = msg
+    override def handleFatal(action: AnyRef, e: Throwable): Unit = lastFatal = (action, e)
+    override def handleError(msg: String): Unit = lastError = msg
   }
 
   def tests = TestSuite {
@@ -91,24 +90,52 @@ object CircuitTests extends TestSuite {
       }
     }
     'Listener - {
-      val c = circuit
-      var state: Model = null
-      var callbackCount = 0
-      def listener(): Unit = {
-        state = c.model
-        callbackCount += 1
+      'Normal - {
+        val c = circuit
+        var state: Model = null
+        var callbackCount = 0
+        def listener(): Unit = {
+          state = c.model
+          callbackCount += 1
+        }
+        val unsubscribe = c.subscribe(listener)
+        c.dispatch(SetS("Listen"))
+        assert(state.s == "Listen")
+        assert(callbackCount == 1)
+        // sequence of actions causes only a single callback
+        c.dispatch(Seq(SetS("Listen1"), SetS("Listen2"), SetS("Listen3"), SetS("Listen4")))
+        assert(state.s == "Listen4")
+        assert(callbackCount == 2)
+        unsubscribe()
+        c.dispatch(SetS("Deaf"))
+        assert(state.s == "Listen4")
       }
-      val unsubscribe = c.subscribe(listener)
-      c.dispatch(SetS("Listen"))
-      assert(state.s == "Listen")
-      assert(callbackCount == 1)
-      // sequence of actions causes only a single callback
-      c.dispatch(Seq(SetS("Listen1"), SetS("Listen2"), SetS("Listen3"), SetS("Listen4")))
-      assert(state.s == "Listen4")
-      assert(callbackCount == 2)
-      unsubscribe()
-      c.dispatch(SetS("Deaf"))
-      assert(state.s == "Listen4")
+      'Cursor - {
+        val c = circuit
+        var state: Model = null
+        var state2: Model = null
+        var callbackCount = 0
+        def listener1(): Unit = {
+          state = c.model
+          callbackCount += 1
+        }
+        def listener2(): Unit = {
+          state2 = c.model
+          callbackCount += 1
+        }
+        c.subscribe(listener1, _.data)
+        c.subscribe(listener2, _.s)
+        // check that only listener2 is called
+        c.dispatch(SetS("Listen"))
+        assert(state == null)
+        assert(state2.s == "Listen")
+        assert(callbackCount == 1)
+        // check that only listener1 is called
+        c.dispatch(SetD(Data(43, false)))
+        assert(state.data.i == 43)
+        assert(state2.data.i == 42)
+        assert(callbackCount == 2)
+      }
     }
     'Effects - {
       'Run - {
@@ -187,7 +214,7 @@ object CircuitTests extends TestSuite {
             action match {
               case Delay(a) =>
                 pending.enqueue((a, dispatcher))
-                NoChange
+                ActionResult.NoChange
               case _ => next(action)
             }
           }
