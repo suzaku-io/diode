@@ -19,7 +19,7 @@ In a Scala.js project the dependency looks like this.
 
 <pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.1.0-SNAPSHOT"</code></pre>
 
-<img src="doc/images/architecture.png" style="float: right; padding: 10px">
+<img align="right" src="doc/images/architecture.png">
 
 ### The Model
 
@@ -141,6 +141,12 @@ Further updates due to user clicking the buttons are handled similarly.
 # Documentation
 
 Early preview [available here](http://ochrons.github.io/diode/index.html).
+
+# Examples
+
+There are two example projects in the [examples](examples) directory. First one is a [simple](examples/simple) application showing the basic use of Diode. The
+second example features a recursive [tree view](examples/treeview) component with a couple of edit actions. Both examples use "plain HTML" without any framework
+like React.
 
 # Change history
 
