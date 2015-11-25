@@ -1,6 +1,6 @@
 # Views
 
-<img src="../images/architecture-view.png" style="float: right; padding: 10px";>
+<img src="../images/architecture-view.png" style="float: right; padding: 10px">
 In Diode a _view_ is a component that renders data from a model and reacts to model updates. It doesn't necessarily have to be a visual component (although it
 typically is), you could also use it for automatically storing changed model data into local storage or so.
 
@@ -26,7 +26,7 @@ Using a `ModelR` instead of the actual value means we don't have to recreate the
 beginning and use it forever.
   
 ```scala
-val counter = new CounterView(AppModel.zoom(_.counter), AppModel)
+val counter = new CounterView(AppCircuit.zoom(_.counter), AppCircuit)
 ```
 
 For our directory tree we need a more complex view that supports the recursive nature of the data.
@@ -78,7 +78,7 @@ function you can later call to stop receiving notifications.
 
 ```scala
 val root = dom.document.getElementById("root")
-AppModel.subscribe(() => render(root))
+AppCircuit.subscribe(() => render(root))
 def render(root: dom.Element) = { ... }
 ```
 Listeners are called when _anything_ in the model changes, even if it has no effect in the part of the model your view is interested in. Therefore it makes
@@ -86,9 +86,9 @@ sense to check if a real change has happened, before doing expensive re-computat
 
 ```scala
 // rebuild the tree view if the model has changed
-if(AppModel.zoom(_.tree.root).value ne currentModel) {
-  currentModel = AppModel.zoom(_.tree.root).value
-  treeView = new TreeView(AppModel.zoom(_.tree.root), Seq.empty, AppModel.zoom(_.tree.selected), AppModel)
+if(AppCircuit.zoom(_.tree.root).value ne currentModel) {
+  currentModel = AppCircuit.zoom(_.tree.root).value
+  treeView = new TreeView(AppCircuit.zoom(_.tree.root), Seq.empty, AppCircuit.zoom(_.tree.selected), AppCircuit)
 }
 ```
 If only `selected` is changed, we don't need to rebuild the tree as its structure has stayed the same. We do, however, need to re-render the tree to reflect
@@ -100,12 +100,12 @@ If your view is only interested in a small part of the model, you can register a
 interested in, supply a _cursor_ function (`(M) => AnyRef`). This cursor function returns a part of the model for reference equality checking. 
 
 ```scala
-AppModel.subscribe(listener, _.tree.root)
+AppCircuit.subscribe(listener, _.tree.root)
 ```
 
 Note that you cannot transform the values with, for example, `Option.map` because they must return the original reference within the model. If you do have an
 `Option` in your path, use `getOrNull` to get the underlying value.
 
 ```scala
-AppModel.subscribe(listener, _.optValue.map(_.data).getOrNull)
+AppCircuit.subscribe(listener, _.optValue.map(_.data).getOrNull)
 ```

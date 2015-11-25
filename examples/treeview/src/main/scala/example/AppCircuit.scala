@@ -40,10 +40,10 @@ case class ReplaceNode(path: Seq[String], node: FileNode)
 case class Select(selected: Seq[String])
 
 /**
-  * AppModel provides the actual instance of the `RootModel` and all the action
+  * AppCircuit provides the actual instance of the `RootModel` and all the action
   * handlers we need. Everything else comes from the `Circuit`
   */
-object AppModel extends Circuit[RootModel] {
+object AppCircuit extends Circuit[RootModel] {
   // define initial value for the application model
   var model = RootModel(Tree(Directory("", "", Vector.empty), Seq.empty))
 

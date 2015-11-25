@@ -24,7 +24,7 @@ object CircuitTests extends TestSuite {
 
   case class Delay(action: AnyRef)
 
-  class AppModel(implicit ec: ExecutionContext) extends Circuit[Model] {
+  class AppCircuit(implicit ec: ExecutionContext) extends Circuit[Model] {
     import diode.ActionResult._
     override var model = Model("Testing", Data(42, true))
     override protected def actionHandler: HandlerFunction = {
@@ -46,7 +46,7 @@ object CircuitTests extends TestSuite {
   }
 
   def tests = TestSuite {
-    def circuit = new AppModel
+    def circuit = new AppCircuit
 
     'Dispatch - {
       'Action - {

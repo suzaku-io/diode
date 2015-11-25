@@ -24,36 +24,36 @@ object SimpleApp extends JSApp {
     id
   }
 
-  var currentModel = AppModel.zoom(_.tree.root).value
-  var treeView = new TreeView(AppModel.zoom(_.tree.root), Seq.empty, AppModel.zoom(_.tree.selected), AppModel)
+  var currentModel = AppCircuit.zoom(_.tree.root).value
+  var treeView = new TreeView(AppCircuit.zoom(_.tree.root), Seq.empty, AppCircuit.zoom(_.tree.selected), AppCircuit)
 
   @JSExport
   override def main(): Unit = {
     val root = dom.document.getElementById("root")
     // subscribe to changes in the application model and call render when anything changes
-    AppModel.subscribe(() => render(root))
+    AppCircuit.subscribe(() => render(root))
     // start the application by dispatching a ReplaceTree action
-    AppModel.dispatch(ReplaceTree(data))
+    AppCircuit.dispatch(ReplaceTree(data))
   }
 
   def render(root: dom.Element) = {
     // rebuild the tree view if the model has changed
-    if(AppModel.zoom(_.tree.root).value ne currentModel) {
-      currentModel = AppModel.zoom(_.tree.root).value
-      treeView = new TreeView(AppModel.zoom(_.tree.root), Seq.empty, AppModel.zoom(_.tree.selected), AppModel)
+    if(AppCircuit.zoom(_.tree.root).value ne currentModel) {
+      currentModel = AppCircuit.zoom(_.tree.root).value
+      treeView = new TreeView(AppCircuit.zoom(_.tree.root), Seq.empty, AppCircuit.zoom(_.tree.selected), AppCircuit)
     }
 
-    val selectionLoc = AppModel.zoom(_.tree.selected).value
+    val selectionLoc = AppCircuit.zoom(_.tree.selected).value
     def renderButtons(selected: Boolean) = {
       div(
         button(if(!selected) disabled else "", cls := "btn",
-          onclick := { () => AppModel(AddNode(selectionLoc, Directory(UUID.randomUUID().toString, s"New directory $nextId"))) },
+          onclick := { () => AppCircuit(AddNode(selectionLoc, Directory(UUID.randomUUID().toString, s"New directory $nextId"))) },
           "Create dir"),
         button(if(!selected) disabled else "", cls := "btn",
-          onclick := { () => AppModel(AddNode(selectionLoc, File(UUID.randomUUID().toString, s"New file $nextId"))) },
+          onclick := { () => AppCircuit(AddNode(selectionLoc, File(UUID.randomUUID().toString, s"New file $nextId"))) },
           "Create file"),
         button(if(!selected) disabled else "", cls := "btn",
-          onclick := { () => AppModel(RemoveNode(selectionLoc)) },
+          onclick := { () => AppCircuit(RemoveNode(selectionLoc)) },
           "Remove")
       )
     }

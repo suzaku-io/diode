@@ -26,13 +26,13 @@ Add it to the processing chain with `addProcessor`
 
 ```scala
 val logProcessor = new LoggingProcessor[RootModel]
-AppModel.addProcessor(logProcessor)
+AppCircuit.addProcessor(logProcessor)
 ```
 
 Later you can remove a processor if you don't need it anymore. 
 
 ```scala
-AppModel.removeProcessor(logProcessor)
+AppCircuit.removeProcessor(logProcessor)
 ```
 
 ## Common Use Cases

@@ -1,6 +1,6 @@
 # Async Effects
 
-<img src="../images/architecture-effect.png" style="float: right; padding: 10px";>
+<img src="../images/architecture-effect.png" style="float: right; padding: 10px">
 Action handlers in Diode are _pure functions_, meaning they can just do computation based on the action and the current model. Side effects, such as making a
 request to the server, are not allowed. This restriction is mainly to make testing of handlers easier, when they behave in a predictable fashion.
 

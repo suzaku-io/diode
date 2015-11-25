@@ -1,6 +1,6 @@
 # Action Handlers
 
-<img src="../images/architecture-circuit.png" style="float: right; padding: 10px";>
+<img src="../images/architecture-circuit.png" style="float: right; padding: 10px">
 For dispatched actions to actually do anything, they need to be processed by _action handlers_. In principle, an action handler is a pure function of type
 `(model, action) => model` that takes in the current model and the dispatched action, and returns a new model. In practice, the handlers are typically partial
 functions that process different (related) actions, access only part of the model through a `ModelRW` trait and return an `ActionResult`.
@@ -220,7 +220,7 @@ class DirectoryTreeHandler[M](modelRW: ModelRW[M, Directory]) extends ActionHand
   override def handle = { ... }
 }
 
-object AppModel extends Circuit[RootModel] {
+object AppCircuit extends Circuit[RootModel] {
   val treeHandler = new DirectoryTreeHandler(
     zoomRW(_.tree)((m, v) => m.copy(tree = v))
       .zoomRW(_.root)((m, v) => m.copy(root = v)))

@@ -19,6 +19,8 @@ In a Scala.js project the dependency looks like this.
 
 <pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.1.0-SNAPSHOT"</code></pre>
 
+<img src="doc/images/architecture.png" style="float: right; padding: 10px">
+
 ### The Model
 
 Core of an application using Diode is the immutable application _model_, typically represented as a hierarchy of case classes, storing the application's state.
@@ -45,7 +47,7 @@ Application state is stored in a `Circuit[M]` which also takes care of all of th
 extending the Circuit. Your only responsibilities are to define the `model` variable and an `actionHandler`, everything else is taken care by Diode's Circuit.
  
 ```scala
-object AppModel extends Circuit[RootModel] {
+object AppCircuit extends Circuit[RootModel] {
   var model = RootModel(0)
   val actionHandler: PartialFunction[AnyRef, ActionResult[RootModel]] = {
     case Increase(a) => ModelUpdate(model.copy(counter = model.counter + a))
@@ -109,7 +111,7 @@ be handled by the `counterHandler` we defined before.
 In our main class we create an instance of the `CounterView`, granting it read-only access to the `counter` value in our model.
 
 ```scala
-val counter = new CounterView(AppModel.zoom(_.counter), AppModel)
+val counter = new CounterView(AppCircuit.zoom(_.counter), AppCircuit)
 ```
 
 ### The Listener
@@ -120,8 +122,8 @@ updated.
 
 ```scala
 val root = document.getElementById("root")
-AppModel.subscribe(() => render(root))
-AppModel(Reset)
+AppCircuit.subscribe(() => render(root))
+AppCircuit(Reset)
 
 def render(root: Element) = {
   val e = div(

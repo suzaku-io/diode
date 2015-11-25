@@ -1,6 +1,6 @@
 # Application Model
 
-<img src="../images/architecture-model.png" style="float: right; padding: 10px";>
+<img src="../images/architecture-model.png" style="float: right; padding: 10px">
 Having all your application state in a single model may seem like a daunting design task, but it's not really that different from designing a hierarchical UI
 layout. If you are used to having a distributed state between different stores and components, take some time to sit down and redesign the model as a single
 hierarchy.
@@ -14,7 +14,7 @@ case class A(d: Int, e: String)
 case class B(f: Boolean, g: Option[D])
 case class D(h: Seq[Int], i: Int)
 
-object AppModel extends Circuit[Root] { ... }
+object AppCircuit extends Circuit[Root] { ... }
 ```
 
 Making modifications to an immutable model means making a copy of the model every time something changes. Naturally we'll want to modify only those parts of the
@@ -48,7 +48,7 @@ current value from the reader we simply call `reader.value`.
 The `Circuit` provides `zoom` and `zoomRW` functions to zoom into the application model, so we can rewrite the previous example as:
 
 ```scala
-val reader: ModelR[Option[Seq[Int]]] = AppModel.zoom(_.g.map(_.h))
+val reader: ModelR[Option[Seq[Int]]] = AppCircuit.zoom(_.g.map(_.h))
 ```
 
 ### Complex Access Patterns
@@ -58,7 +58,7 @@ access anything in the model and return a composite.
 
 ```scala
 val complexReader: ModelR[(String, Boolean, Option[Int])] = 
-  AppModel.zoom(r => (r.a.e, r.b.f, r.g.map(_.i)))
+  AppCircuit.zoom(r => (r.a.e, r.b.f, r.g.map(_.i)))
 ```
 
 This helps detaching the application model from the UI hierarchy, as you can keep your data in a sensible structure while allowing your UI components to access
@@ -70,7 +70,7 @@ The `ModelRW` trait adds functionality to update the model. In addition to provi
 for updating.
 
 ```scala
-val rwForA: ModelRW[Root, A] = AppModel.zoomRW(_.a)((m, v) => m.copy(a = v))
+val rwForA: ModelRW[Root, A] = AppCircuit.zoomRW(_.a)((m, v) => m.copy(a = v))
 val rwForA_e: ModelRW[Root, String] = rwForA.zoomRW(_.e)((m, v) => m.copy(e = v))
 ```
 
