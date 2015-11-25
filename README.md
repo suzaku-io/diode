@@ -7,7 +7,7 @@
 Diode is a Scala/Scala.js library for managing immutable application state with unidirectional data flow. It is heavily influenced and inspired by
 [Flux](https://facebook.github.io/flux/) and [Elm](https://github.com/evancz/elm-architecture-tutorial/) architectures, and libraries like
 [Om](https://github.com/omcljs/om) and [Redux](https://github.com/rackt/redux). Diode helps you build applications that are easy to reason about, have
-predictable behaviour, are easy to test and debug and are type safe. It's a compact, high performing and easy to extend library with no external dependencies.
+predictable behaviour, are easy to test and debug and are type safe. It's a compact, high performing and extensible library with no external dependencies.
 
 ## Getting Started
 
@@ -15,7 +15,7 @@ Add following dependency declaration to your Scala project.
 
 <pre><code class="lang-scala">"me.chrons" %% "diode" % "0.1.0-SNAPSHOT"</code></pre>
 
-On a Scala.js project the dependency looks like this.
+In a Scala.js project the dependency looks like this.
 
 <pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.1.0-SNAPSHOT"</code></pre>
 

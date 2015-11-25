@@ -12,7 +12,7 @@ this function, typically by combining multiple `ActionHandler` classes together 
 also a `baseHandler` that handles any action that was not handled by the `actionHandler`, ensuring we don't get a runtime `MatchError`.
 
 You may define your action handlers within your application `Circuit` singleton object as anonymous classes, or use external classes. The former is simpler to
-implement while the latter is better for independent testing. In out simple examples the handlers are always defined within the `AppModel` object.
+implement while the latter is better for independent testing. In our examples the handlers are always defined using both strategies.
 
 ## Learn by Example
 
@@ -209,3 +209,57 @@ override val actionHandler = combineHandlers(treeHandler, selectionHandler)
 
 Again we zoom into the `tree` but this time we continue to `selected`. The handler implementation is as trivial as with `ReplaceTree`. To inform `Circuit` about
 this new handler, we include it into the call to the `combineHandlers` function.
+
+## Testing
+
+As action handlers are pure functions, testing them is rather trivial. Although you can define handlers inline within your `Circuit` implementation, it's
+usually better to have them as separate classes for easy testing. For example:
+
+```scala
+class DirectoryTreeHandler[M](modelRW: ModelRW[M, Directory]) extends ActionHandler(modelRW) {
+  override def handle = { ... }
+}
+
+object AppModel extends Circuit[RootModel] {
+  val treeHandler = new DirectoryTreeHandler(
+    zoomRW(_.tree)((m, v) => m.copy(tree = v))
+      .zoomRW(_.root)((m, v) => m.copy(root = v)))
+  ...
+}
+```
+
+In your test class you can instantiate the handler by supplying it with an appropriate reader/writer. Since the handler doesn't care about the root model type,
+usually easiest is just to use the data what your handler expects.
+
+```scala
+object DirectoryTreeHandlerTests extends TestSuite {
+  def tests = TestSuite {
+    // test data
+    val dir = Directory("/", "/", Vector(
+      Directory("2", "My files", Vector(
+        Directory("3", "Documents", Vector(
+          File("F3", "HaukiOnKala.doc")
+        ))
+      )), File("F1", "boot.sys")
+    ))
+
+    def build = new DirectoryTreeHandler(new RootModelRW(dir))
+```
+
+In individual test cases
+ 
+1. Build a handler instance.
+2. Call the `handle` method with an appropriate action.
+3. Check the result.
+
+```scala
+'RemoveNode - {
+  val handler = build
+  val result = handler.handle(RemoveNode(Seq("/", "2")))
+  assertMatch(result) {
+    case ModelUpdate(Directory("/", "/", Vector(File("F1", "boot.sys")))) =>
+  }
+}
+```
+
+If your handler returns any _effects_, you can safely just ignore them in your test.

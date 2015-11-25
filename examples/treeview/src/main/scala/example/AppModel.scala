@@ -48,72 +48,11 @@ object AppModel extends Circuit[RootModel] {
   var model = RootModel(Tree(Directory("", "", Vector.empty), Seq.empty))
 
   // zoom into the model, providing access only to the `root` directory of the tree
-  val treeHandler = new ActionHandler(
+  val treeHandler = new DirectoryTreeHandler(
     zoomRW(_.tree)((m, v) => m.copy(tree = v))
-      .zoomRW(_.root)((m, v) => m.copy(root = v))) {
+      .zoomRW(_.root)((m, v) => m.copy(root = v)))
 
-    /**
-      * Helper function to zoom into the directory hierarchy, delivering the `children` of the last directory.
-      *
-      * @param path Sequence of directory identifiers
-      * @param rw Reader/Writer for current directory
-      * @return
-      * `Some(childrenRW)` if the directory was found or
-      * `None` if something went wrong
-      */
-    @tailrec def zoomToChildren[M](path: Seq[String], rw: ModelRW[M, Directory]): Option[ModelRW[M, IndexedSeq[FileNode]]] = {
-      if (path.isEmpty) {
-        Some(rw.zoomRW(_.children)((m, v) => m.copy(children = v)))
-      } else {
-        // find the index for the next directory in the path and make sure it's a directory
-        rw.value.children.indexWhere(n => n.id == path.head && n.isDirectory) match {
-          case -1 =>
-            // should not happen!
-            None
-          case idx =>
-            // zoom into the directory position given by `idx` and continue recursion
-            zoomToChildren(path.tail, rw.zoomRW(_.children(idx).asInstanceOf[Directory])((m, v) =>
-              m.copy(children = (m.children.take(idx) :+ v) ++ m.children.drop(idx + 1))
-            ))
-        }
-      }
-    }
-
-    override def handle = {
-      case ReplaceTree(newTree) =>
-        update(newTree)
-      case AddNode(path, node) =>
-        // zoom to parent directory and add new node at the end of its children list
-        zoomToChildren(path.tail, modelRW) match {
-          case Some(rw) => ModelUpdate(rw.update(rw.value :+ node))
-          case None => noChange
-        }
-      case RemoveNode(path) =>
-        if (path.init.nonEmpty) {
-          // zoom to parent directory and remove node from its children list
-          val nodeId = path.last
-          zoomToChildren(path.init.tail, modelRW) match {
-            case Some(rw) => ModelUpdate(rw.update(rw.value.filterNot(_.id == nodeId)))
-            case None => noChange
-          }
-        } else {
-          // cannot remove root
-          noChange
-        }
-      case ReplaceNode(path, node) =>
-        if (path.init.nonEmpty) {
-          // zoom to parent directory and replace node in its children list with a new one
-          val nodeId = path.last
-          zoomToChildren(path.init.tail, modelRW) match {
-            case Some(rw) => ModelUpdate(rw.update(rw.value.map(n => if (n.id == nodeId) node else n)))
-            case None => noChange
-          }
-        } else {
-          // cannot replace root
-          noChange
-        }
-    }
-  }
+  // define an inline action handler for selections
   val selectionHandler = new ActionHandler(
     zoomRW(_.tree)((m, v) => m.copy(tree = v))
       .zoomRW(_.selected)((m, v) => m.copy(selected = v))) {
@@ -123,4 +62,72 @@ object AppModel extends Circuit[RootModel] {
   }
 
   override val actionHandler = combineHandlers(treeHandler, selectionHandler)
+}
+
+class DirectoryTreeHandler[M](modelRW: ModelRW[M, Directory]) extends ActionHandler(modelRW) {
+
+  /**
+    * Helper function to zoom into the directory hierarchy, delivering the `children` of the last directory.
+    *
+    * @param path Sequence of directory identifiers
+    * @param rw Reader/Writer for current directory
+    * @return
+      * `Some(childrenRW)` if the directory was found or
+    * `None` if something went wrong
+    */
+  @tailrec private def zoomToChildren(path: Seq[String], rw: ModelRW[M, Directory]): Option[ModelRW[M, IndexedSeq[FileNode]]] = {
+    if (path.isEmpty) {
+      Some(rw.zoomRW(_.children)((m, v) => m.copy(children = v)))
+    } else {
+      // find the index for the next directory in the path and make sure it's a directory
+      rw.value.children.indexWhere(n => n.id == path.head && n.isDirectory) match {
+        case -1 =>
+          // should not happen!
+          None
+        case idx =>
+          // zoom into the directory position given by `idx` and continue recursion
+          zoomToChildren(path.tail, rw.zoomRW(_.children(idx).asInstanceOf[Directory])((m, v) =>
+            m.copy(children = (m.children.take(idx) :+ v) ++ m.children.drop(idx + 1))
+          ))
+      }
+    }
+  }
+
+  /**
+    * Handle directory tree actions
+    */
+  override def handle = {
+    case ReplaceTree(newTree) =>
+      update(newTree)
+    case AddNode(path, node) =>
+      // zoom to parent directory and add new node at the end of its children list
+      zoomToChildren(path.tail, modelRW) match {
+        case Some(rw) => ModelUpdate(rw.update(rw.value :+ node))
+        case None => noChange
+      }
+    case RemoveNode(path) =>
+      if (path.init.nonEmpty) {
+        // zoom to parent directory and remove node from its children list
+        val nodeId = path.last
+        zoomToChildren(path.init.tail, modelRW) match {
+          case Some(rw) => ModelUpdate(rw.update(rw.value.filterNot(_.id == nodeId)))
+          case None => noChange
+        }
+      } else {
+        // cannot remove root
+        noChange
+      }
+    case ReplaceNode(path, node) =>
+      if (path.init.nonEmpty) {
+        // zoom to parent directory and replace node in its children list with a new one
+        val nodeId = path.last
+        zoomToChildren(path.init.tail, modelRW) match {
+          case Some(rw) => ModelUpdate(rw.update(rw.value.map(n => if (n.id == nodeId) node else n)))
+          case None => noChange
+        }
+      } else {
+        // cannot replace root
+        noChange
+      }
+  }
 }
