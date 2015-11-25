@@ -23,7 +23,7 @@ trait PotAction[A, T <: PotAction[A, T]] {
 
   def failed(ex: Throwable) = next(Failed(ex))
 
-  def effect[B](f: Future[B])(success: B => A, failure: Throwable => Throwable = identity)(implicit ec: ExecutionContext): Effect[T] =
+  def effect[B](f: => Future[B])(success: B => A, failure: Throwable => Throwable = identity)(implicit ec: ExecutionContext): Effect[T] =
     () => f.map(x => ready(success(x))).recover { case e: Throwable => failed(failure(e)) }
 }
 

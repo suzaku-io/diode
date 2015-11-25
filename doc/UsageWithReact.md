@@ -22,7 +22,7 @@ Very Much WorkInProgress!!! :)
     private val component = ReactComponentB[ComponentModel[Option[Auth]]]("AuthUser")
       .render_P(cm => {
         import cm._
-        <.div(model match {
+        <.div(value match {
           case Some(auth) =>
             <.button(^.onClick --> (dispatch(Logout) >> dispatch(SetError("Logged out"))), auth.user.name)
           case None =>

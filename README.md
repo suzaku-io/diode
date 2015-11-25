@@ -151,7 +151,7 @@ like React.
 # Change history
 
 ### 0.1.0-SNAPSHOT
-- Initial release, work-in-progress
+- Initial version, work-in-progress
 
 # Contributors
 
