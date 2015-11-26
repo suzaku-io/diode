@@ -27,7 +27,7 @@ object PotState {
   * @define ready [[Ready]]
   * @define empty [[Empty]]
   */
-sealed abstract class Pot[+A] extends Product {
+sealed abstract class Pot[+A] extends Product with Serializable {
   self =>
 
   def get: A

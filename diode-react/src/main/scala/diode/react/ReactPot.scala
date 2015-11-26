@@ -1,28 +1,71 @@
 package diode.react
 
 import diode.util._
-import japgolly.scalajs.react.vdom._
+import japgolly.scalajs.react.ReactNode
 
 object ReactPot {
 
   implicit class potWithReact[A](val pot: Pot[A]) extends AnyVal {
-    def render(f: A => TagMod): TagMod =
-      if (pot.nonEmpty) f(pot.get) else EmptyTag
+    /**
+      * Render non-empty (ready or stale) content
+      * @param f Transforms Pot value into a ReactNode
+      * @return
+      */
+    def render(f: A => ReactNode): ReactNode =
+      if (pot.nonEmpty) f(pot.get) else null
 
-    def renderReady(f: A => TagMod): TagMod =
-      if (pot.isReady) f(pot.get) else EmptyTag
+    /**
+      * Render content in Ready state, not including stale states
+      * @param f Transforms Pot value into a ReactNode
+      * @return
+      */
+    def renderReady(f: A => ReactNode): ReactNode =
+      if (pot.isReady) f(pot.get) else null
 
-    def renderPending(f: Int => TagMod): TagMod =
-      if (pot.isPending) f(pot.asInstanceOf[PendingBase].duration()) else EmptyTag
+    /**
+      * Render when Pot is pending
+      * @param f Transforms duration time into a ReactNode
+      * @return
+      */
+    def renderPending(f: Int => ReactNode): ReactNode =
+      if (pot.isPending) f(pot.asInstanceOf[PendingBase].duration()) else null
 
-    def renderFailed(f: Throwable => TagMod): TagMod =
-      if (pot.isFailed) f(pot.asInstanceOf[FailedBase[Nothing]].exception) else EmptyTag
+    /**
+      * Render when Pot is pending with a filter on duration
+      * @param b Filter based on duration value
+      * @param f Transforms duration time into a ReactNode
+      * @return
+      */
+    def renderPending(b: Int => Boolean, f: Int => ReactNode): ReactNode = {
+      if (pot.isPending) {
+        val duration = pot.asInstanceOf[PendingBase].duration()
+        if (b(duration)) f(duration) else null
+      } else null
+    }
 
-    def renderStale(f: A => TagMod): TagMod =
-      if (pot.isStale) f(pot.get) else EmptyTag
+    /**
+      * Render when Pot has failed
+      * @param f Transforms an exception into a ReactNode
+      * @return
+      */
+    def renderFailed(f: Throwable => ReactNode): ReactNode =
+      pot.exceptionOption.map(f).orNull
 
-    def renderEmpty(f: => TagMod): TagMod =
-      if (pot.isEmpty) f else EmptyTag
+    /**
+      * Render stale content (`PendingStale` or `FailedStale`)
+      * @param f Transforms Pot value into a ReactNode
+      * @return
+      */
+    def renderStale(f: A => ReactNode): ReactNode =
+      if (pot.isStale) f(pot.get) else null
+
+    /**
+      * Render when Pot is empty
+      * @param f Returns a ReactNode
+      * @return
+      */
+    def renderEmpty(f: => ReactNode): ReactNode =
+      if (pot.isEmpty) f else null
   }
 
 }

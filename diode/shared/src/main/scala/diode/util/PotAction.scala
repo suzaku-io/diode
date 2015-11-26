@@ -1,5 +1,7 @@
 package diode.util
 
+import java.util.concurrent.TimeoutException
+
 import diode.ActionResult.Effect
 import diode._
 
@@ -15,7 +17,7 @@ trait PotAction[A, T <: PotAction[A, T]] {
   def handle[M](pf: PartialFunction[PotState, ActionResult[M]]) = pf(state)
 
   def handleWith[M, S](handler: ActionHandler[M, S], updateEffect: Effect[T])
-    (f: (PotAction[A, T], ActionHandler[M, S], PotState, Effect[T]) => ActionResult[M]) = f(this, handler, state, updateEffect)
+    (f: (PotAction[A, T], ActionHandler[M, S], Effect[T]) => ActionResult[M]) = f(this, handler, updateEffect)
 
   def pending = next(Pending())
 
@@ -29,10 +31,10 @@ trait PotAction[A, T <: PotAction[A, T]] {
 
 object PotAction {
   def handler[A, M, T <: PotAction[A, T]](retries: Int = 0, progressDelta: FiniteDuration = Duration.Zero)(implicit runner: RunAfter, ec: ExecutionContext) =
-    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], state: PotState, updateEffect: Effect[T]) => {
+    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], updateEffect: Effect[T]) => {
       import PotState._
       import handler._
-      state match {
+      action.state match {
         case PotEmpty =>
           if (progressDelta > Duration.Zero) {
             updatePar(value.pending(retries), updateEffect, runAfter(progressDelta)(action.pending))
@@ -51,7 +53,7 @@ object PotAction {
           if (value.canRetry) {
             update(value.retry, updateEffect)
           } else {
-            update(action.value)
+            update(value.fail(new TimeoutException("Did not get a reply")))
           }
       }
     }
