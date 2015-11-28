@@ -4,7 +4,6 @@ scala:
 - 2.11.7
 sudo: false
 jdk:
-- oraclejdk8
 - oraclejdk7
 script:
 - sbt ++$TRAVIS_SCALA_VERSION diodeJVM/test diodeJS/test

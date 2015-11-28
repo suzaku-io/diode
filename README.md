@@ -4,6 +4,9 @@
 >
 > a semiconductor device with two terminals, typically allowing the flow of current in one direction only
 
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ochrons/diode)
+[![Build Status](https://travis-ci.org/ochrons/diode.svg?branch=master)](https://travis-ci.org/ochrons/diode)
+
 Diode is a Scala/Scala.js library for managing immutable application state with unidirectional data flow. It is heavily influenced and inspired by
 [Flux](https://facebook.github.io/flux/) and [Elm](https://github.com/evancz/elm-architecture-tutorial/) architectures, and libraries like
 [Om](https://github.com/omcljs/om) and [Redux](https://github.com/rackt/redux). Diode helps you build applications that are easy to reason about, have
