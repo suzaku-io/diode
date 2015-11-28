@@ -36,14 +36,15 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
 
   private val baseHandler: HandlerFunction = {
     case seq: Seq[_] =>
-      // dispatch all actions in the sequence
+      // dispatch all actions in the sequence using internal dispatchBase to prevent
+      // additional calls to subscribed listeners
       seq.asInstanceOf[Seq[AnyRef]].foreach(dispatchBase)
       ActionResult.NoChange
     case None =>
       // ignore
       ActionResult.NoChange
     case action =>
-      handleError(s"Action $action was not handled by and action handler")
+      handleError(s"Action $action was not handled by any action handler")
       ActionResult.NoChange
   }
 
@@ -72,14 +73,17 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * result in a call.
     *
     * @param listener Function to be called when model is updated
-    * @param cursor Cursor function returning the part of the model you are interested in
+    * @param cursor Cursor function returning the part of the model you are interested in. By
+    *               default this is the root model, which means your listener is called on any
+    *               change in the model.
     * @return A function to unsubscribe your listener
     */
   def subscribe(listener: Listener, cursor: Cursor = m => m): () => Unit = {
     this.synchronized {
       listenerId += 1
-      listeners += listenerId -> Subscription(listener, cursor, cursor(model))
-      () => this.synchronized(listeners -= listenerId)
+      val id = listenerId
+      listeners += id -> Subscription(listener, cursor, cursor(model))
+      () => this.synchronized(listeners -= id)
     }
   }
 
@@ -90,8 +94,10 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * @param processor
     */
   def addProcessor(processor: ActionProcessor[M]): Unit = {
-    processors = processor :: processors
-    processChain = buildProcessChain
+    this.synchronized {
+      processors = processor :: processors
+      processChain = buildProcessChain
+    }
   }
 
   /**
@@ -100,8 +106,10 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * @param processor
     */
   def removeProcessor(processor: ActionProcessor[M]): Unit = {
-    processors = processors.filterNot(_ == processor)
-    processChain = buildProcessChain
+    this.synchronized {
+      processors = processors.filterNot(_ == processor)
+      processChain = buildProcessChain
+    }
   }
 
   /**
@@ -152,19 +160,21 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * @param action Action to dispatch
     */
   def dispatch(action: AnyRef): Unit = {
-    val oldModel = model
-    dispatchBase(action)
-    if (oldModel ne model) {
-      // walk through all listeners and update subscriptions when model has changed
-      listeners = listeners.foldLeft(listeners) { case (l, (key, sub)) =>
-        val curValue = sub.cursor(model)
-        if (curValue ne sub.lastValue) {
-          // value at the cursor has changed, call listener and update subscription
-          sub.listener()
-          l.updated(key, sub.copy(lastValue = curValue))
-        } else {
-          // nothing interesting happened
-          l
+    this.synchronized {
+      val oldModel = model
+      dispatchBase(action)
+      if (oldModel ne model) {
+        // walk through all listeners and update subscriptions when model has changed
+        listeners = listeners.foldLeft(listeners) { case (l, (key, sub)) =>
+          val curValue = sub.cursor(model)
+          if (curValue ne sub.lastValue) {
+            // value at the cursor has changed, call listener and update subscription
+            sub.listener()
+            l.updated(key, sub.copy(lastValue = curValue))
+          } else {
+            // nothing interesting happened
+            l
+          }
         }
       }
     }
