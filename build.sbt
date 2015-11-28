@@ -2,6 +2,8 @@ import sbt._
 import Keys._
 import com.typesafe.sbt.pgp.PgpKeys._
 
+crossScalaVersions := Seq("2.11.7", "2.10.5")
+
 val commonSettings = Seq(
   organization := "me.chrons",
   version := Version.library,
