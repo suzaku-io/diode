@@ -1,12 +1,10 @@
 package diode.util
 
-import java.util.concurrent.TimeoutException
-
 import diode.ActionResult.Effect
 import diode._
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 
 trait PotAction[A, T <: PotAction[A, T]] {
   def value: Pot[A]
@@ -16,8 +14,8 @@ trait PotAction[A, T <: PotAction[A, T]] {
 
   def handle[M](pf: PartialFunction[PotState, ActionResult[M]]) = pf(state)
 
-  def handleWith[M, S](handler: ActionHandler[M, S], updateEffect: Effect[T])
-    (f: (PotAction[A, T], ActionHandler[M, S], Effect[T]) => ActionResult[M]) = f(this, handler, updateEffect)
+  def handleWith[M](handler: ActionHandler[M, Pot[A]], updateEffect: Effect[T])
+    (f: (PotAction[A, T], ActionHandler[M, Pot[A]], Effect[T]) => ActionResult[M]) = f(this, handler, updateEffect)
 
   def pending = next(Pending())
 
@@ -30,7 +28,27 @@ trait PotAction[A, T <: PotAction[A, T]] {
 }
 
 object PotAction {
-  def handler[A, M, T <: PotAction[A, T]](retries: Int = 0, progressDelta: FiniteDuration = Duration.Zero)(implicit runner: RunAfter, ec: ExecutionContext) =
+  def handler[A, M, T <: PotAction[A, T]](retries: Int = 0)(implicit ec: ExecutionContext) =
+    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], updateEffect: Effect[T]) => {
+      import PotState._
+      import handler._
+      action.state match {
+        case PotEmpty =>
+          update(value.pending(retries), updateEffect)
+        case PotPending =>
+          noChange
+        case PotReady =>
+          update(action.value)
+        case PotFailed =>
+          if (value.canRetry) {
+            update(value.retry, updateEffect)
+          } else {
+            update(value.fail(action.value.exceptionOption.get))
+          }
+      }
+    }
+
+  def handler[A, M, T <: PotAction[A, T]](retries: Int, progressDelta: FiniteDuration)(implicit runner: RunAfter, ec: ExecutionContext) =
     (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], updateEffect: Effect[T]) => {
       import PotState._
       import handler._
@@ -53,7 +71,7 @@ object PotAction {
           if (value.canRetry) {
             update(value.retry, updateEffect)
           } else {
-            update(value.fail(new TimeoutException("Did not get a reply")))
+            update(value.fail(action.value.exceptionOption.get))
           }
       }
     }

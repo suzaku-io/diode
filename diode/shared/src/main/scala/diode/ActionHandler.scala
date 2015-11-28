@@ -1,5 +1,7 @@
 package diode
 
+import diode.util.RunAfter
+
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -21,10 +23,6 @@ object ActionResult {
 
   case class ModelUpdateEffectPar[M, A <: AnyRef](newValue: M, effects: Seq[Effect[A]], ec: ExecutionContext) extends ModelUpdated[M]
 
-}
-
-trait RunAfter {
-  def runAfter[A](delay: FiniteDuration)(f: => A): Future[A]
 }
 
 abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {

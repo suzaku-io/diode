@@ -1,6 +1,4 @@
-package diode.js
-
-import diode.RunAfter
+package diode.util
 
 import scala.concurrent.Promise
 import scala.concurrent.duration.FiniteDuration

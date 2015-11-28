@@ -1,6 +1,4 @@
-package diode.jvm
-
-import diode.RunAfter
+package diode.util
 
 import scala.concurrent.Promise
 import java.util.concurrent._
@@ -21,3 +19,5 @@ class RunAfterJVM extends RunAfter {
 object RunAfterJVM {
   private val executor = new ScheduledThreadPoolExecutor(1)
 }
+
+
