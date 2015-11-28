@@ -117,7 +117,7 @@ object PotActionTests extends TestSuite {
         }
       }
       'PotFailedRetry - {
-        val model = Model(PendingStale("41", 1))
+        val model = Model(PendingStale("41", Retry(1)))
         val modelRW = new RootModelRW(model)
         val handlerFail = new TestFailHandler(modelRW.zoomRW(_.s)((m, v) => m.copy(s = v)))
         val nextAction = handlerFail.handle(TestAction(Failed(new TimeoutException))) match {

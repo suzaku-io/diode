@@ -37,7 +37,7 @@ object CircuitJVMTests extends TestSuite {
     }
   }
 
-  override def tests = TestSuite {
+  def tests = TestSuite {
     def circuit = new TestCircuit
 
     'ParallelActions - {

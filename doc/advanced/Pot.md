@@ -72,23 +72,25 @@ Otherwise a `Pot` works like an `Option` (`Empty`, `Pending` and `Failed` work l
 
 ### Retries
 
-A common pattern with async data is to retry failed loads a few times. `Pot` supports this pattern by providing a retry counter (`retriesLeft`) and some state
+A common pattern with async data is to retry failed loads a few times. `Pot` supports this pattern by providing a retry policy (`retryPolicy`) and some state
 management to deal with retries. A typical case is to check for retry after `Pot` goes into failed state and then retry the operation like in the example below:
 
 ```scala
 val value: Pot[A] = ...
 
 case PotEmpty =>
-  update(value.pending(retries), updateFunc)
+  update(value.pending(retries), updateEffect)
 case PotFailed =>
-  if (value.canRetry) {
-    update(value.retry, updateFunc)
-  } else {
-    update(action.model)
+  value.retryPolicy.retry(action.value.exceptionOption.get, updateEffect) match {
+    case Right((nextPolicy, retryEffect)) =>
+      update(value.retry(nextPolicy), retryEffect)
+    case Left(ex) =>
+      update(value.fail(ex))
   }
 ```
 
-The `retry` function set the `Pot` into `Pending` (or `PendingStale`) state and reduces `retriesLeft` by one.
+The `retry` function set the `Pot` into `Pending` (or `PendingStale`) state and updates `retryPolicy`. Common retry policies `Immediate` and `Backoff` can be
+found in the `Retry` object.
 
 ### Waiting Time
 

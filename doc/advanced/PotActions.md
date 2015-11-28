@@ -37,10 +37,11 @@ override def handle = {
       case PotReady =>
         update(action.value)
       case PotFailed =>
-        if (value.canRetry) {
-          update(value.retry, updateF)
-        } else {
-          update(action.value)
+        value.retryPolicy.retry(action.value.exceptionOption.get, updateEffect) match {
+          case Right((nextPolicy, retryEffect)) =>
+            update(value.retry(nextPolicy), retryEffect)
+          case Left(ex) =>
+            update(value.fail(ex))
         }
     }
 }
@@ -61,7 +62,7 @@ import scala.concurrent.duration._
 override def handle = {
   case action: UpdateTodos =>
     val updateF = action.effect(loadTodos())(todos => Todos(todos))
-    action.handleWith(this, updateF)(PotAction.handler(3, 100.millis))
+    action.handleWith(this, updateF)(PotAction.handler(Retry(3), 100.millis))
 }
 ```
     

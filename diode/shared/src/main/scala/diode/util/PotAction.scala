@@ -28,36 +28,37 @@ trait PotAction[A, T <: PotAction[A, T]] {
 }
 
 object PotAction {
-  def handler[A, M, T <: PotAction[A, T]](retries: Int = 0)(implicit ec: ExecutionContext) =
+  def handler[A, M, T <: PotAction[A, T]](retryPolicy: RetryPolicy = Retry.None)(implicit ec: ExecutionContext) =
     (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], updateEffect: Effect[T]) => {
       import PotState._
       import handler._
       action.state match {
         case PotEmpty =>
-          update(value.pending(retries), updateEffect)
+          update(value.pending(retryPolicy), updateEffect)
         case PotPending =>
           noChange
         case PotReady =>
           update(action.value)
         case PotFailed =>
-          if (value.canRetry) {
-            update(value.retry, updateEffect)
-          } else {
-            update(value.fail(action.value.exceptionOption.get))
+          value.retryPolicy.retry(action.value.exceptionOption.get, updateEffect) match {
+            case Right((nextPolicy, retryEffect)) =>
+              update(value.retry(nextPolicy), retryEffect)
+            case Left(ex) =>
+              update(value.fail(ex))
           }
       }
     }
 
-  def handler[A, M, T <: PotAction[A, T]](retries: Int, progressDelta: FiniteDuration)(implicit runner: RunAfter, ec: ExecutionContext) =
+  def handler[A, M, T <: PotAction[A, T]](retryPolicy: RetryPolicy, progressDelta: FiniteDuration)(implicit runner: RunAfter, ec: ExecutionContext) =
     (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], updateEffect: Effect[T]) => {
       import PotState._
       import handler._
       action.state match {
         case PotEmpty =>
           if (progressDelta > Duration.Zero) {
-            updatePar(value.pending(retries), updateEffect, runAfter(progressDelta)(action.pending))
+            updatePar(value.pending(retryPolicy), updateEffect, runAfter(progressDelta)(action.pending))
           } else {
-            update(value.pending(retries), updateEffect)
+            update(value.pending(retryPolicy), updateEffect)
           }
         case PotPending =>
           if (value.isPending && progressDelta > Duration.Zero) {
@@ -68,10 +69,11 @@ object PotAction {
         case PotReady =>
           update(action.value)
         case PotFailed =>
-          if (value.canRetry) {
-            update(value.retry, updateEffect)
-          } else {
-            update(value.fail(action.value.exceptionOption.get))
+          value.retryPolicy.retry(action.value.exceptionOption.get, updateEffect) match {
+            case Right((nextPolicy, retryEffect)) =>
+              update(value.retry(nextPolicy), retryEffect)
+            case Left(ex) =>
+              update(value.fail(ex))
           }
       }
     }

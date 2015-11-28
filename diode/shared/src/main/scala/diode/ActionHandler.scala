@@ -46,5 +46,8 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
   def effectOnly[A <: AnyRef](effects: Effect[A]*)(implicit ec: ExecutionContext): ActionResult[M] =
     ModelUpdateEffect(modelRW.update(value), effects, ec)
 
+  def effectOnlyPar[A <: AnyRef](effects: Effect[A]*)(implicit ec: ExecutionContext): ActionResult[M] =
+    ModelUpdateEffectPar(modelRW.update(value), effects, ec)
+
   def runAfter[A <: AnyRef](delay: FiniteDuration)(f: => A)(implicit runner: RunAfter): Effect[A] = () => runner.runAfter(delay)(f)
 }
