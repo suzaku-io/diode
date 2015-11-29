@@ -27,6 +27,9 @@ trait RetryPolicy {
     * @return
     */
   def retry[T <: AnyRef](reason: Throwable, effect: Effect[T]): Either[Throwable, (RetryPolicy, Effect[T])]
+
+  def retry[T <: AnyRef](pot: Pot[_], effect: Effect[T]): Either[Throwable, (RetryPolicy, Effect[T])] =
+    retry(pot.exceptionOption.getOrElse(new IllegalStateException("Pot is not in a failed state")), effect)
 }
 
 object Retry {

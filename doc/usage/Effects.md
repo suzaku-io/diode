@@ -44,24 +44,24 @@ case class Messages(msgs: String, loadTime: Int)
 val messageHandler = new ActionHandler(zoomRW(_.messages)((m, v) => m.copy(messages = v))) {
   override def handle = {
     case LoadMessages(user) =>
-      update(value.copy(loadTime = 0), loadMessagesEffect(user))
+      updated(value.copy(loadTime = 0), loadMessagesEffect(user))
     case NewMessages(msgs) =>
-      update(Messages(msgs, -1))
+      updated(Messages(msgs, -1))
   }
 }
 ```
 
-If you have no state change, use `effectOnly` and if you want your effects to be run in parallel (normally they are run in serial), use `updatePar`. For example
+If you have no state change, use `effectOnly` and if you want your effects to be run in parallel (normally they are run in serial), use `updatedPar`. For example
 we might want to get periodic notifications (using `runAfter`) while the messages are being loaded, to update the UI accordingly.
 
 ```scala
     case LoadMessages(user) =>
-      updatePar(value.copy(loadTime = 0), loadMessagesEffect(user), runAfter(500.millis)(StillLoading))
+      updatedPar(value.copy(loadTime = 0), loadMessagesEffect(user), runAfter(500.millis)(StillLoading))
     case NewMessages(msgs) =>
-      update(Messages(msgs, -1))
+      updated(Messages(msgs, -1))
     case StillLoading =>
       if(value.loadTime != -1)
-        update(value.copy(loadTime = value.loadTime + 500), runAfter(500.millis)(StillLoading)) 
+        updated(value.copy(loadTime = value.loadTime + 500), runAfter(500.millis)(StillLoading)) 
       else
         noChange
 ```

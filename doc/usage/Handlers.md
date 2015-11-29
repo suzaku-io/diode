@@ -12,7 +12,7 @@ this function, typically by combining multiple `ActionHandler` classes together 
 also a `baseHandler` that handles any action that was not handled by the `actionHandler`, ensuring we don't get a runtime `MatchError`.
 
 You may define your action handlers within your application `Circuit` singleton object as anonymous classes, or use external classes. The former is simpler to
-implement while the latter is better for independent testing. In our examples the handlers are always defined using both strategies.
+implement while the latter is better for independent testing. In our examples the handlers are defined using both strategies.
 
 ## Learn by Example
 
@@ -72,7 +72,7 @@ val treeHandler = new ActionHandler(
     .zoomRW(_.root)((m, v) => m.copy(root = v))) {
   override def handle = {
     case ReplaceTree(newTree) =>
-      update(newTree)
+      updated(newTree)
   }
 }
 
@@ -93,7 +93,7 @@ Now our application is ready to handle dispatched `ReplaceTree` actions successf
 abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
   def handle: PartialFunction[AnyRef, ActionResult[M]]
   def value: T = modelRW.value
-  def update(newValue: T): ActionResult[M] = ModelUpdate(modelRW.update(newValue))
+  def updated(newValue: T): ActionResult[M] = ModelUpdate(modelRW.updated(newValue))
   ...
 }
 ```
@@ -143,7 +143,7 @@ def zoomToChildren[M](path: Seq[String], rw: ModelRW[M, Directory])
 ```
 
 First we try to find the index to the `children` sequence, where the next directory in our path resides and depending on the result we either return `None` for 
-failure, or dive deeper into the hierarchy by recursively calling the same function again with updated reader/writer and path. The writer function copies all
+failure, or dive deeper into the hierarchy by recursively calling the same function again with am updated reader/writer and path. The writer function copies all
 nodes preceding the one we are interested in, then adds a new node and then any nodes succeeding the original node.
  
 Now we are ready to write action handlers for rest of the tree manipulation functions.
@@ -152,7 +152,7 @@ Now we are ready to write action handlers for rest of the tree manipulation func
 case AddNode(path, node) =>
   // zoom to the directory and add new node at the end of its children list
   zoomToChildren(path.tail, modelRW) match {
-    case Some(rw) => ModelUpdate(rw.update(rw.value :+ node))
+    case Some(rw) => ModelUpdate(rw.updated(rw.value :+ node))
     case None => noChange
   }
 ```
@@ -166,7 +166,7 @@ case RemoveNode(path) =>
     // zoom to parent directory and remove node from its children list
     val nodeId = path.last
     zoomToChildren(path.init.tail, modelRW) match {
-      case Some(rw) => ModelUpdate(rw.update(rw.value.filterNot(_.id == nodeId)))
+      case Some(rw) => ModelUpdate(rw.updated(rw.value.filterNot(_.id == nodeId)))
       case None => noChange
     }
   } else {
@@ -178,7 +178,7 @@ case ReplaceNode(path, node) =>
     // zoom to parent directory and replace node in its children list with a new one
     val nodeId = path.last
     zoomToChildren(path.init.tail, modelRW) match {
-      case Some(rw) => ModelUpdate(rw.update(rw.value.map(n => if (n.id == nodeId) node else n)))
+      case Some(rw) => ModelUpdate(rw.updated(rw.value.map(n => if (n.id == nodeId) node else n)))
       case None => noChange
     }
   } else {
@@ -200,7 +200,7 @@ val selectionHandler = new ActionHandler(
   zoomRW(_.tree)((m, v) => m.copy(tree = v))
     .zoomRW(_.selected)((m, v) => m.copy(selected = v))) {
   override def handle = {
-    case Select(sel) => update(sel)
+    case Select(sel) => updated(sel)
   }
 }
 

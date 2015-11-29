@@ -1,9 +1,9 @@
 {
   "gitbook": "2.5.x",
-  "plugins": ["edit-link", "prism", "-highlight", "github"],
+  "plugins": ["editlink", "prism", "-highlight", "github"],
   "pluginsConfig": {
-    "edit-link": {
-      "base": "https://github.com/ochrons/diode/tree/master",
+    "editlink": {
+      "base": "https://github.com/ochrons/diode/tree/master/doc",
       "label": "Edit This Page"
     },
     "github": {

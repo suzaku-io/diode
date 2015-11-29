@@ -34,17 +34,17 @@ object PotAction {
       import handler._
       action.state match {
         case PotEmpty =>
-          update(value.pending(retryPolicy), updateEffect)
+          updated(value.pending(retryPolicy), updateEffect)
         case PotPending =>
           noChange
         case PotReady =>
-          update(action.value)
+          updated(action.value)
         case PotFailed =>
-          value.retryPolicy.retry(action.value.exceptionOption.get, updateEffect) match {
+          value.retryPolicy.retry(action.value, updateEffect) match {
             case Right((nextPolicy, retryEffect)) =>
-              update(value.retry(nextPolicy), retryEffect)
+              updated(value.retry(nextPolicy), retryEffect)
             case Left(ex) =>
-              update(value.fail(ex))
+              updated(value.fail(ex))
           }
       }
     }
@@ -56,24 +56,24 @@ object PotAction {
       action.state match {
         case PotEmpty =>
           if (progressDelta > Duration.Zero) {
-            updatePar(value.pending(retryPolicy), updateEffect, runAfter(progressDelta)(action.pending))
+            updatedPar(value.pending(retryPolicy), updateEffect, runAfter(progressDelta)(action.pending))
           } else {
-            update(value.pending(retryPolicy), updateEffect)
+            updated(value.pending(retryPolicy), updateEffect)
           }
         case PotPending =>
           if (value.isPending && progressDelta > Duration.Zero) {
-            update(value.pending(), runAfter(progressDelta)(action.pending))
+            updated(value.pending(), runAfter(progressDelta)(action.pending))
           } else {
             noChange
           }
         case PotReady =>
-          update(action.value)
+          updated(action.value)
         case PotFailed =>
-          value.retryPolicy.retry(action.value.exceptionOption.get, updateEffect) match {
+          value.retryPolicy.retry(action.value, updateEffect) match {
             case Right((nextPolicy, retryEffect)) =>
-              update(value.retry(nextPolicy), retryEffect)
+              updated(value.retry(nextPolicy), retryEffect)
             case Left(ex) =>
-              update(value.fail(ex))
+              updated(value.fail(ex))
           }
       }
     }

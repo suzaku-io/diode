@@ -3,11 +3,13 @@ package diode
 trait ModelR[+S] {
   def value: S
 
+  def apply(): S = value
+
   def zoom[T](get: S => T): ModelR[T]
 }
 
 trait ModelRW[M, S] extends ModelR[S] {
-  def update(newValue: S): M
+  def updated(newValue: S): M
 
   def zoomRW[T](get: S => T)(set: (S, T) => S): ModelRW[M, T]
 }
@@ -28,12 +30,12 @@ class RootModelRW[M](get: => M) extends RootModelR(get) with ModelRW[M, M] {
   override def zoomRW[T](get: M => T)(set: (M, T) => M) =
     new ZoomModelRW[M, T](this, get, (s, u) => set(value, u))
 
-  override def update(newValue: M) = newValue
+  override def updated(newValue: M) = newValue
 }
 
 class ZoomModelRW[M, T](root: RootModelR[M], get: M => T, set: (M, T) => M) extends ZoomModelR(root, get) with ModelRW[M, T] {
   override def zoomRW[U](get: T => U)(set: (T, U) => T) =
     new ZoomModelRW[M, U](root, get compose this.get, (s, u) => this.set(s, set(this.get(s), u)))
 
-  override def update(newValue: T) = set(root.value, newValue)
+  override def updated(newValue: T) = set(root.value, newValue)
 }

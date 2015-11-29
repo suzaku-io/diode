@@ -8,14 +8,14 @@ import scala.language.existentials
   * Wraps a model reader, dispatcher and React connector to be passed to React components
   * in props.
   */
-case class ComponentModel[S](modelReader: ModelR[S], dispatch: AnyRef => Callback, connector: ReactConnector[_ <: AnyRef]) {
-  def value = modelReader.value
+case class ModelProxy[S](modelReader: ModelR[S], dispatch: AnyRef => Callback, connector: ReactConnector[_ <: AnyRef]) {
+  def value = modelReader()
 
-  def apply() = modelReader.value
+  def apply() = modelReader()
 
-  def zoom[T](f: S => T) = ComponentModel(modelReader.zoom(f), dispatch, connector)
+  def zoom[T](f: S => T) = ModelProxy(modelReader.zoom(f), dispatch, connector)
 
-  def connect[T <: AnyRef, C](f: S => T)(compB: ComponentModel[T] => C)
+  def connect[T <: AnyRef, C](f: S => T)(compB: ModelProxy[T] => C)
                              (implicit ev: C => ReactElement): ReactComponentU[Unit, T, _, TopNode] = {
     connector.connect(modelReader.zoom(f))(compB)
   }
@@ -32,7 +32,7 @@ trait ReactConnector[M <: AnyRef] {
     * @param compB Function that creates the wrapped component
     * @return A React component
     */
-  def connect[S <: AnyRef, C](zoomFunc: M => S)(compB: ComponentModel[S] => C)
+  def connect[S <: AnyRef, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)
                              (implicit ev: C => ReactElement): ReactComponentU[Unit, S, _, TopNode] = {
     connect(circuit.zoom(zoomFunc))(compB)
   }
@@ -45,7 +45,7 @@ trait ReactConnector[M <: AnyRef] {
     * @param compB Function that creates the wrapped component
     * @return A React component
     */
-  def connect[S <: AnyRef, C](modelReader: ModelR[S])(compB: ComponentModel[S] => C)
+  def connect[S <: AnyRef, C](modelReader: ModelR[S])(compB: ModelProxy[S] => C)
                              (implicit ev: C => ReactElement): ReactComponentU[Unit, S, _, TopNode] = {
 
     class Backend(t: BackendScope[Unit, S]) {
@@ -54,7 +54,7 @@ trait ReactConnector[M <: AnyRef] {
       def didMount = Callback {
         // subscribe to model changes
         // we can provide a cursor that ignores the model parameter, because we know the model already :)
-        unsubscribe = Some(circuit.subscribe(changeHandler, _ => modelReader.value))
+        unsubscribe = Some(circuit.subscribe(changeHandler, _ => modelReader()))
       }
 
       def willUnmount = Callback {
@@ -64,15 +64,15 @@ trait ReactConnector[M <: AnyRef] {
 
       private def changeHandler(): Unit = {
         // modify state if we are mounted and state has actually changed
-        if(t.isMounted() && (t.accessDirect.state ne modelReader.value))
-          t.accessDirect.setState(modelReader.value)
+        if(t.isMounted() && (t.accessDirect.state ne modelReader()))
+          t.accessDirect.setState(modelReader())
       }
 
       def render(s: S) = wrap(modelReader)(compB)
     }
 
     ReactComponentB[Unit]("DiodeWrapper")
-      .initialState(modelReader.value)
+      .initialState(modelReader())
       .renderBackend[Backend]
       .componentDidMount(scope => scope.backend.didMount)
       .componentWillUnmount(scope => scope.backend.willUnmount)
@@ -87,7 +87,7 @@ trait ReactConnector[M <: AnyRef] {
     * @param compB Function that creates the wrapped component
     * @return The component returned by `compB`
     */
-  def wrap[S <: AnyRef, C](zoomFunc: M => S)(compB: ComponentModel[S] => C)(implicit ev: C => ReactElement): C = {
+  def wrap[S <: AnyRef, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)(implicit ev: C => ReactElement): C = {
     wrap(circuit.zoom(zoomFunc))(compB)
   }
 
@@ -98,7 +98,7 @@ trait ReactConnector[M <: AnyRef] {
     * @param compB Function that creates the wrapped component
     * @return The component returned by `compB`
     */
-  def wrap[S <: AnyRef, C](modelReader: ModelR[S])(compB: ComponentModel[S] => C)(implicit ev: C => ReactElement): C = {
-    compB(ComponentModel(modelReader, action => Callback(circuit.dispatch(action)), ReactConnector.this))
+  def wrap[S <: AnyRef, C](modelReader: ModelR[S])(compB: ModelProxy[S] => C)(implicit ev: C => ReactElement): C = {
+    compB(ModelProxy(modelReader, action => Callback(circuit.dispatch(action)), ReactConnector.this))
   }
 }

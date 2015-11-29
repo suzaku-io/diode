@@ -77,13 +77,13 @@ object CircuitTests extends TestSuite {
       'read - {
         val c = circuit
         val dataReader = c.zoom(_.data)
-        assert(dataReader.value.i == 42)
-        assert(dataReader.value.b == true)
+        assert(dataReader().i == 42)
+        assert(dataReader().b == true)
       }
       'write - {
         val c = circuit
         val dataWriter = c.zoomRW(_.data)((m, v) => m.copy(data = v))
-        val m = dataWriter.update(Data(43, false))
+        val m = dataWriter.updated(Data(43, false))
         assert(m.s == "Testing")
         assert(m.data.i == 43)
         assert(m.data.b == false)

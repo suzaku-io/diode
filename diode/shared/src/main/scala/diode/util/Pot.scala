@@ -37,6 +37,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
   def isFailed: Boolean
   def isReady = !isEmpty && !isStale
   def retryPolicy: RetryPolicy
+  def ready[B >: A](value: B): Pot[B] = Ready(value)
   def pending(policy: RetryPolicy = Retry.None): Pot[A]
   def retry(policy: RetryPolicy): Pot[A]
   def fail(exception: Throwable): Pot[A]
@@ -131,14 +132,14 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     *
     * @example
     * {{{
-    *  // Returns true because Ready instance contains string "something" which equals "something".
-    *  Ready("something") contains "something"
+    *   // Returns true because Ready instance contains string "something" which equals "something".
+    *   Ready("something") contains "something"
     *
-    *  // Returns false because "something" != "anything".
-    *  Ready("something") contains "anything"
+    *   // Returns false because "something" != "anything".
+    *   Ready("something") contains "anything"
     *
-    *  // Returns false when method called on Empty.
-    *  Empty contains "anything"
+    *   // Returns false when method called on Empty.
+    *   Empty contains "anything"
     * }}}
     *
     * @param elem the element to test.
@@ -183,14 +184,14 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     *
     * @example
     * {{{
-    *  // Returns Ready(HTTP) because the partial function covers the case.
-    *  Ready("http") collect {case "http" => "HTTP"}
+    *   // Returns Ready(HTTP) because the partial function covers the case.
+    *   Ready("http") collect {case "http" => "HTTP"}
     *
-    *  // Returns Empty because the partial function doesn't cover the case.
-    *  Ready("ftp") collect {case "http" => "HTTP"}
+    *   // Returns Empty because the partial function doesn't cover the case.
+    *   Ready("ftp") collect {case "http" => "HTTP"}
     *
-    *  // Returns Empty because Empty is passed to the collect method.
-    *  Empty collect {case value => value}
+    *   // Returns Empty because Empty is passed to the collect method.
+    *   Empty collect {case value => value}
     * }}}
     *
     * @param  pf   the partial function.

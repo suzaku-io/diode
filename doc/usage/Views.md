@@ -2,7 +2,7 @@
 
 <img src="../images/architecture-view.png" style="float: right; padding: 10px">
 In Diode a _view_ is a component that renders data from a model and reacts to model updates. It doesn't necessarily have to be a visual component (although it
-typically is), you could also use it for automatically storing changed model data into local storage or so.
+typically is), you could also make one to automatically store changed model data into local storage.
 
 ## Building a View
 
@@ -68,6 +68,7 @@ to indicate its relative position in the tree.
   }
 }
 ```
+
 In the render method the name of the node is rendered as a clickable element that dispatches a `Select` action when clicked. Currently selected node is 
 highlighted. If the node is a directory, its children are recursively rendered. 
 

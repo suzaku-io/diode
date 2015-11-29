@@ -14,7 +14,7 @@ class CounterView(counter: ModelR[Int], dispatch: Dispatcher) {
   def render = {
     div(
       h3("Counter"),
-      p("Value = ", b(counter.value)),
+      p("Value = ", b(counter())),
       button(onclick := { () => dispatch(Increase(2)) }, "Increase"),
       button(onclick := { () => dispatch(Decrease(1)) }, "Decrease"),
       button(onclick := { () => dispatch(Reset) }, "Reset")

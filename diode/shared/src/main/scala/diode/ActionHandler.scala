@@ -33,21 +33,27 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
 
   def value: T = modelRW.value
 
-  def update(newValue: T): ActionResult[M] = ModelUpdate(modelRW.update(newValue))
+  def updated(newValue: T): ActionResult[M] =
+    ModelUpdate(modelRW.updated(newValue))
 
-  def update[A <: AnyRef](newValue: T, effects: Effect[A]*)(implicit ec: ExecutionContext): ActionResult[M] =
-    ModelUpdateEffect(modelRW.update(newValue), effects, ec)
+  def updated[A <: AnyRef](newValue: T, effects: Effect[A]*)(implicit ec: ExecutionContext): ActionResult[M] =
+    ModelUpdateEffect(modelRW.updated(newValue), effects, ec)
 
-  def updatePar[A <: AnyRef](newValue: T, effects: Effect[A]*)(implicit ec: ExecutionContext): ActionResult[M] =
-    ModelUpdateEffectPar(modelRW.update(newValue), effects, ec)
+  def updatedPar[A <: AnyRef](newValue: T, effects: Effect[A]*)(implicit ec: ExecutionContext): ActionResult[M] =
+    ModelUpdateEffectPar(modelRW.updated(newValue), effects, ec)
 
-  def noChange = NoChange
+  def noChange: ActionResult[M] =
+    NoChange
 
   def effectOnly[A <: AnyRef](effects: Effect[A]*)(implicit ec: ExecutionContext): ActionResult[M] =
-    ModelUpdateEffect(modelRW.update(value), effects, ec)
+    ModelUpdateEffect(modelRW.updated(value), effects, ec)
 
   def effectOnlyPar[A <: AnyRef](effects: Effect[A]*)(implicit ec: ExecutionContext): ActionResult[M] =
-    ModelUpdateEffectPar(modelRW.update(value), effects, ec)
+    ModelUpdateEffectPar(modelRW.updated(value), effects, ec)
 
-  def runAfter[A <: AnyRef](delay: FiniteDuration)(f: => A)(implicit runner: RunAfter): Effect[A] = () => runner.runAfter(delay)(f)
+  def runAfter[A <: AnyRef](delay: FiniteDuration)(f: => A)(implicit runner: RunAfter): Effect[A] =
+    () => runner.runAfter(delay)(f)
+
+  def effectAfter[A <: AnyRef](delay: FiniteDuration)(effect: Effect[A])(implicit runner: RunAfter, ec: ExecutionContext): Effect[A] =
+    runner.effectAfter(delay)(effect)
 }

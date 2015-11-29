@@ -8,7 +8,7 @@ operation has been running and notifying the user when it has been delayed for t
 ## Potential Data
 
 <img src="../images/pot-states.png" style="float: right; padding: 10px";>
-A `Pot[A]` represents _potential_ data that may exist in six different states as seen in the picture on the right. `Pot` provides you with the same interface as
+A `Pot[+A]` represents _potential_ data that may exist in six different states as seen in the picture on the right. `Pot` provides you with the same interface as
 `Option` or `Try`, making it very easy to use in your existing application code. Things like _for comprehension_, `getOrElse` or even `recover` are supported.
 Like `Option`, `Pot` is immutable and you have to create a new `Pot` when the state or content changes.
 
@@ -28,7 +28,7 @@ myData = myData.pending() // myData is now Pending
 Assuming you get a successful response from the server, you can change the state to `Ready`.
 
 ```scala
-myData = Ready(data) // myData is now Ready(data)
+myData = myValue.ready(data) // myData is now Ready(data)
 ```
 
 In case something went wrong, you can store the exception in the `Failed` state.
@@ -79,18 +79,18 @@ management to deal with retries. A typical case is to check for retry after `Pot
 val value: Pot[A] = ...
 
 case PotEmpty =>
-  update(value.pending(retries), updateEffect)
+  updated(value.pending(retries), updateEffect)
 case PotFailed =>
-  value.retryPolicy.retry(action.value.exceptionOption.get, updateEffect) match {
+  value.retryPolicy.retry(action.value, updateEffect) match {
     case Right((nextPolicy, retryEffect)) =>
-      update(value.retry(nextPolicy), retryEffect)
+      updated(value.retry(nextPolicy), retryEffect)
     case Left(ex) =>
-      update(value.fail(ex))
+      updated(value.fail(ex))
   }
 ```
 
-The `retry` function set the `Pot` into `Pending` (or `PendingStale`) state and updates `retryPolicy`. Common retry policies `Immediate` and `Backoff` can be
-found in the `Retry` object.
+The `Pot.retry` function sets the `Pot` into `Pending` (or `PendingStale`) state and updates `retryPolicy`. Common retry policies `Immediate` and `Backoff` are
+available in the `Retry` object, but feel free to roll your own.
 
 ### Waiting Time
 

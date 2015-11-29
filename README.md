@@ -69,9 +69,9 @@ Because we want to keep the code clean and DRY, let's use the `ActionHandler` he
 ```scala
 val counterHandler = new ActionHandler(zoomRW(_.counter)((m, v) => m.copy(counter = v))) {
   override def handle = {
-    case Increase(a) => update(value + a)
-    case Decrease(a) => update(value - a)
-    case Reset => update(0)
+    case Increase(a) => updated(value + a)
+    case Decrease(a) => updated(value - a)
+    case Reset => updated(0)
   }
 }
 val actionHandler = combineHandlers(counterHandler)
@@ -79,7 +79,7 @@ val actionHandler = combineHandlers(counterHandler)
 
 Note how in the `ActionHandler`'s constructor call we _zoom_ into the model, defining a reader/writer pair to access the part of the model these actions are
 interested in. This defines a _scope_ for our handler, both preventing it from inadvertently accessing other parts of our application model and also simplifying
-access to the part we _are_ interested in (provided through the `value` function). The class also provides helper functions like `update`, making it trivial to
+access to the part we _are_ interested in (provided through the `value` function). The class also provides helper functions like `updated`, making it trivial to
 perform model updates in our code.
 
 Finally we convert the `ActionHandler` into a partial function with `combineHandlers`. As its name implies, you can supply several handlers that are chained

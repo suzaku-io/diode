@@ -31,17 +31,17 @@ override def handle = {
     val updateF = action.effect(loadTodos())(todos => Todos(todos))
     action.handle {
       case PotEmpty =>
-        update(value.pending, updateF)
+        updated(value.pending, updateF)
       case PotPending =>
         noChange
       case PotReady =>
-        update(action.value)
+        updated(action.value)
       case PotFailed =>
-        value.retryPolicy.retry(action.value.exceptionOption.get, updateEffect) match {
+        value.retryPolicy.retry(action.value, updateEffect) match {
           case Right((nextPolicy, retryEffect)) =>
-            update(value.retry(nextPolicy), retryEffect)
+            updated(value.retry(nextPolicy), retryEffect)
           case Left(ex) =>
-            update(value.fail(ex))
+            updated(value.fail(ex))
         }
     }
 }

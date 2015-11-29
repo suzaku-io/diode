@@ -1,3 +1,5 @@
+# ![Diode](images/diode-logo-big.png)
+
 # Introduction
 
 Diode was born out of the need of having something similar to Redux or Om for Scala applications. It's a very simple but powerful library with three basic

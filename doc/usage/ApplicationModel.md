@@ -51,6 +51,8 @@ The `Circuit` provides `zoom` and `zoomRW` functions to zoom into the applicatio
 val reader: ModelR[Option[Seq[Int]]] = AppCircuit.zoom(_.g.map(_.h))
 ```
 
+Note that you don't need to specify the types for the readers, they are automatically inferred. They are displayed here for clarity.
+
 ### Complex Access Patterns
 
 We are not limited to traversing the hierarchy to get a reader for just a single value. Since we get to define the access function ourselves, we can freely
@@ -74,10 +76,10 @@ val rwForA: ModelRW[Root, A] = AppCircuit.zoomRW(_.a)((m, v) => m.copy(a = v))
 val rwForA_e: ModelRW[Root, String] = rwForA.zoomRW(_.e)((m, v) => m.copy(e = v))
 ```
 
-This time we are defining the writer in two steps to take advantage of the provided function composition. To make the update, just call `update`.
+This time we are defining the writer in two steps to take advantage of the provided function composition. To make the update, just call `updated`.
 
 ```scala
-val newRoot: Root = rwForA_e.update("New value!")
+val newRoot: Root = rwForA_e.updated("New value!")
 ```
 Since `Circuit` doesn't allow us to change the internal model directly, we are just storing a copy for demonstration purposes. Only way to make actual changes
 to the model is to dispatch and handle [actions](Actions.md).
