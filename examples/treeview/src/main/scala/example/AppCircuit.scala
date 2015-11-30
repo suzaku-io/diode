@@ -57,7 +57,7 @@ object AppCircuit extends Circuit[RootModel] {
     zoomRW(_.tree)((m, v) => m.copy(tree = v))
       .zoomRW(_.selected)((m, v) => m.copy(selected = v))) {
     override def handle = {
-      case Select(sel) => update(sel)
+      case Select(sel) => updated(sel)
     }
   }
 
@@ -98,11 +98,11 @@ class DirectoryTreeHandler[M](modelRW: ModelRW[M, Directory]) extends ActionHand
     */
   override def handle = {
     case ReplaceTree(newTree) =>
-      update(newTree)
+      updated(newTree)
     case AddNode(path, node) =>
       // zoom to parent directory and add new node at the end of its children list
       zoomToChildren(path.tail, modelRW) match {
-        case Some(rw) => ModelUpdate(rw.update(rw.value :+ node))
+        case Some(rw) => ModelUpdate(rw.updated(rw.value :+ node))
         case None => noChange
       }
     case RemoveNode(path) =>
@@ -110,7 +110,7 @@ class DirectoryTreeHandler[M](modelRW: ModelRW[M, Directory]) extends ActionHand
         // zoom to parent directory and remove node from its children list
         val nodeId = path.last
         zoomToChildren(path.init.tail, modelRW) match {
-          case Some(rw) => ModelUpdate(rw.update(rw.value.filterNot(_.id == nodeId)))
+          case Some(rw) => ModelUpdate(rw.updated(rw.value.filterNot(_.id == nodeId)))
           case None => noChange
         }
       } else {
@@ -122,7 +122,7 @@ class DirectoryTreeHandler[M](modelRW: ModelRW[M, Directory]) extends ActionHand
         // zoom to parent directory and replace node in its children list with a new one
         val nodeId = path.last
         zoomToChildren(path.init.tail, modelRW) match {
-          case Some(rw) => ModelUpdate(rw.update(rw.value.map(n => if (n.id == nodeId) node else n)))
+          case Some(rw) => ModelUpdate(rw.updated(rw.value.map(n => if (n.id == nodeId) node else n)))
           case None => noChange
         }
       } else {
