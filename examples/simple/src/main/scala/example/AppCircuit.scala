@@ -23,9 +23,9 @@ object AppCircuit extends Circuit[RootModel] {
   // zoom into the model, providing access only to the
   val counterHandler = new ActionHandler(zoomRW(_.counter)((m, v) => m.copy(counter = v))) {
     override def handle = {
-      case Increase(a) => update(value + a)
-      case Decrease(a) => update(value - a)
-      case Reset => update(0)
+      case Increase(a) => updated(value + a)
+      case Decrease(a) => updated(value - a)
+      case Reset => updated(0)
     }
   }
   val actionHandler = combineHandlers(counterHandler)
