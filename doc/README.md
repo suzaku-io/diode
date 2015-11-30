@@ -13,6 +13,14 @@ If you are interested in the motivation, or prior art for Diode, we recommend re
 [Redux introduction](http://rackt.org/redux/docs/introduction/index.html) and [Flux architecture](https://facebook.github.io/flux/docs/overview.html#content).
 Both give a great overview on the benefits of unidirectional data flow and immutable state.
 
+To use Diode in your application add following dependency declaration to your Scala project.
+
+<pre><code class="lang-scala">"me.chrons" %% "diode" % "{{ book.version }}"</code></pre>
+
+In a Scala.js project the dependency looks like this.
+
+<pre><code class="lang-scala">"me.chrons" %%% "diode" % "{{ book.version }}"</code></pre>
+
 ## Diode Architecture
 
 The building blocks and data flow of a Diode application are shown in the diagram below.

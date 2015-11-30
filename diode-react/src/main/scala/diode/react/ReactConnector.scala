@@ -15,8 +15,10 @@ case class ModelProxy[S](modelReader: ModelR[S], dispatch: AnyRef => Callback, c
 
   def zoom[T](f: S => T) = ModelProxy(modelReader.zoom(f), dispatch, connector)
 
+  def wrap[T <: AnyRef, C](f: S => T)(compB: ModelProxy[T] => C)(implicit ev: C => ReactElement): C = compB(zoom(f))
+
   def connect[T <: AnyRef, C](f: S => T)(compB: ModelProxy[T] => C)
-                             (implicit ev: C => ReactElement): ReactComponentU[Unit, T, _, TopNode] = {
+    (implicit ev: C => ReactElement): ReactComponentU[Unit, T, _, TopNode] = {
     connector.connect(modelReader.zoom(f))(compB)
   }
 }
@@ -25,15 +27,37 @@ trait ReactConnector[M <: AnyRef] {
   circuit: Circuit[M] =>
 
   /**
+    * Wraps a React component by providing it an instance of ModelProxy for easy access to the model and dispatcher.
+    *
+    * @param zoomFunc Function to retrieve relevant piece from the model
+    * @param compB    Function that creates the wrapped component
+    * @return The component returned by `compB`
+    */
+  def wrap[S <: AnyRef, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)(implicit ev: C => ReactElement): C = {
+    wrap(circuit.zoom(zoomFunc))(compB)
+  }
+
+  /**
+    * Wraps a React component by providing it an instance of ModelProxy for easy access to the model and dispatcher.
+    *
+    * @param modelReader A reader that returns the piece of model we are interested in
+    * @param compB       Function that creates the wrapped component
+    * @return The component returned by `compB`
+    */
+  def wrap[S <: AnyRef, C](modelReader: ModelR[S])(compB: ModelProxy[S] => C)(implicit ev: C => ReactElement): C = {
+    compB(ModelProxy(modelReader, action => Callback(circuit.dispatch(action)), ReactConnector.this))
+  }
+
+  /**
     * Connects a React component into the Circuit by wrapping it in another component that listens to
     * relevant state changes and updates the wrapped component as needed.
     *
     * @param zoomFunc Function to retrieve relevant piece from the model
-    * @param compB Function that creates the wrapped component
+    * @param compB    Function that creates the wrapped component
     * @return A React component
     */
   def connect[S <: AnyRef, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)
-                             (implicit ev: C => ReactElement): ReactComponentU[Unit, S, _, TopNode] = {
+    (implicit ev: C => ReactElement): ReactComponentU[Unit, S, _, TopNode] = {
     connect(circuit.zoom(zoomFunc))(compB)
   }
 
@@ -42,11 +66,11 @@ trait ReactConnector[M <: AnyRef] {
     * relevant state changes and updates the wrapped component as needed.
     *
     * @param modelReader A reader that returns the piece of model we are interested in
-    * @param compB Function that creates the wrapped component
+    * @param compB       Function that creates the wrapped component
     * @return A React component
     */
   def connect[S <: AnyRef, C](modelReader: ModelR[S])(compB: ModelProxy[S] => C)
-                             (implicit ev: C => ReactElement): ReactComponentU[Unit, S, _, TopNode] = {
+    (implicit ev: C => ReactElement): ReactComponentU[Unit, S, _, TopNode] = {
 
     class Backend(t: BackendScope[Unit, S]) {
       private var unsubscribe = Option.empty[() => Unit]
@@ -64,7 +88,7 @@ trait ReactConnector[M <: AnyRef] {
 
       private def changeHandler(): Unit = {
         // modify state if we are mounted and state has actually changed
-        if(t.isMounted() && (t.accessDirect.state ne modelReader()))
+        if (t.isMounted() && (t.accessDirect.state ne modelReader()))
           t.accessDirect.setState(modelReader())
       }
 
@@ -78,27 +102,5 @@ trait ReactConnector[M <: AnyRef] {
       .componentWillUnmount(scope => scope.backend.willUnmount)
       .shouldComponentUpdate(scope => scope.currentState ne scope.nextState)
       .buildU.apply()
-  }
-
-  /**
-    * Wraps a React component by providing it an instace of ComponentModel for easy access to the model and dispatcher.
-    *
-    * @param zoomFunc Function to retrieve relevant piece from the model
-    * @param compB Function that creates the wrapped component
-    * @return The component returned by `compB`
-    */
-  def wrap[S <: AnyRef, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)(implicit ev: C => ReactElement): C = {
-    wrap(circuit.zoom(zoomFunc))(compB)
-  }
-
-  /**
-    * Wraps a React component by providing it an instace of ComponentModel for easy access to the model and dispatcher.
-    *
-    * @param modelReader A reader that returns the piece of model we are interested in
-    * @param compB Function that creates the wrapped component
-    * @return The component returned by `compB`
-    */
-  def wrap[S <: AnyRef, C](modelReader: ModelR[S])(compB: ModelProxy[S] => C)(implicit ev: C => ReactElement): C = {
-    compB(ModelProxy(modelReader, action => Callback(circuit.dispatch(action)), ReactConnector.this))
   }
 }
