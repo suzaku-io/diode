@@ -12,6 +12,10 @@ Diode is a Scala/Scala.js library for managing immutable application state with 
 [Om](https://github.com/omcljs/om) and [Redux](https://github.com/rackt/redux). Diode helps you build applications that are easy to reason about, have
 predictable behaviour, are easy to test and debug and are type safe. It's a compact, high performing and extensible library with no external dependencies.
 
+## Documentation
+
+Full documentation [available here](http://ochrons.github.io/diode/index.html).
+
 ## Getting Started
 
 Add following dependency declaration to your Scala project.
@@ -23,6 +27,7 @@ In a Scala.js project the dependency looks like this.
 <pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.1.0"</code></pre>
 
 <img align="right" src="doc/images/architecture.png">
+
 
 ### The Model
 
@@ -140,10 +145,6 @@ def render(root: Element) = {
 
 After subscribing to model updates we start the circuit by dispatching a `Reset` action. This will cause the model to update and the `render` to be called.
 Further updates due to user clicking the buttons are handled similarly.
-
-# Documentation
-
-Early preview [available here](http://ochrons.github.io/diode/index.html).
 
 # Examples
 
