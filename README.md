@@ -16,11 +16,11 @@ predictable behaviour, are easy to test and debug and are type safe. It's a comp
 
 Add following dependency declaration to your Scala project.
 
-<pre><code class="lang-scala">"me.chrons" %% "diode" % "0.1.0-SNAPSHOT"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %% "diode" % "0.1.0"</code></pre>
 
 In a Scala.js project the dependency looks like this.
 
-<pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.1.0-SNAPSHOT"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.1.0"</code></pre>
 
 <img align="right" src="doc/images/architecture.png">
 
