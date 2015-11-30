@@ -156,8 +156,8 @@ The third example is the traditional [TodoMVC](examples/todomvc) implemented wit
 
 # Change history
 
-### 0.1.0-SNAPSHOT
-- Initial version, work-in-progress
+### 0.1.0
+- Initial version
 
 # Contributors
 
