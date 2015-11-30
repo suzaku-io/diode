@@ -106,3 +106,8 @@ val Motd = ReactComponentB[ModelProxy[Pot[String]]]("Motd")
 Each of the rendering functions optionally renders the provided content, depending on the state of `Pot`. In `renderPending` you can supply a condition based
 on the duration of the pending request, so that the UI will show a "Loading" message only after some time has elapsed. This of course requires that your action
 is updating the model at suitable intervals for the model to update.
+
+## Example
+
+You may also want to take a look at the [TodoMVC](https://github.com/ochrons/diode/examples/todomvc) example for how to build React applications using Diode for
+application state management.

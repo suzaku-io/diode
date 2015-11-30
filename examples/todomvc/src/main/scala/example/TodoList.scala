@@ -55,9 +55,8 @@ object TodoList {
     def todoList(dispatch: AnyRef => Callback, editing: Option[TodoId], todos: Seq[Todo], activeCount: Int) =
       <.section(
         ^.className := "main",
-        <.input(
+        <.input.checkbox(
           ^.className := "toggle-all",
-          ^.`type` := "checkbox",
           ^.checked := activeCount == 0,
           ^.onChange ==> { e: ReactEventI => dispatch(ToggleAll(e.target.checked)) }
         ),
