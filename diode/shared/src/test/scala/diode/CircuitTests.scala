@@ -157,8 +157,8 @@ object CircuitTests extends TestSuite {
     'Processor - {
       'ModAction - {
         val c = circuit
-        val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model]) = {
+        val p = new ActionProcessor {
+          override def process[M](dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M]) = {
             next(action match {
               case s: String =>
                 SetS(s)
@@ -175,8 +175,8 @@ object CircuitTests extends TestSuite {
       }
       'Filter - {
         val c = circuit
-        val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model]) = {
+        val p = new ActionProcessor {
+          override def process[M](dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M]) = {
             action match {
               case SetS(_) =>
                 ActionResult.NoChange
@@ -191,10 +191,10 @@ object CircuitTests extends TestSuite {
       'LogState - {
         val c = circuit
         var log = "log"
-        val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model]) = {
+        val p = new ActionProcessor {
+          override def process[M](dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M]) = {
             next(action) match {
-              case m: ModelUpdated[Model] =>
+              case m: ModelUpdated[Model] @unchecked =>
                 log += m.newValue.s
                 m
               case r => r
@@ -207,10 +207,10 @@ object CircuitTests extends TestSuite {
       }
       'Delay - {
         val c = circuit
-        class AP extends ActionProcessor[Model] {
+        class AP extends ActionProcessor {
           val pending = mutable.Queue.empty[(AnyRef, Dispatcher)]
 
-          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model]) = {
+          override def process[M](dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M]) = {
             action match {
               case Delay(a) =>
                 pending.enqueue((a, dispatcher))

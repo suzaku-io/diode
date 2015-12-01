@@ -6,8 +6,8 @@ trait Dispatcher {
   def apply(action: AnyRef) = dispatch(action)
 }
 
-trait ActionProcessor[M] {
-  def process(dispatch: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M]): ActionResult[M]
+trait ActionProcessor {
+  def process[M](dispatch: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M]): ActionResult[M]
 }
 
 trait Circuit[M <: AnyRef] extends Dispatcher {
@@ -24,7 +24,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   private val modelRW = new RootModelRW[M](model)
   private var listenerId = 0
   private var listeners = Map.empty[Int, Subscription]
-  private var processors = List.empty[ActionProcessor[M]]
+  private var processors = List.empty[ActionProcessor]
   private var processChain = buildProcessChain
 
   private def buildProcessChain = {
@@ -93,7 +93,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     *
     * @param processor
     */
-  def addProcessor(processor: ActionProcessor[M]): Unit = {
+  def addProcessor(processor: ActionProcessor): Unit = {
     this.synchronized {
       processors = processor :: processors
       processChain = buildProcessChain
@@ -105,7 +105,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     *
     * @param processor
     */
-  def removeProcessor(processor: ActionProcessor[M]): Unit = {
+  def removeProcessor(processor: ActionProcessor): Unit = {
     this.synchronized {
       processors = processors.filterNot(_ == processor)
       processChain = buildProcessChain
