@@ -111,3 +111,6 @@ is updating the model at suitable intervals for the model to update.
 
 You may also want to take a look at the [TodoMVC](https://github.com/ochrons/diode/examples/todomvc) example for how to build React applications using Diode for
 application state management.
+
+Another more complete application is example is the [Scala.js SPA tutorial](https://github.com/ochrons/scalajs-spa-tutorial), demonstrating the use of
+`ReactPot` as well.

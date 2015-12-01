@@ -154,6 +154,9 @@ like React.
 
 The third example is the traditional [TodoMVC](examples/todomvc) implemented with React on Diode.
 
+Another more complete application is example is the [Scala.js SPA tutorial](https://github.com/ochrons/scalajs-spa-tutorial), demonstrating the use of
+React integration features and async operations.
+
 # Change history
 
 ### 0.1.0
