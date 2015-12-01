@@ -1,6 +1,5 @@
-#!/bin/sh
+#!/bin/bash
 
-rm -rf _book
 gitbook build doc _book
 cd _book
 git init

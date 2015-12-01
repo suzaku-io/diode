@@ -1,0 +1,115 @@
+package example
+
+import diode._
+
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+
+// Define the root of our application model
+case class RootModel(animations: Map[Int, Animated], now: Double)
+
+case class Point(x: Double, y: Double)
+
+case class Animated(started: Double, animation: Animation, isRunning: Boolean = false, pausedAt: Double = 0) {
+  def pause(time: Double) = copy(isRunning = false, pausedAt = time)
+  def continue(time: Double) = copy(started = time - pausedAt + started, isRunning = true)
+  def updated(time: Double) = copy(animation = animation.update((time - started) / 1000.0))
+}
+
+trait Animation {
+  def update(delta: Double): Animation
+  def color: String = "red"
+  def position: Point
+  def scale: Double = 1.0
+}
+
+// Define different animations
+case class Circle(rpm: Double, position: Point = Point(1, 0)) extends Animation {
+  override def update(delta: Double) = {
+    val newPos = Point(math.cos(rpm * delta / 60), math.sin(rpm * delta / 60))
+    copy(position = newPos)
+  }
+}
+
+case class Spiral(rpm: Double, position: Point = Point(1, 0)) extends Animation {
+  override def update(delta: Double) = {
+    val radius = (math.cos(rpm * delta / 180) + 1)/2
+    val newPos = Point(math.cos(rpm * delta / 60)*radius, math.sin(rpm * delta / 60)*radius)
+    copy(position = newPos)
+  }
+}
+
+case class Flower(rpm: Double, position: Point = Point(1, 0), override val scale: Double = 1.0) extends Animation {
+  override def update(delta: Double) = {
+    val radius = (math.cos(rpm * delta / 10) + 1)/2
+    val newPos = Point(math.cos(rpm * delta / 60)*radius, math.sin(rpm * delta / 60)*radius)
+    copy(position = newPos, scale = (math.cos(rpm * delta / 10) + 1.1)/2.2)
+  }
+}
+
+// Define actions
+case object Reset
+
+case class AddAnimation(animation: Animation)
+
+case class UpdateAnimation(id: Int) extends RAFAction
+
+case class StartAnimation(id: Int, animation: Animation) extends RAFAction
+
+case class PauseAnimation(id: Int) extends RAFAction
+
+case class ContinueAnimation(id: Int) extends RAFAction
+
+case class DeleteAnimation(id: Int) extends RAFAction
+
+/**
+  * AppCircuit provides the actual instance of the `RootModel` and all the action
+  * handlers we need. Everything else comes from the `Circuit`
+  */
+object AppCircuit extends Circuit[RootModel] {
+  // define initial value for the application model
+  var model = RootModel(Map(), System.currentTimeMillis())
+
+  // zoom into the model, providing access only to the animations
+  val animationHandler = new AnimationHandler(zoomRW(_.animations)((m, v) => m.copy(animations = v)), zoom(_.now))
+
+  val timestampHandler = new ActionHandler(zoomRW(_.now)((m, v) => m.copy(now = v))) {
+    override def handle = {
+      case RAFTimeStamp(time) =>
+        updated(time)
+    }
+  }
+
+  val actionHandler = combineHandlers(animationHandler, timestampHandler)
+}
+
+class AnimationHandler[M](modelRW: ModelRW[M, Map[Int, Animated]], now: ModelR[Double]) extends ActionHandler(modelRW) {
+  def updateOne(id: Int, f: Animated => Animated) = {
+    value.get(id).fold(value)(a => value.updated(id, f(a)))
+  }
+
+  override def handle = {
+    case Reset =>
+      updated(Map.empty[Int, Animated])
+
+    case UpdateAnimation(id) =>
+      // request next update if it's still running
+      val effects = value.get(id).filter(_.isRunning).toList.map(_ => () => Future.successful(UpdateAnimation(id)))
+      updated(updateOne(id, _.updated(now())), effects: _*)
+
+    case AddAnimation(animation) =>
+      val id = value.keys.foldLeft(0)( (a, id) => a max id ) + 1
+      // request update to start animation
+      updated(value + (id -> Animated(now(), animation, true)), () => Future.successful(UpdateAnimation(id)))
+
+    case DeleteAnimation(id) =>
+      updated(value.filterNot(_._1 == id))
+
+    case PauseAnimation(id) =>
+      updated(updateOne(id, _.pause(now())))
+
+    case ContinueAnimation(id) =>
+      // request update to start animation
+      updated(updateOne(id, _.continue(now())), () => Future.successful(UpdateAnimation(id)))
+  }
+}

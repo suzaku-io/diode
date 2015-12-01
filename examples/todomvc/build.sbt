@@ -24,6 +24,6 @@ libraryDependencies ++= Seq(
 )
 
 jsDependencies ++= Seq(
-  "org.webjars.bower" % "react"     % "0.14.3" / "react-with-addons.js" commonJSName "React"    minified "react-with-addons.min.js",
-  "org.webjars.bower" % "react-dom" % "0.14.3" / "react-dom.js"         commonJSName "ReactDOM" minified "react-dom.min.js" dependsOn "react-with-addons.js"
+  "org.webjars.bower" % "react" % "0.14.3" / "react-with-addons.js" commonJSName "React" minified "react-with-addons.min.js",
+  "org.webjars.bower" % "react" % "0.14.3" / "react-dom.js" commonJSName "ReactDOM" minified "react-dom.min.js" dependsOn "react-with-addons.js"
 )

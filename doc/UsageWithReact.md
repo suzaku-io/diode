@@ -107,10 +107,10 @@ Each of the rendering functions optionally renders the provided content, dependi
 on the duration of the pending request, so that the UI will show a "Loading" message only after some time has elapsed. This of course requires that your action
 is updating the model at suitable intervals for the model to update.
 
-## Example
+## Examples
 
-You may also want to take a look at the [TodoMVC](https://github.com/ochrons/diode/examples/todomvc) example for how to build React applications using Diode for
-application state management.
+You may also want to take a look at the [TodoMVC](https://github.com/ochrons/diode/tree/master/examples/todomvc) example for how to build React applications
+using Diode for application state management.
 
 Another more complete application is example is the [Scala.js SPA tutorial](https://github.com/ochrons/scalajs-spa-tutorial), demonstrating the use of
 `ReactPot` as well.

@@ -59,7 +59,8 @@ object SimpleApp extends JSApp {
     }
 
     val e = div(
-      h1("Diode example"),
+      div(img(src := "diode-logo-small.png")),
+      h1("Treeview example"),
       renderButtons(selectionLoc.nonEmpty),
       treeView.render
     ).render

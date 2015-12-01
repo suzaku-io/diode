@@ -21,8 +21,9 @@ object SimpleApp extends JSApp {
   }
 
   def render(root: Element) = {
-    val e = div(
-      h1("Diode example"),
+    val e = div(cls := "container",
+      div(img(src := "diode-logo-small.png")),
+      h1("Simple counter example"),
       counter.render // renders the counter view
     ).render
     // clear and update contents
