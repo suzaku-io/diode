@@ -3,6 +3,8 @@
 The familiar TodoMVC application implemented in Diode React. Adapted from 
 [TodoMVC Scala.js React](https://github.com/tastejs/todomvc/tree/master/examples/scalajs-react).
 
+See [live demonstration](http://ochrons.github.io/diode/examples/todomvc/)
+
 ## Usage
 
 1. Clone the repository from GitHub

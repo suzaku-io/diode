@@ -148,14 +148,19 @@ Further updates due to user clicking the buttons are handled similarly.
 
 # Examples
 
-There are three example projects in the [examples](examples) directory. First one is a [simple](examples/simple) application showing the basic use of Diode. The
-second example features a recursive [tree view](examples/treeview) component with a couple of edit actions. Both examples use "plain HTML" without any framework
-like React.
+There are several example projects in the [examples](examples) directory. 
+
+First one is a [simple](examples/simple) application showing the basic use of Diode. 
+
+The second example features a recursive [tree view](examples/treeview) component with a couple of edit actions. Both examples use "plain HTML" without any
+framework like React.
 
 The third example is the traditional [TodoMVC](examples/todomvc) implemented with React on Diode.
 
-Another more complete application is example is the [Scala.js SPA tutorial](https://github.com/ochrons/scalajs-spa-tutorial), demonstrating the use of
-React integration features and async operations.
+The [RAF example](examples/raf) demonstrates the use of _action processors_ to batch and render synchronized animations with `requestAnimationFrame`.
+
+A more complete application example is the [Scala.js SPA tutorial](https://github.com/ochrons/scalajs-spa-tutorial), demonstrating the use of React integration
+features and async operations.
 
 # Change history
 

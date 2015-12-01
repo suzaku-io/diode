@@ -24,6 +24,7 @@ object SimpleApp extends JSApp {
     val e = div(cls := "container",
       div(img(src := "diode-logo-small.png")),
       h1("Simple counter example"),
+      p(a(href := "https://github.com/ochrons/diode/tree/master/examples/simple", "Source code")),
       counter.render // renders the counter view
     ).render
     // clear and update contents

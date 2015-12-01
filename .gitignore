@@ -24,5 +24,6 @@ out
 
 # GitBook
 _book
+_examples
 node_modules
 

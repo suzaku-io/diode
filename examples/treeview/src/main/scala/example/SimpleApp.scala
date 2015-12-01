@@ -58,9 +58,10 @@ object SimpleApp extends JSApp {
       )
     }
 
-    val e = div(
+    val e = div(cls := "container",
       div(img(src := "diode-logo-small.png")),
       h1("Treeview example"),
+      p(a(href := "https://github.com/ochrons/diode/tree/master/examples/treeview", "Source code")),
       renderButtons(selectionLoc.nonEmpty),
       treeView.render
     ).render

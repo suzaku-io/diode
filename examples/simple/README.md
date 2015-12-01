@@ -2,6 +2,8 @@
 
 This is a very simple example application using Diode. See the Diode documentation for further information.
 
+See [live demonstration](http://ochrons.github.io/diode/examples/simple/)
+
 ## Usage
 
 1. Clone the repository from GitHub
