@@ -1,4 +1,4 @@
-# ![Diode](images/diode-logo-big.png)
+# [![Diode](images/diode-logo-big.png)](https://github.com/ochrons/diode)
 
 # Introduction
 
