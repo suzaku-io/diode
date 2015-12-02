@@ -22,8 +22,8 @@ trait PotAction[A, T <: PotAction[A, T]] {
 
   def failed(ex: Throwable) = next(Failed(ex))
 
-  def effect[B](f: => Future[B])(success: B => A, failure: Throwable => Throwable = identity)(implicit ec: ExecutionContext): Effects =
-    () => f.map(x => ready(success(x))).recover { case e: Throwable => failed(failure(e)) }
+  def effect[B](f: => Future[B])(success: B => A, failure: Throwable => Throwable = identity)(implicit ec: ExecutionContext): Effect[PotAction[A, T]] =
+    new Effect(() => f.map(x => ready(success(x))).recover { case e: Throwable => failed(failure(e)) }, ec)
 }
 
 object PotAction {
@@ -55,13 +55,13 @@ object PotAction {
       action.state match {
         case PotEmpty =>
           if (progressDelta > Duration.Zero) {
-            updated(value.pending(retryPolicy), updateEffect + runAfter(progressDelta)(action.pending))
+            updated(value.pending(retryPolicy), updateEffect + Effects.action(action.pending).after(progressDelta))
           } else {
             updated(value.pending(retryPolicy), updateEffect)
           }
         case PotPending =>
           if (value.isPending && progressDelta > Duration.Zero) {
-            updated(value.pending(), runAfter(progressDelta)(action.pending))
+            updated(value.pending(), Effects.action(action.pending).after(progressDelta))
           } else {
             noChange
           }

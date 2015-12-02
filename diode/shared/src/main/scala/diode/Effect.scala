@@ -160,10 +160,10 @@ object Effects {
     new EffectSet(new Effect(f _, ec), tail.map(f => new Effect(f, ec)).toSet, ec)
 
   /**
-    * Converts a straight action value into an effect. Typically used in combination of other effects or
+    * Converts a lazy action value into an effect. Typically used in combination of other effects or
     * with `after` to delay execution.
     */
-  def action[A <: AnyRef](action: A)(implicit ec: ExecutionContext): Effect[A] =
+  def action[A <: AnyRef](action: => A)(implicit ec: ExecutionContext): Effect[A] =
     new Effect(() => Future.successful(action), ec)
 
   implicit def f2effect[A <: AnyRef](f: EffectF[A])(implicit ec: ExecutionContext): Effect[A] = new Effect(f, ec)

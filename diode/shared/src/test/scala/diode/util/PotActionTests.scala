@@ -56,8 +56,8 @@ object PotActionTests extends TestSuite {
         var completed = false
         val eff = ta.effect(Future {completed = !completed; 42})(_.toString)
 
-        eff.run { action =>
-          assert(action.asInstanceOf[TestAction].value == Ready("42"))
+        eff.toFuture.map { action =>
+          assert(action.value == Ready("42"))
           assert(completed == true)
         }
       }
@@ -65,8 +65,8 @@ object PotActionTests extends TestSuite {
         val ta = TestAction()
         val eff = ta.effect(Future {if (true) throw new Exception("Oh no!") else 42})(_.toString, ex => new Exception(ex.getMessage * 2))
 
-        eff.run { action =>
-          assert(action.asInstanceOf[TestAction].value.exceptionOption.exists(_.getMessage == "Oh no!Oh no!"))
+        eff.toFuture.map { action =>
+          assert(action.value.exceptionOption.exists(_.getMessage == "Oh no!Oh no!"))
         }
       }
     }
