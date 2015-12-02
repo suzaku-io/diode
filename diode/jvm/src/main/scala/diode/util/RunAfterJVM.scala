@@ -1,11 +1,8 @@
 package diode.util
 
-import java.util.concurrent.{TimeUnit, ScheduledThreadPoolExecutor}
-
-import diode.ActionResult._
+import java.util.concurrent.{ScheduledThreadPoolExecutor, TimeUnit}
 
 import scala.concurrent._
-
 import scala.concurrent.duration.FiniteDuration
 
 class RunAfterJVM extends RunAfter {
@@ -16,17 +13,6 @@ class RunAfterJVM extends RunAfter {
     }
     RunAfterJVM.executor.schedule(task, delay.toMillis, TimeUnit.MILLISECONDS)
     p.future
-  }
-
-  def effectAfter[A <: AnyRef](delay: FiniteDuration)(f: Effect[A])(implicit ec: ExecutionContext) = {
-    () => {
-      val p = Promise[A]()
-      val task = new Runnable {
-        def run() = f().map(p.success)
-      }
-      RunAfterJVM.executor.schedule(task, delay.toMillis, TimeUnit.MILLISECONDS)
-      p.future
-    }
   }
 }
 

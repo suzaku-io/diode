@@ -19,8 +19,8 @@ libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "0.8.2",
   "com.github.japgolly.scalajs-react" %%% "core" % "0.10.2",
   "com.github.japgolly.scalajs-react" %%% "extra" % "0.10.2",
-  "me.chrons" %%% "diode" % "0.1.0",
-  "me.chrons" %%% "diode-react" % "0.1.0"
+  "me.chrons" %%% "diode" % "0.2.0-SNAPSHOT",
+  "me.chrons" %%% "diode-react" % "0.2.0-SNAPSHOT"
 )
 
 jsDependencies ++= Seq(

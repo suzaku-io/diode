@@ -26,13 +26,13 @@ object RetryTests extends TestSuite {
       assert(r.isRight)
       val now = System.currentTimeMillis()
       // check that effect happens in the future
-      r.right.get._2().flatMap { n =>
+      r.right.get._2.toFuture.flatMap { n =>
         println(s"First retry after ${System.currentTimeMillis() - now}")
         assert(System.currentTimeMillis() - now > 150)
         // next retry
         val rr = r.right.get._1.retry(new Exception, effect)
         // check that effect happens in the future
-        rr.right.get._2().map { n =>
+        rr.right.get._2.toFuture.map { n =>
           println(s"Second retry after ${System.currentTimeMillis() - now}")
           assert(System.currentTimeMillis() - now > 550)
         }

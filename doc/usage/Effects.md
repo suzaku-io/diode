@@ -10,15 +10,10 @@ side effects into `Effect`s and returning them from the action handler with the 
 
 ## What is an Effect?
 
-In an Effect we _describe_ a computation instead of directly _executing_ it. It's quite similar to the `IO` concept in Scalaz/Haskell but with a very
-straightforward implementation:
+In an Effect we _describe_ a computation instead of directly _executing_ it. It's quite similar to the `IO` concept in Scalaz/Haskell, containing a function
+that returns a `Future[AnyRef]`.
 
-```scala
-type Effect[Action <: AnyRef] = () => Future[Action]
-```
-
-It's just a function returning a `Future[Action]`. The action returned by the `Future` is automatically dispatched. If your effect doesn't need anything
-dispatched, return a `None`.
+The action returned by the `Future` is automatically dispatched by the Circuit. If your effect doesn't need anything dispatched, return a `None`.
 
 ### Using Effects
 
@@ -30,11 +25,11 @@ import org.scalajs.dom.ext.Ajax
 case class NewMessages(msgs: String)
 
 def loadMessagesEffect(user: String) = 
-  () => Ajax.get(s"/user/messages?id=$user").map(r => NewMessages(r.responseText))
+  Effects(Ajax.get(s"/user/messages?id=$user").map(r => NewMessages(r.responseText)))
 ```
 
-Here the `loadMessagesEffect` doesn't actually execute the Ajax call immediately, but just provides a function to do so. Once the future does complete, the
-result is mapped into a `NewMessages` action that gets automatically dispatched.
+Here the `loadMessagesEffect` doesn't actually execute the Ajax call immediately, but just provides an effect to do so. Once the `Ajax` future does complete, the
+result is mapped into a `NewMessages` action.
 
 To return the effects alongside the new model, use one of the helper functions provided by `ActionHandler`.
 
@@ -51,17 +46,30 @@ val messageHandler = new ActionHandler(zoomRW(_.messages)((m, v) => m.copy(messa
 }
 ```
 
-If you have no state change, use `effectOnly` and if you want your effects to be run in parallel (normally they are run in serial), use `updatedPar`. For example
-we might want to get periodic notifications (using `runAfter`) while the messages are being loaded, to update the UI accordingly.
+If you have no state change, use `effectOnly` instead of `updated`.
+ 
+### Combining effects
+
+If you want to combine multiple effects into one, join them with the `>>`, `<<` and `+` operators.
+
+```scala
+val serialAB = Effects(a) >> Effects(b)  // b is run after a completes
+val serialBA = Effects(a) << Effects(b)  // a is run after b completes
+val parallelAB = Effects(a) + Effects(b) // a and b are run in parallel
+```
+
+For example we might want to get periodic notifications (using `after`) while the messages are being loaded, to update the UI accordingly.
 
 ```scala
     case LoadMessages(user) =>
-      updatedPar(value.copy(loadTime = 0), loadMessagesEffect(user), runAfter(500.millis)(StillLoading))
+      updated(value.copy(loadTime = 0), 
+        loadMessagesEffect(user) + Effects.action(StillLoading).after(500.millis))
     case NewMessages(msgs) =>
       updated(Messages(msgs, -1))
     case StillLoading =>
       if(value.loadTime != -1)
-        updated(value.copy(loadTime = value.loadTime + 500), runAfter(500.millis)(StillLoading)) 
+        updated(value.copy(loadTime = value.loadTime + 500),  
+          Effects.action(StillLoading).after(500.millis)) 
       else
         noChange
 ```

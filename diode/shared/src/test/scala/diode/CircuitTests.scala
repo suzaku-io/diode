@@ -31,12 +31,12 @@ object CircuitTests extends TestSuite {
       case SetS(s) =>
         ModelUpdate(model.copy(s = s))
       case EffectOnly(effect) =>
-        ModelUpdateEffect(model, Seq(effect), ec)
+        ModelUpdateEffect(model, effect)
       case SetD(d) =>
         ModelUpdate(model.copy(data = d))
       case SetEffect(s, effect) =>
         // run effect twice!
-        ModelUpdateEffectPar(model.copy(s = s), Seq(effect, effect), ec)
+        ModelUpdateEffect(model.copy(s = s), Effects(effect()) + effect)
     }
     var lastFatal: (AnyRef, Throwable) = ("", null)
     var lastError = ""

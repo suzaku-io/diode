@@ -190,20 +190,10 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
         // no-op
         case ActionResult.ModelUpdate(newModel) =>
           update(newModel)
-        case ActionResult.ModelUpdateEffect(newModel, effects, ec) =>
-          implicit val exCon = ec
+        case ActionResult.ModelUpdateEffect(newModel, effects) =>
           update(newModel)
-          // run effects serially
-          if (effects.nonEmpty) {
-            effects.tail.foldLeft(effects.head.apply().map(dispatch)) { (prev, effect) =>
-              prev.flatMap(_ => effect().map(dispatch))
-            }
-          }
-        case ActionResult.ModelUpdateEffectPar(newModel, effects, ec) =>
-          implicit val exCon = ec
-          update(newModel)
-          // run effects in parallel
-          effects.foreach(effect => effect().map(dispatch))
+          // run effects
+          effects.run(dispatch)
       }
     } catch {
       case e: Throwable =>

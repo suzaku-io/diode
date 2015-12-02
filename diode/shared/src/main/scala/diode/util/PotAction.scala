@@ -1,6 +1,5 @@
 package diode.util
 
-import diode.ActionResult.Effect
 import diode._
 
 import scala.concurrent.duration._
@@ -14,8 +13,8 @@ trait PotAction[A, T <: PotAction[A, T]] {
 
   def handle[M](pf: PartialFunction[PotState, ActionResult[M]]) = pf(state)
 
-  def handleWith[M](handler: ActionHandler[M, Pot[A]], updateEffect: Effect[T])
-    (f: (PotAction[A, T], ActionHandler[M, Pot[A]], Effect[T]) => ActionResult[M]) = f(this, handler, updateEffect)
+  def handleWith[M](handler: ActionHandler[M, Pot[A]], updateEffect: Effects)
+    (f: (PotAction[A, T], ActionHandler[M, Pot[A]], Effects) => ActionResult[M]) = f(this, handler, updateEffect)
 
   def pending = next(Pending())
 
@@ -23,13 +22,13 @@ trait PotAction[A, T <: PotAction[A, T]] {
 
   def failed(ex: Throwable) = next(Failed(ex))
 
-  def effect[B](f: => Future[B])(success: B => A, failure: Throwable => Throwable = identity)(implicit ec: ExecutionContext): Effect[T] =
+  def effect[B](f: => Future[B])(success: B => A, failure: Throwable => Throwable = identity)(implicit ec: ExecutionContext): Effects =
     () => f.map(x => ready(success(x))).recover { case e: Throwable => failed(failure(e)) }
 }
 
 object PotAction {
   def handler[A, M, T <: PotAction[A, T]](retryPolicy: RetryPolicy = Retry.None)(implicit ec: ExecutionContext) =
-    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], updateEffect: Effect[T]) => {
+    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], updateEffect: Effects) => {
       import PotState._
       import handler._
       action.state match {
@@ -50,13 +49,13 @@ object PotAction {
     }
 
   def handler[A, M, T <: PotAction[A, T]](retryPolicy: RetryPolicy, progressDelta: FiniteDuration)(implicit runner: RunAfter, ec: ExecutionContext) =
-    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], updateEffect: Effect[T]) => {
+    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], updateEffect: Effects) => {
       import PotState._
       import handler._
       action.state match {
         case PotEmpty =>
           if (progressDelta > Duration.Zero) {
-            updatedPar(value.pending(retryPolicy), updateEffect, runAfter(progressDelta)(action.pending))
+            updated(value.pending(retryPolicy), updateEffect + runAfter(progressDelta)(action.pending))
           } else {
             updated(value.pending(retryPolicy), updateEffect)
           }

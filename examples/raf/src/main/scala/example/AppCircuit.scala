@@ -33,17 +33,17 @@ case class Circle(rpm: Double, position: Point = Point(1, 0)) extends Animation 
 
 case class Spiral(rpm: Double, position: Point = Point(1, 0)) extends Animation {
   override def update(delta: Double) = {
-    val radius = (math.cos(rpm * delta / 180) + 1)/2
-    val newPos = Point(math.cos(rpm * delta / 60)*radius, math.sin(rpm * delta / 60)*radius)
+    val radius = (math.cos(rpm * delta / 180) + 1) / 2
+    val newPos = Point(math.cos(rpm * delta / 60) * radius, math.sin(rpm * delta / 60) * radius)
     copy(position = newPos)
   }
 }
 
 case class Flower(rpm: Double, position: Point = Point(1, 0), override val scale: Double = 1.0) extends Animation {
   override def update(delta: Double) = {
-    val radius = (math.cos(rpm * delta / 10) + 1)/2
-    val newPos = Point(math.cos(rpm * delta / 60)*radius, math.sin(rpm * delta / 60)*radius)
-    copy(position = newPos, scale = (math.cos(rpm * delta / 10) + 1.1)/2.2)
+    val radius = (math.cos(rpm * delta / 10) + 1) / 2
+    val newPos = Point(math.cos(rpm * delta / 60) * radius, math.sin(rpm * delta / 60) * radius)
+    copy(position = newPos, scale = (math.cos(rpm * delta / 10) + 1.1) / 2.2)
   }
 }
 
@@ -94,13 +94,17 @@ class AnimationHandler[M](modelRW: ModelRW[M, Map[Int, Animated]], now: ModelR[D
 
     case UpdateAnimation(id) =>
       // request next update if it's still running
-      val effects = value.get(id).filter(_.isRunning).toList.map(_ => () => Future.successful(UpdateAnimation(id)))
-      updated(updateOne(id, _.updated(now())), effects: _*)
+      value.get(id).filter(_.isRunning) match {
+        case Some(_) =>
+          updated(updateOne(id, _.updated(now())), Effects.action(UpdateAnimation(id)))
+        case None =>
+          updated(updateOne(id, _.updated(now())))
+      }
 
     case AddAnimation(animation) =>
-      val id = value.keys.foldLeft(0)( (a, id) => a max id ) + 1
+      val id = value.keys.foldLeft(0)((a, id) => a max id) + 1
       // request update to start animation
-      updated(value + (id -> Animated(now(), animation, true)), () => Future.successful(UpdateAnimation(id)))
+      updated(value + (id -> Animated(now(), animation, true)), Effects.action(UpdateAnimation(id)))
 
     case DeleteAnimation(id) =>
       updated(value.filterNot(_._1 == id))
@@ -110,6 +114,6 @@ class AnimationHandler[M](modelRW: ModelRW[M, Map[Int, Animated]], now: ModelR[D
 
     case ContinueAnimation(id) =>
       // request update to start animation
-      updated(updateOne(id, _.continue(now())), () => Future.successful(UpdateAnimation(id)))
+      updated(updateOne(id, _.continue(now())), Effects.action(UpdateAnimation(id)))
   }
 }

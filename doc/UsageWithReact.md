@@ -70,7 +70,7 @@ val Dashboard = ReactComponentB[ModelProxy[RootModel]("Dashboard")
   .render_P { proxy =>
     <.div(
       h3("Data"),
-      proxy.connect(_.asyncData)(p => AsyncDataView(p), // pass ModelProxy
+      proxy.connect(_.asyncData)(p => AsyncDataView(p)), // pass ModelProxy
       proxy.wrap(_.data)(p => DataView(p()), // just pass the value
       <.button(^.onClick --> proxy.dispatch(RefreshData), "Refresh") 
     )

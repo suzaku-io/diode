@@ -17,7 +17,7 @@ object CircuitJVMTests extends TestSuite {
 
   case class Filter(f: Int => Boolean)
 
-  case class RunEffects[A <: AnyRef](effects: Seq[ActionResult.Effect[A]], parallel: Boolean = false)
+  case class RunEffects[A <: AnyRef](effects: Seq[Effects], parallel: Boolean = false)
 
   class TestCircuit(implicit ec: ExecutionContext) extends Circuit[Model] {
     import diode.ActionResult._
@@ -31,9 +31,9 @@ object CircuitJVMTests extends TestSuite {
         ModelUpdate(Model(model.list.filter(f)))
       case RunEffects(effects, parallel) =>
         if (parallel)
-          ModelUpdateEffectPar(model, effects, ec)
+          ModelUpdateEffect(model, effects.reduce(_ + _))
         else
-          ModelUpdateEffect(model, effects, ec)
+          ModelUpdateEffect(model, effects.reduce(_ >> _))
     }
   }
 
@@ -69,7 +69,7 @@ object CircuitJVMTests extends TestSuite {
 
       // run 1000 serial effects actions
       val effects = for (i <- 0 until 1000) yield {
-        () => Future(Append(i))
+        Effects(Future(Append(i)))
       }
       c.dispatch(RunEffects(effects))
       // wait for futures to complete
@@ -82,7 +82,7 @@ object CircuitJVMTests extends TestSuite {
 
       // run 1000 serial effects actions
       val effects = for (i <- 0 until 1000) yield {
-        () => Future(Append(i))
+        Effects(Future(Append(i)))
       }
       c.dispatch(RunEffects(effects, true))
       // wait for futures to complete

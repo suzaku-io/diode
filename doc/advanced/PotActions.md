@@ -28,10 +28,10 @@ Now you can write an action handler managing the different states of your `Updat
 ```scala
 override def handle = {
   case action: UpdateTodos =>
-    val updateF = action.effect(loadTodos())(todos => Todos(todos))
+    val updateEffect = action.effect(loadTodos())(todos => Todos(todos))
     action.handle {
       case PotEmpty =>
-        updated(value.pending, updateF)
+        updated(value.pending, updateEffect)
       case PotPending =>
         noChange
       case PotReady =>
@@ -61,8 +61,8 @@ action via an external handler function through `handleWith`.
 import scala.concurrent.duration._
 override def handle = {
   case action: UpdateTodos =>
-    val updateF = action.effect(loadTodos())(todos => Todos(todos))
-    action.handleWith(this, updateF)(PotAction.handler(Retry(3), 100.millis))
+    val updateEffect = action.effect(loadTodos())(todos => Todos(todos))
+    action.handleWith(this, updateEffect)(PotAction.handler(Retry(3), 100.millis))
 }
 ```
     
