@@ -97,8 +97,8 @@ abstract class EffectBase(val ec: ExecutionContext) extends Effect {
   *
   * @param f The effect function, returning a `Future[A]`
   */
-class EffectSingle[A <: AnyRef](f: () => Future[A], override implicit val ec: ExecutionContext) extends EffectBase(ec) {
-  override def run(dispatch: AnyRef => Unit) = f().map(dispatch)
+class EffectSingle[A <: AnyRef](f: () => Future[A], ec: ExecutionContext) extends EffectBase(ec) {
+  override def run(dispatch: AnyRef => Unit) = f().map(dispatch)(ec)
 
   override def toFuture = f()
 }
@@ -110,9 +110,9 @@ class EffectSingle[A <: AnyRef](f: () => Future[A], override implicit val ec: Ex
   * @param head First effect to be run.
   * @param tail Rest of the effects.
   */
-class EffectSeq(head: Effect, tail: Seq[Effect], override implicit val ec: ExecutionContext) extends EffectBase(ec) {
+class EffectSeq(head: Effect, tail: Seq[Effect], ec: ExecutionContext) extends EffectBase(ec) {
   private def executeWith[A](f: Effect => Future[A]): Future[A] =
-    tail.foldLeft(f(head)) { (prev, effect) => prev.flatMap(_ => f(effect)) }
+    tail.foldLeft(f(head)) { (prev, effect) => prev.flatMap(_ => f(effect))(ec) }
 
   override def run(dispatch: (AnyRef) => Unit) =
     executeWith(_.run(dispatch))
@@ -124,7 +124,7 @@ class EffectSeq(head: Effect, tail: Seq[Effect], override implicit val ec: Execu
     new EffectSeq(that, head +: tail, ec)
 
   override def size =
-    1 + tail.map(_.size).sum
+    head.size + tail.map(_.size).sum
 
   override def toFuture =
     executeWith(_.toFuture)
@@ -147,13 +147,13 @@ class EffectSet(head: Effect, tail: Set[Effect], override implicit val ec: Execu
     Future.traverse(tail + head)(f(_))
 
   override def run(dispatch: (AnyRef) => Unit) =
-    executeWith(_.run(dispatch)).asInstanceOf[Future[Unit]]
+    executeWith(_.run(dispatch)).map(_ => ())
 
   override def +(that: Effect) =
     new EffectSet(head, tail + that, ec)
 
   override def size =
-    1 + tail.map(_.size).sum
+    head.size + tail.foldLeft(0)((acc, e) => acc + e.size)
 
   override def toFuture =
     executeWith(_.toFuture)
