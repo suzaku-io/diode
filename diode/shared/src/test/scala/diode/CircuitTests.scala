@@ -36,7 +36,7 @@ object CircuitTests extends TestSuite {
         ModelUpdate(model.copy(data = d))
       case SetEffect(s, effect) =>
         // run effect twice!
-        ModelUpdateEffect(model.copy(s = s), Effects(effect()) + effect)
+        ModelUpdateEffect(model.copy(s = s), Effect(effect()) + effect)
     }
     var lastFatal: (AnyRef, Throwable) = ("", null)
     var lastError = ""

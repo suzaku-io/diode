@@ -13,8 +13,8 @@ trait PotAction[A, T <: PotAction[A, T]] {
 
   def handle[M](pf: PartialFunction[PotState, ActionResult[M]]) = pf(state)
 
-  def handleWith[M](handler: ActionHandler[M, Pot[A]], updateEffect: Effects)
-    (f: (PotAction[A, T], ActionHandler[M, Pot[A]], Effects) => ActionResult[M]) = f(this, handler, updateEffect)
+  def handleWith[M](handler: ActionHandler[M, Pot[A]], updateEffect: Effect)
+    (f: (PotAction[A, T], ActionHandler[M, Pot[A]], Effect) => ActionResult[M]) = f(this, handler, updateEffect)
 
   def pending = next(Pending())
 
@@ -22,15 +22,14 @@ trait PotAction[A, T <: PotAction[A, T]] {
 
   def failed(ex: Throwable) = next(Failed(ex))
 
-  def effect[B](f: => Future[B])(success: B => A, failure: Throwable => Throwable = identity)(implicit ec: ExecutionContext): Effect[PotAction[A, T]] =
-    new Effect(() => f.map(x => ready(success(x))).recover { case e: Throwable => failed(failure(e)) }, ec)
+  def effect[B](f: => Future[B])(success: B => A, failure: Throwable => Throwable = identity)(implicit ec: ExecutionContext) =
+    Effect(f.map(x => ready(success(x))).recover { case e: Throwable => failed(failure(e)) })
 }
 
 object PotAction {
   def handler[A, M, T <: PotAction[A, T]](retryPolicy: RetryPolicy = Retry.None)(implicit ec: ExecutionContext) =
-    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], updateEffect: Effects) => {
-      import PotState._
-      import handler._
+    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], updateEffect: Effect) => {
+      import PotState._, handler._
       action.state match {
         case PotEmpty =>
           updated(value.pending(retryPolicy), updateEffect)
@@ -48,23 +47,16 @@ object PotAction {
       }
     }
 
-  def handler[A, M, T <: PotAction[A, T]](retryPolicy: RetryPolicy, progressDelta: FiniteDuration)(implicit runner: RunAfter, ec: ExecutionContext) =
-    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], updateEffect: Effects) => {
-      import PotState._
-      import handler._
+  def handler[A, M, T <: PotAction[A, T]](retryPolicy: RetryPolicy, progressDelta: FiniteDuration)(implicit runner: RunAfter, ec: ExecutionContext) = {
+    require(progressDelta > Duration.Zero)
+
+    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], updateEffect: Effect) => {
+      import PotState._, handler._
       action.state match {
         case PotEmpty =>
-          if (progressDelta > Duration.Zero) {
-            updated(value.pending(retryPolicy), updateEffect + Effects.action(action.pending).after(progressDelta))
-          } else {
-            updated(value.pending(retryPolicy), updateEffect)
-          }
+          updated(value.pending(retryPolicy), updateEffect + Effect.action(action.pending).after(progressDelta))
         case PotPending =>
-          if (value.isPending && progressDelta > Duration.Zero) {
-            updated(value.pending(), Effects.action(action.pending).after(progressDelta))
-          } else {
-            noChange
-          }
+          updated(value.pending(), Effect.action(action.pending).after(progressDelta))
         case PotReady =>
           updated(action.value)
         case PotFailed =>
@@ -76,4 +68,5 @@ object PotAction {
           }
       }
     }
+  }
 }

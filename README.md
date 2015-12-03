@@ -164,6 +164,9 @@ features and async operations.
 
 # Change history
 
+### 0.2.0
+- Upgraded `Effects` to be real class(es) instead of just type alias for easier composition etc.
+
 ### 0.1.0
 - Initial version
 

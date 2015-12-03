@@ -2,7 +2,7 @@ package diode.util
 
 import java.util.concurrent.TimeUnit
 
-import diode.Effects
+import diode.Effect
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -26,10 +26,10 @@ trait RetryPolicy {
     * @param effect Effect to be retried.
     * @return
     */
-  def retry[T <: AnyRef](reason: Throwable, effects: Effects): Either[Throwable, (RetryPolicy, Effects)]
+  def retry[T <: AnyRef](reason: Throwable, effect: Effect): Either[Throwable, (RetryPolicy, Effect)]
 
-  def retry[T <: AnyRef](pot: Pot[_], effects: Effects): Either[Throwable, (RetryPolicy, Effects)] =
-    retry(pot.exceptionOption.getOrElse(new IllegalStateException("Pot is not in a failed state")), effects)
+  def retry[T <: AnyRef](pot: Pot[_], effect: Effect): Either[Throwable, (RetryPolicy, Effect)] =
+    retry(pot.exceptionOption.getOrElse(new IllegalStateException("Pot is not in a failed state")), effect)
 }
 
 object Retry {
@@ -40,7 +40,7 @@ object Retry {
   case object None extends RetryPolicy {
     override def canRetry(reason: Throwable) = false
 
-    override def retry[T <: AnyRef](reason: Throwable, effects: Effects) =
+    override def retry[T <: AnyRef](reason: Throwable, effects: Effect) =
       Left(reason)
   }
 
@@ -56,7 +56,7 @@ object Retry {
     override def canRetry(reason: Throwable) =
       retriesLeft > 0 && filter(reason)
 
-    override def retry[T <: AnyRef](reason: Throwable, effects: Effects) = {
+    override def retry[T <: AnyRef](reason: Throwable, effects: Effect) = {
       if (canRetry(reason))
         Right((Immediate(retriesLeft - 1, filter), effects))
       else
@@ -81,10 +81,10 @@ object Retry {
     override def canRetry(reason: Throwable) =
       retriesLeft > 0 && filter(reason)
 
-    override def retry[T <: AnyRef](reason: Throwable, effects: Effects) = {
+    override def retry[T <: AnyRef](reason: Throwable, effect: Effect) = {
       if (canRetry(reason)) {
         // wrap effects into a delayed effect
-        val delayEffect = effects.after(delay)
+        val delayEffect = effect.after(delay)
         // calculate next delay time
         val nextDelay = (delay.toUnit(TimeUnit.MILLISECONDS) * exp).millis
         Right((Backoff(retriesLeft - 1, nextDelay, exp, filter), delayEffect))

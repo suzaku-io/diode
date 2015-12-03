@@ -6,12 +6,12 @@ import org.scalajs.dom._
 // marker trait to identify actions that should be RAF batched
 trait RAFAction
 
-private[example] case class RAFWrapper(action: AnyRef, dispatch: Dispatcher)
+private[example] final case class RAFWrapper(action: AnyRef, dispatch: Dispatcher)
 
-case class RAFTimeStamp(time: Double)
+final case class RAFTimeStamp(time: Double)
 
 class RAFBatcher extends ActionProcessor {
-  private var batch = Vector.empty[RAFWrapper]
+  private var batch = List.empty[RAFWrapper]
   private var frameRequested = false
 
   /**
@@ -22,14 +22,15 @@ class RAFBatcher extends ActionProcessor {
   private def nextAnimationFrame(time: Double): Unit = {
     frameRequested = false
     if (batch.nonEmpty) {
+      val curBatch = batch
+      batch = Nil
       // dispatch all actions in the batch, supports multiple different dispatchers
-      batch.groupBy(_.dispatch).foreach { case (dispatch, actions) =>
+      curBatch.reverse.groupBy(_.dispatch).foreach { case (dispatch, actions) =>
         // Precede actions with a time stamp action to get correct time in animations.
         // When dispatching a sequence, Circuit optimizes processing internally and only calls
         // listeners after all the actions are processed
-        dispatch(Seq(RAFTimeStamp(time)) ++ actions)
+        dispatch(RAFTimeStamp(time) :: actions)
       }
-      batch = Vector.empty[RAFWrapper]
       // request next frame
       requestAnimationFrame
     } else {
@@ -51,7 +52,7 @@ class RAFBatcher extends ActionProcessor {
     action match {
       case rafAction: RAFAction =>
         // save action into the batch using a wrapper
-        batch :+= RAFWrapper(rafAction, dispatch)
+        batch = RAFWrapper(rafAction, dispatch) :: batch
         // request animation frame to run the batch
         requestAnimationFrame
         // skip processing of the action for now

@@ -17,7 +17,7 @@ object ActionResult {
 
   case class ModelUpdate[M](newValue: M) extends ModelUpdated[M]
 
-  case class ModelUpdateEffect[M, A <: AnyRef](newValue: M, effects: Effects) extends ModelUpdated[M]
+  case class ModelUpdateEffect[M, A <: AnyRef](newValue: M, effects: Effect) extends ModelUpdated[M]
 }
 
 abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
@@ -31,15 +31,15 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
   def updated(newValue: T): ActionResult[M] =
     ModelUpdate(modelRW.updated(newValue))
 
-  def updated[A <: AnyRef](newValue: T, effects: Effects): ActionResult[M] =
+  def updated[A <: AnyRef](newValue: T, effects: Effect): ActionResult[M] =
     ModelUpdateEffect(modelRW.updated(newValue), effects)
 
   def noChange: ActionResult[M] =
     NoChange
 
-  def effectOnly[A <: AnyRef](effects: Effects): ActionResult[M] =
+  def effectOnly[A <: AnyRef](effects: Effect): ActionResult[M] =
     ModelUpdateEffect(modelRW.updated(value), effects)
 
-  def runAfter[A <: AnyRef](delay: FiniteDuration)(f: => A)(implicit runner: RunAfter, ec: ExecutionContext): Effects =
-    Effects(runner.runAfter(delay)(f))
+  def runAfter[A <: AnyRef](delay: FiniteDuration)(f: => A)(implicit runner: RunAfter, ec: ExecutionContext): Effect =
+    Effect(runner.runAfter(delay)(f))
 }

@@ -2,7 +2,6 @@ package example
 
 import diode._
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
 // Define the root of our application model
@@ -93,10 +92,10 @@ class AnimationHandler[M](modelRW: ModelRW[M, Map[Int, Animated]], now: ModelR[D
       updated(Map.empty[Int, Animated])
 
     case UpdateAnimation(id) =>
-      // request next update if it's still running
+      // request next update if animation is still running
       value.get(id).filter(_.isRunning) match {
         case Some(_) =>
-          updated(updateOne(id, _.updated(now())), Effects.action(UpdateAnimation(id)))
+          updated(updateOne(id, _.updated(now())), Effect.action(UpdateAnimation(id)))
         case None =>
           updated(updateOne(id, _.updated(now())))
       }
@@ -104,7 +103,7 @@ class AnimationHandler[M](modelRW: ModelRW[M, Map[Int, Animated]], now: ModelR[D
     case AddAnimation(animation) =>
       val id = value.keys.foldLeft(0)((a, id) => a max id) + 1
       // request update to start animation
-      updated(value + (id -> Animated(now(), animation, true)), Effects.action(UpdateAnimation(id)))
+      updated(value + (id -> Animated(now(), animation, true)), Effect.action(UpdateAnimation(id)))
 
     case DeleteAnimation(id) =>
       updated(value.filterNot(_._1 == id))
@@ -114,6 +113,6 @@ class AnimationHandler[M](modelRW: ModelRW[M, Map[Int, Animated]], now: ModelR[D
 
     case ContinueAnimation(id) =>
       // request update to start animation
-      updated(updateOne(id, _.continue(now())), Effects.action(UpdateAnimation(id)))
+      updated(updateOne(id, _.continue(now())), Effect.action(UpdateAnimation(id)))
   }
 }
