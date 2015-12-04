@@ -124,7 +124,7 @@ class EffectSeq(head: Effect, tail: Seq[Effect], ec: ExecutionContext) extends E
     new EffectSeq(that, head +: tail, ec)
 
   override def size =
-    head.size + tail.map(_.size).sum
+    head.size + tail.foldLeft(0)((acc, e) => acc + e.size)
 
   override def toFuture =
     executeWith(_.toFuture)
