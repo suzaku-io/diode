@@ -25,7 +25,7 @@ import org.scalajs.dom.ext.Ajax
 case class NewMessages(msgs: String)
 
 def loadMessagesEffect(user: String) = 
-  Effects(Ajax.get(s"/user/messages?id=$user").map(r => NewMessages(r.responseText)))
+  Effect(Ajax.get(s"/user/messages?id=$user").map(r => NewMessages(r.responseText)))
 ```
 
 Here the `loadMessagesEffect` doesn't actually execute the Ajax call immediately, but just provides an effect to do so. Once the `Ajax` future does complete, the
@@ -53,9 +53,9 @@ If you have no state change, use `effectOnly` instead of `updated`.
 If you want to combine multiple effects into one, join them with the `>>`, `<<` and `+` operators.
 
 ```scala
-val serialAB = Effects(a) >> Effects(b)  // b is run after a completes
-val serialBA = Effects(a) << Effects(b)  // a is run after b completes
-val parallelAB = Effects(a) + Effects(b) // a and b are run in parallel
+val serialAB = Effect(a) >> Effect(b)  // b is run after a completes
+val serialBA = Effect(a) << Effect(b)  // a is run after b completes
+val parallelAB = Effect(a) + Effect(b) // a and b are run in parallel
 ```
 
 For example we might want to get periodic notifications (using `after`) while the messages are being loaded, to update the UI accordingly.
@@ -63,13 +63,13 @@ For example we might want to get periodic notifications (using `after`) while th
 ```scala
     case LoadMessages(user) =>
       updated(value.copy(loadTime = 0), 
-        loadMessagesEffect(user) + Effects.action(StillLoading).after(500.millis))
+        loadMessagesEffect(user) + Effect.action(StillLoading).after(500.millis))
     case NewMessages(msgs) =>
       updated(Messages(msgs, -1))
     case StillLoading =>
       if(value.loadTime != -1)
         updated(value.copy(loadTime = value.loadTime + 500),  
-          Effects.action(StillLoading).after(500.millis)) 
+          Effect.action(StillLoading).after(500.millis)) 
       else
         noChange
 ```

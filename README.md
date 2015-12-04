@@ -20,11 +20,11 @@ Full documentation [available here](http://ochrons.github.io/diode/index.html).
 
 Add following dependency declaration to your Scala project.
 
-<pre><code class="lang-scala">"me.chrons" %% "diode" % "0.1.0"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %% "diode" % "0.2.0"</code></pre>
 
 In a Scala.js project the dependency looks like this.
 
-<pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.1.0"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.2.0"</code></pre>
 
 <img align="right" src="doc/images/architecture.png">
 
@@ -165,7 +165,7 @@ features and async operations.
 # Change history
 
 ### 0.2.0
-- Upgraded `Effects` to be real class(es) instead of just type alias for easier composition etc.
+- Upgraded `Effect`s to be real class(es) instead of just type alias for easier composition etc.
 - Added animation example using `requestAnimationFrame`
 - Added TodoMVC example using React
 
