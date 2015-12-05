@@ -75,7 +75,7 @@ trait ReactConnector[M <: AnyRef] {
     class Backend(t: BackendScope[Unit, S]) {
       private var unsubscribe = Option.empty[() => Unit]
 
-      def didMount = Callback {
+      def willMount = Callback {
         // subscribe to model changes
         // we can provide a cursor that ignores the model parameter, because we know the model already :)
         unsubscribe = Some(circuit.subscribe(changeHandler, _ => modelReader()))
@@ -98,7 +98,7 @@ trait ReactConnector[M <: AnyRef] {
     ReactComponentB[Unit]("DiodeWrapper")
       .initialState(modelReader())
       .renderBackend[Backend]
-      .componentDidMount(scope => scope.backend.didMount)
+      .componentWillMount(scope => scope.backend.willMount)
       .componentWillUnmount(scope => scope.backend.willUnmount)
       .shouldComponentUpdate(scope => scope.currentState ne scope.nextState)
       .buildU.apply()
