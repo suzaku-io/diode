@@ -13,6 +13,9 @@ object TodoList {
   case class State(editing: Option[TodoId])
 
   class Backend($: BackendScope[Props, State]) {
+    def mounted(props: Props) =
+      props.proxy.dispatch(InitTodos)
+
     def handleNewTodoKeyDown(dispatch: AnyRef => Callback)(e: ReactKeyboardEventI): Option[Callback] = {
       val title = e.target.value.trim
       if (e.nativeEvent.keyCode == KeyCode.Enter && title.nonEmpty) {
@@ -90,6 +93,7 @@ object TodoList {
   private val component = ReactComponentB[Props]("TodoList")
     .initialState_P(p => State(None))
     .renderBackend[Backend]
+      .componentDidMount(scope => scope.backend.mounted(scope.props))
     .build
 
   def apply(proxy: ModelProxy[Todos], currentFilter: TodoFilter, ctl: RouterCtl[TodoFilter]) = component(Props(proxy, currentFilter, ctl))

@@ -25,6 +25,8 @@ class TodoHandler[M](modelRW: ModelRW[M, Seq[Todo]])extends ActionHandler(modelR
     }
 
   override def handle = {
+    case InitTodos =>
+      updated(List(Todo(TodoId.random, "Test your code!", false)))
     case AddTodo(title) =>
       updated(value :+ Todo(TodoId.random, title, false))
     case ToggleAll(checked) =>

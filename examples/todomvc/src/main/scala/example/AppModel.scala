@@ -29,6 +29,7 @@ object TodoFilter {
 }
 
 // define actions
+case object InitTodos
 
 case class AddTodo(title: String)
 
