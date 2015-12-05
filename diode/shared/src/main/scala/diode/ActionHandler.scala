@@ -2,8 +2,8 @@ package diode
 
 import diode.util.RunAfter
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ExecutionContext, Future}
 
 sealed trait ActionResult[+M]
 
@@ -17,7 +17,10 @@ object ActionResult {
 
   case class ModelUpdate[M](newValue: M) extends ModelUpdated[M]
 
-  case class ModelUpdateEffect[M, A <: AnyRef](newValue: M, effects: Effect) extends ModelUpdated[M]
+  case class EffectOnly(effects: Effect) extends ActionResult[Nothing]
+
+  case class ModelUpdateEffect[M](newValue: M, effects: Effect) extends ModelUpdated[M]
+
 }
 
 abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
@@ -38,7 +41,7 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
     NoChange
 
   def effectOnly[A <: AnyRef](effects: Effect): ActionResult[M] =
-    ModelUpdateEffect(modelRW.updated(value), effects)
+    EffectOnly(effects)
 
   def runAfter[A <: AnyRef](delay: FiniteDuration)(f: => A)(implicit runner: RunAfter, ec: ExecutionContext): Effect =
     Effect(runner.runAfter(delay)(f))

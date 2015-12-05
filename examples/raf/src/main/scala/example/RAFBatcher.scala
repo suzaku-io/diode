@@ -10,7 +10,7 @@ private[example] final case class RAFWrapper(action: AnyRef, dispatch: Dispatche
 
 final case class RAFTimeStamp(time: Double)
 
-class RAFBatcher extends ActionProcessor {
+class RAFBatcher[M <: AnyRef] extends ActionProcessor[M] {
   private var batch = List.empty[RAFWrapper]
   private var frameRequested = false
 
@@ -48,7 +48,7 @@ class RAFBatcher extends ActionProcessor {
     }
   }
 
-  override def process[M](dispatch: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M]) = {
+  override def process(dispatch: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M], currentModel: M) = {
     action match {
       case rafAction: RAFAction =>
         // save action into the batch using a wrapper

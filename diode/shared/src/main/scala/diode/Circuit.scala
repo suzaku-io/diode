@@ -6,8 +6,8 @@ trait Dispatcher {
   def apply(action: AnyRef) = dispatch(action)
 }
 
-trait ActionProcessor {
-  def process[M](dispatch: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M]): ActionResult[M]
+trait ActionProcessor[M <: AnyRef] {
+  def process(dispatch: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M], currentModel: M): ActionResult[M]
 }
 
 trait Circuit[M <: AnyRef] extends Dispatcher {
@@ -24,13 +24,13 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   private val modelRW = new RootModelRW[M](model)
   private var listenerId = 0
   private var listeners = Map.empty[Int, Subscription]
-  private var processors = List.empty[ActionProcessor]
+  private var processors = List.empty[ActionProcessor[M]]
   private var processChain = buildProcessChain
 
   private def buildProcessChain = {
     // chain processing functions
     processors.reverse.foldLeft(process _)((next, processor) =>
-      (action: AnyRef) => processor.process(this, action, next)
+      (action: AnyRef) => processor.process(this, action, next, model)
     )
   }
 
@@ -88,12 +88,12 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   }
 
   /**
-    * Adds a new `ActionProcessor` to the action processing chain. The processor is called for
+    * Adds a new `ActionProcessor[M]` to the action processing chain. The processor is called for
     * every dispatched action.
     *
     * @param processor
     */
-  def addProcessor(processor: ActionProcessor): Unit = {
+  def addProcessor(processor: ActionProcessor[M]): Unit = {
     this.synchronized {
       processors = processor :: processors
       processChain = buildProcessChain
@@ -101,11 +101,11 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   }
 
   /**
-    * Removes a previously added `ActionProcessor` from the action processing chain.
+    * Removes a previously added `ActionProcessor[M]` from the action processing chain.
     *
     * @param processor
     */
-  def removeProcessor(processor: ActionProcessor): Unit = {
+  def removeProcessor(processor: ActionProcessor[M]): Unit = {
     this.synchronized {
       processors = processors.filterNot(_ == processor)
       processChain = buildProcessChain
@@ -190,6 +190,9 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
         // no-op
         case ActionResult.ModelUpdate(newModel) =>
           update(newModel)
+        case ActionResult.EffectOnly(effects) =>
+          // run effects
+          effects.run(dispatch)
         case ActionResult.ModelUpdateEffect(newModel, effects) =>
           update(newModel)
           // run effects

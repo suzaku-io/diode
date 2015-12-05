@@ -16,7 +16,7 @@ object AppCircuit extends Circuit[AppModel] with ReactConnector[AppModel] {
   )
 }
 
-class TodoHandler[M](modelRW: ModelRW[M, Seq[Todo]])extends ActionHandler(modelRW) {
+class TodoHandler[M](modelRW: ModelRW[M, Seq[Todo]]) extends ActionHandler(modelRW) {
 
   def updateOne(Id: TodoId)(f: Todo => Todo): Seq[Todo] =
     value.map {
