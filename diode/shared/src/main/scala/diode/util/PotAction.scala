@@ -5,16 +5,16 @@ import diode._
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
 
-trait PotAction[A, T <: PotAction[A, T]] {
+trait PotAction[A, P <: PotAction[A, P]] {
   def value: Pot[A]
-  def next(newValue: Pot[A]): T
+  def next(newValue: Pot[A]): P
 
   def state = value.state
 
   def handle[M](pf: PartialFunction[PotState, ActionResult[M]]) = pf(state)
 
-  def handleWith[M](handler: ActionHandler[M, Pot[A]], updateEffect: Effect)
-    (f: (PotAction[A, T], ActionHandler[M, Pot[A]], Effect) => ActionResult[M]) = f(this, handler, updateEffect)
+  def handleWith[M, T](handler: ActionHandler[M, T], updateEffect: Effect)
+    (f: (PotAction[A, P], ActionHandler[M, T], Effect) => ActionResult[M]) = f(this, handler, updateEffect)
 
   def pending = next(Pending())
 
@@ -27,14 +27,16 @@ trait PotAction[A, T <: PotAction[A, T]] {
 }
 
 object PotAction {
-  def handler[A, M, T <: PotAction[A, T]](retryPolicy: RetryPolicy = Retry.None)(implicit ec: ExecutionContext) =
-    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], updateEffect: Effect) => {
+  def handler[A, M, P <: PotAction[A, P]](retryPolicy: RetryPolicy = Retry.None)(implicit ec: ExecutionContext) =
+    (action: PotAction[A, P], handler: ActionHandler[M, Pot[A]], updateEffect: Effect) => {
       import PotState._, handler._
       action.state match {
         case PotEmpty =>
           updated(value.pending(retryPolicy), updateEffect)
         case PotPending =>
           noChange
+        case PotUnavailable =>
+          updated(value.unavailable())
         case PotReady =>
           updated(action.value)
         case PotFailed =>
@@ -47,16 +49,18 @@ object PotAction {
       }
     }
 
-  def handler[A, M, T <: PotAction[A, T]](retryPolicy: RetryPolicy, progressDelta: FiniteDuration)(implicit runner: RunAfter, ec: ExecutionContext) = {
+  def handler[A, M, P <: PotAction[A, P]](retryPolicy: RetryPolicy, progressDelta: FiniteDuration)(implicit runner: RunAfter, ec: ExecutionContext) = {
     require(progressDelta > Duration.Zero)
 
-    (action: PotAction[A, T], handler: ActionHandler[M, Pot[A]], updateEffect: Effect) => {
+    (action: PotAction[A, P], handler: ActionHandler[M, Pot[A]], updateEffect: Effect) => {
       import PotState._, handler._
       action.state match {
         case PotEmpty =>
           updated(value.pending(retryPolicy), updateEffect + Effect.action(action.pending).after(progressDelta))
         case PotPending =>
           updated(value.pending(), Effect.action(action.pending).after(progressDelta))
+        case PotUnavailable =>
+          updated(value.unavailable())
         case PotReady =>
           updated(action.value)
         case PotFailed =>
@@ -65,6 +69,78 @@ object PotAction {
               updated(value.retry(nextPolicy), retryEffect)
             case Left(ex) =>
               updated(value.fail(ex))
+          }
+      }
+    }
+  }
+
+  def mapHandler[K, V <: Pot[_], A <: Traversable[(K, V)], M, P <: PotAction[A, P]](keys: Set[K], retryPolicy: RetryPolicy = Retry.None)
+    (implicit ec: ExecutionContext) = {
+    require(keys.nonEmpty)
+    (action: PotAction[A, P], handler: ActionHandler[M, PotMap[K, V]], updateEffect: Effect) => {
+      import PotState._, handler._
+      // updates only those values whose key is in the `keys` list
+      def updateInCollection[W >: V](f: V => W): PotMap[K, V] = {
+        value.map { (k, v) =>
+          if (keys.contains(k))
+            f(v).asInstanceOf[V]
+          else
+            v
+        }
+      }
+      action.state match {
+        case PotEmpty =>
+          updated(updateInCollection(_.pending(retryPolicy)), updateEffect)
+        case PotPending =>
+          noChange
+        case PotUnavailable =>
+          noChange
+        case PotReady =>
+          updated(value.updated(action.value.get))
+        case PotFailed =>
+          // get one retry policy, they're all the same
+          val rp = value.get(keys.head).retryPolicy
+          rp.retry(action.value, updateEffect) match {
+            case Right((nextPolicy, retryEffect)) =>
+              updated(updateInCollection(_.pending(nextPolicy)), retryEffect)
+            case Left(ex) =>
+              updated(updateInCollection(_.fail(ex)))
+          }
+      }
+    }
+  }
+
+  def vectorHandler[V <: Pot[_], A <: Traversable[(Int, V)], M, P <: PotAction[A, P]](indices: Set[Int], retryPolicy: RetryPolicy = Retry.None)
+    (implicit ec: ExecutionContext) = {
+    require(indices.nonEmpty)
+    (action: PotAction[A, P], handler: ActionHandler[M, PotVector[V]], updateEffect: Effect) => {
+      import PotState._, handler._
+      // updates only those values whose key is in the `keys` list
+      def updateInCollection[W >: V](f: V => W): PotVector[V] = {
+        value.map { (k, v) =>
+          if (indices.contains(k))
+            f(v).asInstanceOf[V]
+          else
+            v
+        }
+      }
+      action.state match {
+        case PotEmpty =>
+          updated(updateInCollection(_.pending(retryPolicy)), updateEffect)
+        case PotPending =>
+          noChange
+        case PotUnavailable =>
+          noChange
+        case PotReady =>
+          updated(value.updated(action.value.get))
+        case PotFailed =>
+          // get one retry policy, they're all the same
+          val rp = value.get(indices.head).retryPolicy
+          rp.retry(action.value, updateEffect) match {
+            case Right((nextPolicy, retryEffect)) =>
+              updated(updateInCollection(_.pending(nextPolicy)), retryEffect)
+            case Left(ex) =>
+              updated(updateInCollection(_.fail(ex)))
           }
       }
     }

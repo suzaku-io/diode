@@ -14,7 +14,13 @@ object PotActionTests extends TestSuite {
     override def next(newValue: Pot[String]) = TestAction(newValue)
   }
 
+  case class TestCollAction(value: Pot[Set[(String, Pot[String])]] = Empty) extends PotAction[Set[(String, Pot[String])], TestCollAction] {
+    override def next(newValue: Pot[Set[(String, Pot[String])]]) = TestCollAction(newValue)
+  }
+
   case class Model(s: Pot[String])
+
+  case class CollModel(c: PotMap[String, Pot[String]])
 
   class TestHandler[M](modelRW: ModelRW[M, Pot[String]]) extends ActionHandler(modelRW) {
     override def handle = {
@@ -24,12 +30,26 @@ object PotActionTests extends TestSuite {
     }
   }
 
+  class TestCollHandler[M](modelRW: ModelRW[M, PotMap[String, Pot[String]]], keys: Set[String]) extends ActionHandler(modelRW) {
+    override def handle = {
+      case action: TestCollAction =>
+        val updateF = action.effect(Future(42))(v => keys.map(k => (k, Ready(v.toString))))
+        action.handleWith(this, updateF)(PotAction.mapHandler(keys))
+    }
+  }
+
   class TestFailHandler[M](modelRW: ModelRW[M, Pot[String]]) extends ActionHandler(modelRW) {
     override def handle = {
       case action: TestAction =>
         val updateF = action.effect(Future(throw new TimeoutException))(_.toString)
         action.handleWith(this, updateF)(PotAction.handler())
     }
+  }
+
+  val fetcher = new Fetch[String] {
+    override def fetch(key: String): Unit = ()
+    override def fetch(start: String, end: String): Unit = ()
+    override def fetch(keys: Traversable[String]): Unit = ()
   }
 
   def tests = TestSuite {
@@ -134,6 +154,27 @@ object PotActionTests extends TestSuite {
         nextAction.map {
           case TestAction(value) if value.isFailed =>
             assert(value.exceptionOption.get.isInstanceOf[TimeoutException])
+          case _ => assert(false)
+        }
+      }
+    }
+    'CollectionHandler - {
+      val model = CollModel(new PotMap[String, Pot[String]](fetcher))
+      val modelRW = new RootModelRW(model)
+      val handler = new TestCollHandler(modelRW.zoomRW(_.c)((m, v) => m.copy(c = v)), Set("A"))
+      'empty - {
+        val nextAction = handler.handle(TestCollAction()) match {
+          case ModelUpdateEffect(newModel, effects) =>
+            assert(newModel.c("A").isPending)
+            assert(effects.size == 1)
+            // run effect
+            effects.toFuture
+          case _ =>
+            ???
+        }
+        nextAction.map {
+          case TestCollAction(value) if value.isReady =>
+            assert(value.get == Set(("A", Ready("42"))))
           case _ => assert(false)
         }
       }

@@ -12,6 +12,8 @@ object PotState {
 
   case object PotEmpty extends PotState
 
+  case object PotUnavailable extends PotState
+
   case object PotReady extends PotState
 
   case object PotPending extends PotState
@@ -41,6 +43,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
   def pending(policy: RetryPolicy = Retry.None): Pot[A]
   def retry(policy: RetryPolicy): Pot[A]
   def fail(exception: Throwable): Pot[A]
+  def unavailable() = Unavailable
   def state: PotState
 
   /** Returns false if the pot is Empty, true otherwise.
@@ -297,6 +300,21 @@ case object Empty extends Pot[Nothing] {
   def isStale = false
   def retriesLeft = 0
   def state = PotState.PotEmpty
+  def retryPolicy = Retry.None
+  def retry(policy: RetryPolicy) = throw new IllegalStateException("Cannot retry in Empty state")
+
+  override def pending(policy: RetryPolicy) = Pending(policy)
+  override def fail(exception: Throwable) = Failed(exception)
+}
+
+case object Unavailable extends Pot[Nothing] {
+  def get = throw new NoSuchElementException("Unavailable.get")
+  def isEmpty = true
+  def isPending = false
+  def isFailed = true
+  def isStale = false
+  def retriesLeft = 0
+  def state = PotState.PotUnavailable
   def retryPolicy = Retry.None
   def retry(policy: RetryPolicy) = throw new IllegalStateException("Cannot retry in Empty state")
 

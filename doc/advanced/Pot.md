@@ -8,7 +8,7 @@ operation has been running and notifying the user when it has been delayed for t
 ## Potential Data
 
 <img src="../images/pot-states.png" style="float: right; padding: 10px";>
-A `Pot[+A]` represents _potential_ data that may exist in six different states as seen in the picture on the right. `Pot` provides you with the same interface as
+A `Pot[+A]` represents _potential_ data that may exist in seven different states as seen in the picture on the right. `Pot` provides you with the same interface as
 `Option` or `Try`, making it very easy to use in your existing application code. Things like _for comprehension_, `getOrElse` or even `recover` are supported.
 Like `Option`, `Pot` is immutable and you have to create a new `Pot` when the state or content changes.
 
@@ -51,6 +51,12 @@ old data.
 myData = myData.fail(exception) // myData is now FailedStale(data, exception)
 ```
 
+If the data you are trying to fetch does not exist, you can use `Unavailable` to indicate that.
+
+```scala
+myData = myData.unavailable() // myData is now Unavailable
+```
+
 ### Usage
 
 `Pot` exposes its state via following functions.
@@ -68,7 +74,7 @@ def state: PotState
 You can query specific state via `isX` functions, or use `state` for matching. Note that `isEmpty` means there is no data in the `Pot`, so states `Pending` and
 `Failed`, in addition to `Empty`, all return `true`.
 
-Otherwise a `Pot` works like an `Option` (`Empty`, `Pending` and `Failed` work like `None`).
+Otherwise a `Pot` works like an `Option` (`Empty`, `Unavailable`, `Pending` and `Failed` work like `None`).
 
 ### Retries
 
