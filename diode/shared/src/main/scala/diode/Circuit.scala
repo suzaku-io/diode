@@ -192,11 +192,17 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
           update(newModel)
         case ActionResult.EffectOnly(effects) =>
           // run effects
-          effects.run(dispatch)
+          effects.run(dispatch).recover {
+            case e: Throwable =>
+              handleError(s"Error in processing effects for action $action: $e")
+          }(effects.ec)
         case ActionResult.ModelUpdateEffect(newModel, effects) =>
           update(newModel)
           // run effects
-          effects.run(dispatch)
+          effects.run(dispatch).recover {
+            case e: Throwable =>
+              handleError(s"Error in processing effects for action $action: $e")
+          }(effects.ec)
       }
     } catch {
       case e: Throwable =>

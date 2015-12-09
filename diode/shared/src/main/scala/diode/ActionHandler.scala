@@ -15,11 +15,11 @@ object ActionResult {
 
   case object NoChange extends ActionResult[Nothing]
 
-  case class ModelUpdate[M](newValue: M) extends ModelUpdated[M]
+  final case class ModelUpdate[M](newValue: M) extends ModelUpdated[M]
 
-  case class EffectOnly(effects: Effect) extends ActionResult[Nothing]
+  final case class EffectOnly(effects: Effect) extends ActionResult[Nothing]
 
-  case class ModelUpdateEffect[M](newValue: M, effects: Effect) extends ModelUpdated[M]
+  final case class ModelUpdateEffect[M](newValue: M, effects: Effect) extends ModelUpdated[M]
 
 }
 

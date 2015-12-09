@@ -6,8 +6,8 @@ import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
-  * Provides method for saving and loading application state.
-  *
+  * Provides an action processor for saving and loading application state.
+  * Needs to be extended with an actual implementation for pickling and save/load.
   */
 abstract class PersistState[M <: AnyRef, P] extends ActionProcessor[M] {
   import PersistState._
