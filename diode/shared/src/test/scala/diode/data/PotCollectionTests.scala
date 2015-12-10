@@ -29,7 +29,7 @@ object PotCollectionTests extends TestSuite {
       }
       'get - {
         val fetcher = new TestFetcher[String]
-        val m = new PotMap[String, String](fetcher)
+        val m = PotMap[String, String](fetcher)
         val m1 = m + ("test1" -> Ready("Yeaa"))
         assert(m1.get("test2").isPending)
         assert(fetcher.lastFetch == "test2")

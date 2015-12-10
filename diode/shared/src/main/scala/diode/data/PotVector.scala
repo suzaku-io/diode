@@ -5,7 +5,7 @@ import java.util
 class PotVector[V](
   private val fetcher: Fetch[Int],
   private val length: Int,
-  private val elems: Array[Option[Pot[V]]] = Array.empty[Option[Pot[V]]]
+  private val elems: Array[Option[Pot[V]]]
 ) extends PotCollection[Int, V] {
 
   private def enlarge[V](newSize: Int) = {

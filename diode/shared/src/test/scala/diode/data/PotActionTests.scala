@@ -160,7 +160,7 @@ object PotActionTests extends TestSuite {
       }
     }
     'CollectionHandler - {
-      val model = CollModel(new PotMap[String, String](fetcher))
+      val model = CollModel(PotMap[String, String](fetcher))
       val modelRW = new RootModelRW(model)
       val handler = new TestCollHandler(modelRW.zoomRW(_.c)((m, v) => m.copy(c = v)), Set("A"))
       'empty - {

@@ -2,7 +2,7 @@ package diode.data
 
 class PotMap[K, V](
   private val fetcher: Fetch[K],
-  private val elems: Map[K, Pot[V]] = Map.empty[K, Pot[V]]
+  private val elems: Map[K, Pot[V]]
 ) extends PotCollection[K, V] {
 
   override def updated(key: K, value: Pot[V]): PotMap[K, V] =
@@ -101,5 +101,5 @@ class PotMap[K, V](
 }
 
 object PotMap {
-  def apply[K, V](fetcher: Fetch[K]) = new PotMap[K, V](fetcher)
+  def apply[K, V](fetcher: Fetch[K], elems: Map[K, Pot[V]] = Map.empty[K, Pot[V]]) = new PotMap[K, V](fetcher, elems)
 }
