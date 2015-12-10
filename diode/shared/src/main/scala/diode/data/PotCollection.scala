@@ -20,22 +20,29 @@ trait Fetch[K] {
   def fetch(keys: Traversable[K]): Unit
 }
 
-trait PotCollection[K, V <: Pot[_]] {
-  def updated(key: K, value: V): PotCollection[K, V]
+/**
+  * Trait defining common functionality for all potential collections. All values inside the collection are
+  * wrapped in `Pot[V]`
+  *
+  * @tparam K Type of the key
+  * @tparam V Type of the potential value
+  */
+trait PotCollection[K, V] {
+  def updated(key: K, value: Pot[V]): PotCollection[K, V]
 
-  def updated(start: K, values: Traversable[V])(implicit num: Numeric[K]): PotCollection[K, V]
+  def updated(start: K, values: Traversable[Pot[V]])(implicit num: Numeric[K]): PotCollection[K, V]
 
-  def updated(kvs: Traversable[(K, V)]): PotCollection[K, V]
+  def updated(kvs: Traversable[(K, Pot[V])]): PotCollection[K, V]
 
   def updated(coll: PotCollection[K, V]): PotCollection[K, V] = updated(coll.seq)
 
   def remove(key: K): PotCollection[K, V]
 
-  def apply(key: K): V = get(key)
+  def apply(key: K): Pot[V] = get(key)
 
-  def get(key: K): V
+  def get(key: K): Pot[V]
 
-  def seq: Traversable[(K, V)]
+  def seq: Traversable[(K, Pot[V])]
 
   def refresh(key: K): Unit
 
@@ -43,5 +50,5 @@ trait PotCollection[K, V <: Pot[_]] {
 
   def clear: PotCollection[K, V]
 
-  def map(f: (K, V) => V): PotCollection[K, V]
+  def map(f: (K, Pot[V]) => Pot[V]): PotCollection[K, V]
 }

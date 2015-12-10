@@ -14,7 +14,7 @@ object PotCollectionTests extends TestSuite {
     'PotMap - {
       'update - {
         val fetcher = new TestFetcher[String]
-        val m = new PotMap[String, Pot[String]](fetcher)
+        val m = PotMap[String, String](fetcher)
         val m1 = m + ("test" -> Ready("Yeaa"))
 
         assert(m1.size == 1)
@@ -29,7 +29,7 @@ object PotCollectionTests extends TestSuite {
       }
       'get - {
         val fetcher = new TestFetcher[String]
-        val m = new PotMap[String, Pot[String]](fetcher)
+        val m = new PotMap[String, String](fetcher)
         val m1 = m + ("test1" -> Ready("Yeaa"))
         assert(m1.get("test2").isPending)
         assert(fetcher.lastFetch == "test2")
@@ -40,7 +40,7 @@ object PotCollectionTests extends TestSuite {
     'PotVector - {
       'update - {
         val fetcher = new TestFetcher[Int]
-        val v = new PotVector[Pot[String]](fetcher, 10)
+        val v = PotVector[String](fetcher, 10)
         val v1 = v.updated(0, Ready("0"))
         assert(v1(0) == Ready("0"))
         assert(v1(1).isPending)

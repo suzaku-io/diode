@@ -1,17 +1,17 @@
 package diode.data
 
-class PotMap[K, V <: Pot[_]](
+class PotMap[K, V](
   private val fetcher: Fetch[K],
-  private val elems: Map[K, V] = Map.empty[K, V]
+  private val elems: Map[K, Pot[V]] = Map.empty[K, Pot[V]]
 ) extends PotCollection[K, V] {
 
-  override def updated(key: K, value: V): PotMap[K, V] =
+  override def updated(key: K, value: Pot[V]): PotMap[K, V] =
     new PotMap(fetcher, elems + (key -> value))
 
-  override def updated(kvs: Traversable[(K, V)]) =
+  override def updated(kvs: Traversable[(K, Pot[V])]) =
     new PotMap(fetcher, elems ++ kvs)
 
-  override def updated(start: K, values: Traversable[V])(implicit num: Numeric[K]): PotMap[K, V] = {
+  override def updated(start: K, values: Traversable[Pot[V]])(implicit num: Numeric[K]): PotMap[K, V] = {
     if (values.isEmpty)
       this
     else {
@@ -22,7 +22,7 @@ class PotMap[K, V <: Pot[_]](
     }
   }
 
-  override def seq: Traversable[(K, V)] = elems
+  override def seq: Traversable[(K, Pot[V])] = elems
 
   override def remove(key: K) =
     new PotMap(fetcher, elems - key)
@@ -50,52 +50,56 @@ class PotMap[K, V <: Pot[_]](
   }
 
   override def clear =
-    new PotMap(fetcher, Map.empty[K, V])
+    new PotMap(fetcher, Map.empty[K, Pot[V]])
 
   override def get(key: K) = {
     elems.get(key) match {
       case Some(elem) if elem.state == PotState.PotEmpty =>
         fetcher.fetch(key)
-        Pending().asInstanceOf[V]
+        Pending().asInstanceOf[Pot[V]]
       case Some(elem) =>
         elem
       case None =>
         fetcher.fetch(key)
-        Pending().asInstanceOf[V]
+        Pending().asInstanceOf[Pot[V]]
     }
   }
 
-  override def map(f: (K, V) => V) = {
+  override def map(f: (K, Pot[V]) => Pot[V]) = {
     new PotMap(fetcher, elems.map(kv => (kv._1, f(kv._1, kv._2))))
   }
 
-  def +(kv: (K, V)): PotMap[K, V] = updated(kv._1, kv._2)
+  def +(kv: (K, Pot[V])): PotMap[K, V] = updated(kv._1, kv._2)
 
-  def ++(xs: Traversable[(K, V)]) = updated(xs)
+  def ++(xs: Traversable[(K, Pot[V])]) = updated(xs)
 
   def -(key: K) = remove(key)
 
-  def get(keys: Traversable[K]): Map[K, V] = {
+  def get(keys: Traversable[K]): Map[K, Pot[V]] = {
     var toFetch = List.empty[K]
-    val values: Map[K, V] = keys.map { key =>
+    val values: Map[K, Pot[V]] = keys.map { key =>
       elems.get(key) match {
         case Some(elem) if elem.state == PotState.PotEmpty =>
           toFetch ::= key
-          (key, Pending().asInstanceOf[V])
+          (key, Pending().asInstanceOf[Pot[V]])
         case Some(elem) =>
           (key, elem)
         case None =>
           toFetch ::= key
-          (key, Pending().asInstanceOf[V])
+          (key, Pending().asInstanceOf[Pot[V]])
       }
     }(collection.breakOut)
     fetcher.fetch(toFetch)
     values
   }
 
-  def iterator: Iterator[(K, V)] = elems.iterator
+  def iterator: Iterator[(K, Pot[V])] = elems.iterator
 
   def size = elems.size
 
   def keys = elems.keys
+}
+
+object PotMap {
+  def apply[K, V](fetcher: Fetch[K]) = new PotMap[K, V](fetcher)
 }

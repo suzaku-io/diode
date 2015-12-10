@@ -77,17 +77,17 @@ object PotAction {
     }
   }
 
-  def mapHandler[K, V <: Pot[_], A <: Traversable[(K, V)], M, P <: PotAction[A, P]](keys: Set[K], retryPolicy: RetryPolicy = Retry.None)
+  def mapHandler[K, V, A <: Traversable[(K, Pot[V])], M, P <: PotAction[A, P]](keys: Set[K], retryPolicy: RetryPolicy = Retry.None)
     (implicit ec: ExecutionContext) = {
     require(keys.nonEmpty)
     (action: PotAction[A, P], handler: ActionHandler[M, PotMap[K, V]], updateEffect: Effect) => {
       import PotState._
       import handler._
       // updates only those values whose key is in the `keys` list
-      def updateInCollection[W >: V](f: V => W): PotMap[K, V] = {
+      def updateInCollection(f: Pot[V] => Pot[V]): PotMap[K, V] = {
         value.map { (k, v) =>
           if (keys.contains(k))
-            f(v).asInstanceOf[V]
+            f(v)
           else
             v
         }
@@ -114,17 +114,17 @@ object PotAction {
     }
   }
 
-  def vectorHandler[V <: Pot[_], A <: Traversable[(Int, V)], M, P <: PotAction[A, P]](indices: Set[Int], retryPolicy: RetryPolicy = Retry.None)
+  def vectorHandler[V, A <: Traversable[(Int, Pot[V])], M, P <: PotAction[A, P]](indices: Set[Int], retryPolicy: RetryPolicy = Retry.None)
     (implicit ec: ExecutionContext) = {
     require(indices.nonEmpty)
     (action: PotAction[A, P], handler: ActionHandler[M, PotVector[V]], updateEffect: Effect) => {
       import PotState._
       import handler._
       // updates only those values whose index is in the `indices` list
-      def updateInCollection[W >: V](f: V => W): PotVector[V] = {
+      def updateInCollection(f: Pot[V] => Pot[V]): PotVector[V] = {
         value.map { (k, v) =>
           if (indices.contains(k))
-            f(v).asInstanceOf[V]
+            f(v)
           else
             v
         }

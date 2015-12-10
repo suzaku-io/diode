@@ -21,7 +21,7 @@ object PotActionTests extends TestSuite {
 
   case class Model(s: Pot[String])
 
-  case class CollModel(c: PotMap[String, Pot[String]])
+  case class CollModel(c: PotMap[String, String])
 
   class TestHandler[M](modelRW: ModelRW[M, Pot[String]]) extends ActionHandler(modelRW) {
     override def handle = {
@@ -31,7 +31,7 @@ object PotActionTests extends TestSuite {
     }
   }
 
-  class TestCollHandler[M](modelRW: ModelRW[M, PotMap[String, Pot[String]]], keys: Set[String]) extends ActionHandler(modelRW) {
+  class TestCollHandler[M](modelRW: ModelRW[M, PotMap[String, String]], keys: Set[String]) extends ActionHandler(modelRW) {
     override def handle = {
       case action: TestCollAction =>
         val updateF = action.effect(Future(42))(v => keys.map(k => (k, Ready(v.toString))))
@@ -160,7 +160,7 @@ object PotActionTests extends TestSuite {
       }
     }
     'CollectionHandler - {
-      val model = CollModel(new PotMap[String, Pot[String]](fetcher))
+      val model = CollModel(new PotMap[String, String](fetcher))
       val modelRW = new RootModelRW(model)
       val handler = new TestCollHandler(modelRW.zoomRW(_.c)((m, v) => m.copy(c = v)), Set("A"))
       'empty - {
