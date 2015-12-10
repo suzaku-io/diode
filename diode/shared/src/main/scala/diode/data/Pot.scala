@@ -1,8 +1,9 @@
-package diode.util
+package diode.data
 
 import java.util.Date
 
-import diode.util
+import diode.{data, util}
+import diode.util._
 
 import scala.util.{Failure, Success, Try}
 
@@ -25,7 +26,7 @@ object PotState {
 /**
   * Represents a potential value that may be in different states.
   *
-  * @define pot [[util.Pot]]
+  * @define pot [[data.Pot]]
   * @define ready [[Ready]]
   * @define empty [[Empty]]
   */
@@ -47,6 +48,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
   def state: PotState
 
   /** Returns false if the pot is Empty, true otherwise.
+    *
     * @note   Implemented here to avoid the implicit conversion to Iterable.
     */
   final def nonEmpty = !isEmpty
@@ -60,7 +62,6 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     *
     * @note This is similar to `flatMap` except here,
     *       $f does not need to wrap its result in a pot.
-    *
     * @param  f   the function to apply
     * @see flatMap
     * @see foreach
@@ -73,7 +74,6 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     * expression `ifEmpty`.
     *
     * @note This is equivalent to `Pot map f getOrElse ifEmpty`.
-    *
     * @param  ifEmpty the expression to evaluate if empty.
     * @param  f       the function to apply if nonempty.
     */
@@ -144,8 +144,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     *   // Returns false when method called on Empty.
     *   Empty contains "anything"
     * }}}
-    *
-    * @param elem the element to test.
+      * @param elem the element to test.
     * @return `true` if the pot has an element that is equal (as
     *         determined by `==`) to `elem`, `false` otherwise.
     */
@@ -196,8 +195,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     *   // Returns Empty because Empty is passed to the collect method.
     *   Empty collect {case value => value}
     * }}}
-    *
-    * @param  pf   the partial function.
+      * @param  pf   the partial function.
     * @return the result of applying `pf` to this Pot's
     *         value (if possible), or Empty.
     */
@@ -206,6 +204,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
 
   /** Returns this Pot if it is nonempty,
     * otherwise return the result of evaluating `alternative`.
+    *
     * @param alternative the alternative expression.
     */
   @inline final def orElse[B >: A](alternative: => Pot[B]): Pot[B] =

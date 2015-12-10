@@ -1,4 +1,4 @@
-package diode.util
+package diode.data
 
 class PotMap[K, V <: Pot[_]](
   private val fetcher: Fetch[K],

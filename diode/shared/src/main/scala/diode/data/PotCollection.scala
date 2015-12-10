@@ -1,4 +1,4 @@
-package diode.util
+package diode.data
 
 /**
   * Provides ways to asynchronously fetch value(s) based on key(s)

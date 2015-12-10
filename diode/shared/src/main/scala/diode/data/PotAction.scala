@@ -1,6 +1,7 @@
-package diode.util
+package diode.data
 
 import diode._
+import diode.util._
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -29,7 +30,8 @@ trait PotAction[A, P <: PotAction[A, P]] {
 object PotAction {
   def handler[A, M, P <: PotAction[A, P]](retryPolicy: RetryPolicy = Retry.None)(implicit ec: ExecutionContext) =
     (action: PotAction[A, P], handler: ActionHandler[M, Pot[A]], updateEffect: Effect) => {
-      import PotState._, handler._
+      import PotState._
+      import handler._
       action.state match {
         case PotEmpty =>
           updated(value.pending(retryPolicy), updateEffect)
@@ -53,7 +55,8 @@ object PotAction {
     require(progressDelta > Duration.Zero)
 
     (action: PotAction[A, P], handler: ActionHandler[M, Pot[A]], updateEffect: Effect) => {
-      import PotState._, handler._
+      import PotState._
+      import handler._
       action.state match {
         case PotEmpty =>
           updated(value.pending(retryPolicy), updateEffect + Effect.action(action.pending).after(progressDelta))
@@ -78,7 +81,8 @@ object PotAction {
     (implicit ec: ExecutionContext) = {
     require(keys.nonEmpty)
     (action: PotAction[A, P], handler: ActionHandler[M, PotMap[K, V]], updateEffect: Effect) => {
-      import PotState._, handler._
+      import PotState._
+      import handler._
       // updates only those values whose key is in the `keys` list
       def updateInCollection[W >: V](f: V => W): PotMap[K, V] = {
         value.map { (k, v) =>
@@ -114,8 +118,9 @@ object PotAction {
     (implicit ec: ExecutionContext) = {
     require(indices.nonEmpty)
     (action: PotAction[A, P], handler: ActionHandler[M, PotVector[V]], updateEffect: Effect) => {
-      import PotState._, handler._
-      // updates only those values whose key is in the `keys` list
+      import PotState._
+      import handler._
+      // updates only those values whose index is in the `indices` list
       def updateInCollection[W >: V](f: V => W): PotVector[V] = {
         value.map { (k, v) =>
           if (indices.contains(k))

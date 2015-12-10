@@ -3,6 +3,7 @@ package diode.util
 import java.util.concurrent.TimeUnit
 
 import diode.Effect
+import diode.data.Pot
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._

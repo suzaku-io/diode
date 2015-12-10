@@ -1,6 +1,6 @@
-package diode.util
+package diode.data
 
-import diode.util.PotState._
+import diode.data.PotState._
 import utest._
 
 object PotCollectionTests extends TestSuite {

@@ -1,5 +1,6 @@
 package diode.react
 
+import diode.data.{PendingBase, Pot}
 import diode.util._
 import japgolly.scalajs.react.ReactNode
 
@@ -8,6 +9,7 @@ object ReactPot {
   implicit class potWithReact[A](val pot: Pot[A]) extends AnyVal {
     /**
       * Render non-empty (ready or stale) content
+ *
       * @param f Transforms Pot value into a ReactNode
       * @return
       */
@@ -16,6 +18,7 @@ object ReactPot {
 
     /**
       * Render content in Ready state, not including stale states
+ *
       * @param f Transforms Pot value into a ReactNode
       * @return
       */
@@ -24,6 +27,7 @@ object ReactPot {
 
     /**
       * Render when Pot is pending
+ *
       * @param f Transforms duration time into a ReactNode
       * @return
       */
@@ -32,6 +36,7 @@ object ReactPot {
 
     /**
       * Render when Pot is pending with a filter on duration
+ *
       * @param b Filter based on duration value
       * @param f Transforms duration time into a ReactNode
       * @return
@@ -45,6 +50,7 @@ object ReactPot {
 
     /**
       * Render when Pot has failed
+ *
       * @param f Transforms an exception into a ReactNode
       * @return
       */
@@ -53,6 +59,7 @@ object ReactPot {
 
     /**
       * Render stale content (`PendingStale` or `FailedStale`)
+ *
       * @param f Transforms Pot value into a ReactNode
       * @return
       */
@@ -61,6 +68,7 @@ object ReactPot {
 
     /**
       * Render when Pot is empty
+ *
       * @param f Returns a ReactNode
       * @return
       */

@@ -1,4 +1,4 @@
-package diode.util
+package diode.data
 
 import java.util
 

@@ -1,12 +1,13 @@
-package diode.util
+package diode.data
 
 import diode.ActionResult._
 import diode._
-import diode.util.PotState._
+import diode.data.PotState._
+import diode.util.Retry
 import utest._
 
-import scala.concurrent._
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent._
 
 object PotActionTests extends TestSuite {
 
