@@ -39,7 +39,7 @@ of functions going from `root` all the way to the piece of data we are intereste
 reader to `root.b.g.h` we would write:
 
 ```scala
-val reader: ModelR[Option[Seq[Int]]] = new RootModelR(root).zoom(_.g.map(_.h))
+val reader: ModelR[Option[Seq[Int]]] = new RootModelR(root).zoom(_.b.g.map(_.h))
 ```
 
 Because we have an `Option[D]` on the path, we need to use `map` to access the contents of `D`, thus leaving us with an `Option[Seq[Int]]` reader. To get the
