@@ -55,7 +55,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * @tparam T
     * @return A `ModelR[T]` giving you read-only access to part of the model
     */
-  def zoom[T](get: M => T): ModelR[T] = modelRW.zoom[T](get)
+  def zoom[T](get: M => T): ModelR[M, T] = modelRW.zoom[T](get)
 
   /**
     * Zoom into the model using `get` and `set` functions

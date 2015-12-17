@@ -3,7 +3,7 @@ package example
 import diode._
 import scalatags.JsDom.all._
 
-class TreeView(root: ModelR[FileNode], parent: Seq[String], selection: ModelR[Seq[String]], dispatcher: Dispatcher) {
+class TreeView(root: ModelR[_, FileNode], parent: Seq[String], selection: ModelR[_, Seq[String]], dispatcher: Dispatcher) {
   val id = root().id
   val path = parent :+ id
   val childSeq = build

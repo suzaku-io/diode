@@ -3,12 +3,13 @@ package diode.react
 import diode._
 import japgolly.scalajs.react._
 import scala.language.existentials
+import scala.language.existentials
 
 /**
   * Wraps a model reader, dispatcher and React connector to be passed to React components
   * in props.
   */
-case class ModelProxy[S](modelReader: ModelR[S], dispatch: AnyRef => Callback, connector: ReactConnector[_ <: AnyRef]) {
+case class ModelProxy[S](modelReader: ModelR[_, S], dispatch: AnyRef => Callback, connector: ReactConnector[_ <: AnyRef]) {
   def value = modelReader()
 
   def apply() = modelReader()
@@ -44,7 +45,7 @@ trait ReactConnector[M <: AnyRef] {
     * @param compB       Function that creates the wrapped component
     * @return The component returned by `compB`
     */
-  def wrap[S <: AnyRef, C](modelReader: ModelR[S])(compB: ModelProxy[S] => C)(implicit ev: C => ReactElement): C = {
+  def wrap[S <: AnyRef, C](modelReader: ModelR[_, S])(compB: ModelProxy[S] => C)(implicit ev: C => ReactElement): C = {
     compB(ModelProxy(modelReader, action => Callback(circuit.dispatch(action)), ReactConnector.this))
   }
 
@@ -69,7 +70,7 @@ trait ReactConnector[M <: AnyRef] {
     * @param compB       Function that creates the wrapped component
     * @return A React component
     */
-  def connect[S <: AnyRef, C](modelReader: ModelR[S])(compB: ModelProxy[S] => C)
+  def connect[S <: AnyRef, C](modelReader: ModelR[_, S])(compB: ModelProxy[S] => C)
     (implicit ev: C => ReactElement): ReactComponentU[Unit, S, _, TopNode] = {
 
     class Backend(t: BackendScope[Unit, S]) {

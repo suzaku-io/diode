@@ -14,5 +14,5 @@ libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "0.8.2",
   "com.lihaoyi" %%% "scalatags" % "0.5.3",
   "com.lihaoyi" %%% "utest" % "0.3.1" % "test",
-  "me.chrons" %%% "diode" % "0.2.0"
+  "me.chrons" %%% "diode" % "0.3.0-SNAPSHOT"
 )
