@@ -2,7 +2,7 @@ package diode.data
 
 import java.util.Date
 
-import diode.{data, util}
+import diode.data
 import diode.util._
 
 import scala.util.{Failure, Success, Try}
@@ -26,7 +26,7 @@ object PotState {
 /**
   * Represents a potential value that may be in different states.
   *
-  * @define pot [[data.Pot]]
+  * @define pot   [[data.Pot]]
   * @define ready [[Ready]]
   * @define empty [[Empty]]
   */
@@ -39,9 +39,10 @@ sealed abstract class Pot[+A] extends Product with Serializable {
   def isStale: Boolean
   def isFailed: Boolean
   def isReady = !isEmpty && !isStale
+  def isUnavailable: Boolean
   def retryPolicy: RetryPolicy
   def ready[B >: A](value: B): Pot[B] = Ready(value)
-  def pending(policy: RetryPolicy = Retry.None): Pot[A]
+  def pending(policy: RetryPolicy = retryPolicy): Pot[A]
   def retry(policy: RetryPolicy): Pot[A]
   def fail(exception: Throwable): Pot[A]
   def unavailable() = Unavailable
@@ -49,7 +50,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
 
   /** Returns false if the pot is Empty, true otherwise.
     *
-    * @note   Implemented here to avoid the implicit conversion to Iterable.
+    * @note Implemented here to avoid the implicit conversion to Iterable.
     */
   final def nonEmpty = !isEmpty
 
@@ -62,7 +63,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     *
     * @note This is similar to `flatMap` except here,
     *       $f does not need to wrap its result in a pot.
-    * @param  f   the function to apply
+    * @param  f the function to apply
     * @see flatMap
     * @see foreach
     */
@@ -86,7 +87,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     * Slightly different from `map` in that $f is expected to
     * return a pot (which could be Empty).
     *
-    * @param  f   the function to apply
+    * @param  f the function to apply
     * @see map
     * @see foreach
     */
@@ -99,7 +100,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
   /** Returns this Pot if it is nonempty '''and''' applying the predicate $p to
     * this Pot's value returns true. Otherwise, return Empty.
     *
-    * @param  p   the predicate used for testing.
+    * @param  p the predicate used for testing.
     */
   @inline final def filter(p: A => Boolean): Pot[A] =
     if (isEmpty || p(this.get)) this else Empty
@@ -107,7 +108,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
   /** Returns this Pot if it is nonempty '''and''' applying the predicate $p to
     * this Pot's value returns false. Otherwise, return Empty.
     *
-    * @param  p   the predicate used for testing.
+    * @param  p the predicate used for testing.
     */
   @inline final def filterNot(p: A => Boolean): Pot[A] =
     if (isEmpty || !p(this.get)) this else Empty
@@ -134,16 +135,16 @@ sealed abstract class Pot[+A] extends Product with Serializable {
   /** Tests whether the pot contains a given value as an element.
     *
     * @example
-    * {{{
-    *   // Returns true because Ready instance contains string "something" which equals "something".
-    *   Ready("something") contains "something"
-    *
-    *   // Returns false because "something" != "anything".
-    *   Ready("something") contains "anything"
-    *
-    *   // Returns false when method called on Empty.
-    *   Empty contains "anything"
-    * }}}
+      * {{{
+      *    // Returns true because Ready instance contains string "something" which equals "something".
+      *    Ready("something") contains "something"
+      *
+      *    // Returns false because "something" != "anything".
+      *    Ready("something") contains "anything"
+      *
+      *    // Returns false when method called on Empty.
+      *    Empty contains "anything"
+      * }}}
       * @param elem the element to test.
     * @return `true` if the pot has an element that is equal (as
     *         determined by `==`) to `elem`, `false` otherwise.
@@ -155,7 +156,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     * $p returns true when applied to this Pot's value.
     * Otherwise, returns false.
     *
-    * @param  p   the predicate to test
+    * @param  p the predicate to test
     */
   @inline final def exists(p: A => Boolean): Boolean =
     !isEmpty && p(this.get)
@@ -163,14 +164,14 @@ sealed abstract class Pot[+A] extends Product with Serializable {
   /** Returns true if this pot is empty '''or''' the predicate
     * $p returns true when applied to this Pot's value.
     *
-    * @param  p   the predicate to test
+    * @param  p the predicate to test
     */
   @inline final def forall(p: A => Boolean): Boolean = isEmpty || p(this.get)
 
   /** Apply the given procedure $f to the pot's value,
     * if it is nonempty. Otherwise, do nothing.
     *
-    * @param  f   the procedure to apply.
+    * @param  f the procedure to apply.
     * @see map
     * @see flatMap
     */
@@ -185,17 +186,17 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     * Returns Empty otherwise.
     *
     * @example
-    * {{{
-    *   // Returns Ready(HTTP) because the partial function covers the case.
-    *   Ready("http") collect {case "http" => "HTTP"}
-    *
-    *   // Returns Empty because the partial function doesn't cover the case.
-    *   Ready("ftp") collect {case "http" => "HTTP"}
-    *
-    *   // Returns Empty because Empty is passed to the collect method.
-    *   Empty collect {case value => value}
-    * }}}
-      * @param  pf   the partial function.
+      * {{{
+      *    // Returns Ready(HTTP) because the partial function covers the case.
+      *    Ready("http") collect {case "http" => "HTTP"}
+      *
+      *    // Returns Empty because the partial function doesn't cover the case.
+      *    Ready("ftp") collect {case "http" => "HTTP"}
+      *
+      *    // Returns Empty because Empty is passed to the collect method.
+      *    Empty collect {case value => value}
+      * }}}
+      * @param  pf the partial function.
     * @return the result of applying `pf` to this Pot's
     *         value (if possible), or Empty.
     */
@@ -297,6 +298,7 @@ case object Empty extends Pot[Nothing] {
   def isPending = false
   def isFailed = false
   def isStale = false
+  def isUnavailable = false
   def retriesLeft = 0
   def state = PotState.PotEmpty
   def retryPolicy = Retry.None
@@ -312,6 +314,7 @@ case object Unavailable extends Pot[Nothing] {
   def isPending = false
   def isFailed = true
   def isStale = false
+  def isUnavailable = true
   def retriesLeft = 0
   def state = PotState.PotUnavailable
   def retryPolicy = Retry.None
@@ -327,6 +330,7 @@ final case class Ready[+A](x: A) extends Pot[A] {
   def isPending = false
   def isFailed = false
   def isStale = false
+  def isUnavailable = false
   def retriesLeft = 0
   def state = PotState.PotReady
   def retryPolicy = Retry.None
@@ -339,6 +343,7 @@ final case class Ready[+A](x: A) extends Pot[A] {
 private[diode] sealed trait PendingBase {
   def startTime: Long
   def isPending = true
+  def isUnavailable = false
   def state = PotState.PotPending
   def duration(currentTime: Long = new Date().getTime) = (currentTime - startTime).toInt
 }
@@ -369,6 +374,7 @@ private[diode] sealed trait FailedBase {
   def exception: Throwable
   def isPending = false
   def isFailed = true
+  def isUnavailable = false
   def state = PotState.PotFailed
 }
 

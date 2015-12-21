@@ -1,7 +1,7 @@
 package diode.data
 
 /**
-  * Provides ways to asynchronously fetch value(s) based on key(s)
+  * Provides methods to asynchronously fetch value(s) based on key(s)
   */
 trait Fetch[K] {
   /**
@@ -10,14 +10,24 @@ trait Fetch[K] {
   def fetch(key: K): Unit
 
   /**
-    * Start fetching a range of values from `start` to `end`
-    */
-  def fetch(start: K, end: K): Unit
-
-  /**
     * Start fetching a set of values
     */
   def fetch(keys: Traversable[K]): Unit
+
+  /**
+    * Start fetching a range of values from `start` to `end`
+    */
+  def fetch(start: K, end: K): Unit = {}
+
+  /**
+    * Start fetching values that precede `key`
+    */
+  def fetchPrev(key: K, count: Int = 1): Unit = {}
+
+  /**
+    * Start fetching values that follow `key`
+    */
+  def fetchNext(key: K, count: Int = 1): Unit = {}
 }
 
 /**
@@ -43,6 +53,8 @@ trait PotCollection[K, V] {
   def get(key: K): Pot[V]
 
   def seq: Traversable[(K, Pot[V])]
+
+  def iterator: Iterator[(K, Pot[V])]
 
   def refresh(key: K): Unit
 

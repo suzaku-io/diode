@@ -2,15 +2,21 @@ package diode.data
 
 import java.util
 
+import scala.annotation.tailrec
+
 class PotVector[V](
   private val fetcher: Fetch[Int],
   private val length: Int,
   private val elems: Array[Option[Pot[V]]]
 ) extends PotCollection[Int, V] {
 
-  private def enlarge[V](newSize: Int) = {
-    val newArray = Array.fill[Option[V]](newSize)(None)
+  private def enlarge(newSize: Int) = {
+    val newArray = Array.ofDim[Option[Pot[V]]](newSize)
+    // copy old data
     Array.copy(elems, 0, newArray, 0, elems.length)
+    // clear newly allocated space
+    for(i <- elems.length until newSize)
+      newArray(i) = None
     newArray
   }
 
@@ -19,9 +25,9 @@ class PotVector[V](
       throw new IndexOutOfBoundsException
     val newElems = if (idx >= elems.length) {
       // enlarge the array
-      enlarge[Pot[V]](idx + 1)
+      enlarge(idx + 1)
     } else {
-      elems.asInstanceOf[Array[Option[Pot[V]]]]
+      elems
     }
     newElems(idx) = Some(value)
     new PotVector(fetcher, length, newElems)
@@ -35,9 +41,9 @@ class PotVector[V](
       throw new IndexOutOfBoundsException
     val newElems = if (maxIdx >= elems.length) {
       // enlarge the array
-      enlarge[Pot[V]](maxIdx + 1)
+      enlarge(maxIdx + 1)
     } else {
-      elems.asInstanceOf[Array[Option[Pot[V]]]]
+      elems
     }
     kvs.foreach { case (idx, value) => newElems(idx) = Some(value) }
     new PotVector(fetcher, length, newElems)
@@ -52,9 +58,9 @@ class PotVector[V](
 
     val newElems = if (end >= elems.length) {
       // enlarge the array
-      enlarge[Pot[V]](end + 1)
+      enlarge(end + 1)
     } else {
-      elems.asInstanceOf[Array[Option[Pot[V]]]]
+      elems
     }
     var idx = start
     values.foreach { value =>
@@ -78,6 +84,24 @@ class PotVector[V](
     out
   }
 
+  override def iterator: Iterator[(Int, Pot[V])] = new Iterator[(Int, Pot[V])] {
+    @tailrec private def findNext(idx: Int): Option[Int] = {
+      if(idx >= elems.length)
+        None
+      else if(elems(idx).isEmpty)
+        findNext(idx + 1)
+      else
+        Some(idx)
+    }
+    private var current = findNext(0)
+    override def hasNext: Boolean = current.nonEmpty
+    override def next(): (Int, Pot[V]) = {
+      val idx = current.get
+      current = findNext(idx + 1)
+      idx -> elems(idx).get
+    }
+  }
+
   override def remove(idx: Int) = {
     elems(idx) = None
     this
@@ -86,20 +110,13 @@ class PotVector[V](
   override def refresh(idx: Int): Unit = {
     if (idx < 0 || idx >= length)
       throw new IndexOutOfBoundsException
-    if (idx >= elems.length || elems(idx).isEmpty || !elems(idx).contains(Unavailable))
-      fetcher.fetch(idx)
+    fetcher.fetch(idx)
   }
 
   override def refresh(indices: Traversable[Int]): Unit = {
-    val toFetch = indices.flatMap { idx =>
-      if (idx < 0 || idx >= length)
-        throw new IndexOutOfBoundsException
-      if (idx >= elems.length || elems(idx).isEmpty || !elems(idx).contains(Unavailable))
-        Some(idx)
-      else
-        None
-    }
-    fetcher.fetch(toFetch)
+    if (indices.exists(idx => idx < 0 || idx >= length))
+      throw new IndexOutOfBoundsException
+    fetcher.fetch(indices)
   }
 
   override def clear =

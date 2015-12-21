@@ -68,11 +68,12 @@ def isPending: Boolean
 def isStale: Boolean
 def isFailed: Boolean
 def isReady: Boolean
+def isUnavailable: Boolean
 def state: PotState
 ```
 
-You can query specific state via `isX` functions, or use `state` for matching. Note that `isEmpty` means there is no data in the `Pot`, so states `Pending` and
-`Failed`, in addition to `Empty`, all return `true`.
+You can query specific state via `isX` functions, or use `state` for matching. Note that `isEmpty` means there is no data in the `Pot`, so states `Unavailable`,
+`Pending` and `Failed`, in addition to `Empty`, all return `true`.
 
 Otherwise a `Pot` works like an `Option` (`Empty`, `Unavailable`, `Pending` and `Failed` work like `None`).
 
@@ -85,7 +86,7 @@ management to deal with retries. A typical case is to check for retry after `Pot
 val value: Pot[A] = ...
 
 case PotEmpty =>
-  updated(value.pending(retries), updateEffect)
+  updated(value.pending(retryPolicy), updateEffect)
 case PotFailed =>
   value.retryPolicy.retry(action.value, updateEffect) match {
     case Right((nextPolicy, retryEffect)) =>
@@ -98,8 +99,8 @@ case PotFailed =>
 The `Pot.retry` function sets the `Pot` into `Pending` (or `PendingStale`) state and updates `retryPolicy`. Common retry policies `Immediate` and `Backoff` are
 available in the `Retry` object, but feel free to roll your own.
 
-### Waiting Time
+### Pending Time
 
-The pending states of `Pot` store a time value when created. You can access this through `startTime`, or you can directly get the duration of the operation
+The pending states of `Pot` store a time stamp when created. You can access this through `startTime`, or you can directly get the duration of the operation
 with `duration(currentTime)`. This is useful in an user interface, where you'll want to show an indicator if the operation is taking too long. If
 an operation fails and you retry it, the `startTime` will remain the same, giving you the total duration of the retried operations.

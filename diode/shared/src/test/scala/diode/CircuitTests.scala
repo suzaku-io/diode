@@ -194,7 +194,7 @@ object CircuitTests extends TestSuite {
         val p = new ActionProcessor[Model] {
           override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model], currentModel: Model) = {
             next(action) match {
-              case m: ModelUpdated[Model] @unchecked =>
+              case m: ModelUpdated[Model @unchecked] =>
                 log += m.newValue.s
                 m
               case r => r

@@ -9,7 +9,7 @@ To use Diode React in your application add following dependency declaration to y
 
 ## Overview
 
-In React the user interface is build out of a hierarchy of _components_, each receiving _props_ and optionally having internal _state_. With Diode you'll want
+In React the user interface is built out of a hierarchy of _components_, each receiving _props_ and optionally having internal _state_. With Diode you'll want
 most of your React components to be _stateless_ because state is managed by the Diode circuit. Sometimes, however, it is useful to maintain some state in the
 UI component, for example when editing an item.
 

@@ -24,29 +24,17 @@ class PotMap[K, V](
 
   override def seq: Traversable[(K, Pot[V])] = elems
 
+  override def iterator: Iterator[(K, Pot[V])] = elems.iterator
+
   override def remove(key: K) =
     new PotMap(fetcher, elems - key)
 
   override def refresh(key: K): Unit = {
-    elems.get(key) match {
-      case Some(elem) if elem.state == PotState.PotUnavailable =>
-      // do nothing for Unavailable
-      case _ =>
-        fetcher.fetch(key)
-    }
+    fetcher.fetch(key)
   }
 
   override def refresh(keys: Traversable[K]): Unit = {
-    val toFetch = keys.flatMap { key =>
-      elems.get(key) match {
-        case Some(elem) if elem.state == PotState.PotUnavailable =>
-          // do nothing for Unavailable
-          None
-        case _ =>
-          Some(key)
-      }
-    }
-    fetcher.fetch(toFetch)
+    fetcher.fetch(keys)
   }
 
   override def clear =
@@ -92,8 +80,6 @@ class PotMap[K, V](
     fetcher.fetch(toFetch)
     values
   }
-
-  def iterator: Iterator[(K, Pot[V])] = elems.iterator
 
   def size = elems.size
 

@@ -31,11 +31,13 @@ override def handle = {
     val updateEffect = action.effect(loadTodos())(todos => Todos(todos))
     action.handle {
       case PotEmpty =>
-        updated(value.pending, updateEffect)
+        updated(value.pending(retryPolicy), updateEffect)
       case PotPending =>
         noChange
       case PotReady =>
         updated(action.value)
+      case PotUnavailable =>
+        updated(value.unavailable())
       case PotFailed =>
         value.retryPolicy.retry(action.value, updateEffect) match {
           case Right((nextPolicy, retryEffect)) =>
@@ -59,11 +61,48 @@ action via an external handler function through `handleWith`.
 
 ```scala
 import scala.concurrent.duration._
+
+val updateEffect = action.effect(loadTodos())(todos => Todos(todos))
 override def handle = {
   case action: UpdateTodos =>
-    val updateEffect = action.effect(loadTodos())(todos => Todos(todos))
     action.handleWith(this, updateEffect)(PotAction.handler(Retry(3), 100.millis))
 }
 ```
     
-Here we use a predefined handler from the `PotAction` object, which supports retries and periodic notification of pending actions.
+Here we use a predefined handler from the `PotAction` object, which supports retries and periodic notification of pending actions. Note how the `updateEffect`
+definition can be moved outside the handling function because it's immutable.
+
+### Notifications while Pending
+
+If a `Pot` stays in pending state for too long, you often want to notify the user by showing something in the user interface. But by default the model is not
+updated while an operation is running, so we need to do that ourselves. Easiest way to do that is to use a delayed effect that refreshes model state at a
+given interval. You can create a second, delayed effect with `Effect.action(action.pending).after(someTime)` and combine it with the normal update effect using
+the `+` operator.
+
+```scala
+case PotEmpty =>
+  updated(value.pending(retryPolicy), updateEffect + Effect.action(action.pending).after(someTime))
+```
+
+Now after `someTime` the effect completes and dispatches the `action.pending` action which is handled below:
+
+```scala
+case PotPending =>
+  if(value.isPending)
+    updated(value.pending(), Effect.action(action.pending).after(someTime))
+  else
+    noChange
+```
+
+First we check if the `Pot` is still pending (it hasn't transitioned into failed or ready state in the meanwhile) and if so, we "update" the value to pending
+state (which makes a copy of the `Pot`, creating a new reference, triggering an update in the view) and resubmit a delayed effect. This continues while the
+`PotAction` is in pending state, updating the model at a steady interval.
+
+In the view you can check how long the `Pot` has been pending by calling `duration()` and act accordingly.
+ 
+```scala
+if (pot.isPending) {
+  val duration = pot.asInstanceOf[PendingBase].duration()
+  ...
+```
+  

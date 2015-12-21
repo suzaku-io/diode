@@ -39,7 +39,7 @@ of functions going from `root` all the way to the piece of data we are intereste
 reader to `root.b.g.h` we would write:
 
 ```scala
-val reader: ModelR[Option[Seq[Int]]] = new RootModelR(root).zoom(_.b.g.map(_.h))
+val reader: ModelR[Root, Option[Seq[Int]]] = new RootModelR(root).zoom(_.g.map(_.h))
 ```
 
 Because we have an `Option[D]` on the path, we need to use `map` to access the contents of `D`, thus leaving us with an `Option[Seq[Int]]` reader. To get the
@@ -48,7 +48,7 @@ current value from the reader we simply call `reader.value`.
 The `Circuit` provides `zoom` and `zoomRW` functions to zoom into the application model, so we can rewrite the previous example as:
 
 ```scala
-val reader: ModelR[Option[Seq[Int]]] = AppCircuit.zoom(_.b.g.map(_.h))
+val reader: ModelR[Root, Option[Seq[Int]]] = AppCircuit.zoom(_.g.map(_.h))
 ```
 
 Note that you don't need to specify the types for the readers, they are automatically inferred. They are displayed here for clarity.
@@ -59,8 +59,15 @@ We are not limited to traversing the hierarchy to get a reader for just a single
 access anything in the model and return a composite.
 
 ```scala
-val complexReader: ModelR[(String, Boolean, Option[Int])] = 
+val complexReader: ModelR[Root, (String, Boolean, Option[Int])] = 
   AppCircuit.zoom(r => (r.a.e, r.b.f, r.g.map(_.i)))
+```
+
+Note that a reader like this will not support correct reference equality, because the tuple is recreated every time the reader is accessed. You may also
+`zip` two readers together to form a reader returning a tuple that preserves reference equality (the tuple is only updated when its constituents change).
+
+```scala
+val zipReader: ModelR[Root, (Option[Seq[Int]], Int) = reader.zip(AppCircuit.zoom(_.a.d))
 ```
 
 This helps detaching the application model from the UI hierarchy, as you can keep your data in a sensible structure while allowing your UI components to access

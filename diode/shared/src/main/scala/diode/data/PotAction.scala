@@ -61,7 +61,10 @@ object PotAction {
         case PotEmpty =>
           updated(value.pending(retryPolicy), updateEffect + Effect.action(action.pending).after(progressDelta))
         case PotPending =>
-          updated(value.pending(), Effect.action(action.pending).after(progressDelta))
+          if(value.isPending)
+            updated(value.pending(), Effect.action(action.pending).after(progressDelta))
+          else
+            noChange
         case PotUnavailable =>
           updated(value.unavailable())
         case PotReady =>

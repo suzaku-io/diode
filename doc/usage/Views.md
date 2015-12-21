@@ -9,7 +9,7 @@ typically is), you could also make one to automatically store changed model data
 A simple view needs only a _reader_ to access model data, and a _dispatcher_ to dispatch actions.
 
 ```scala
-class CounterView(counter: ModelR[Int], dispatch: Dispatcher) {
+class CounterView(counter: ModelR[_, Int], dispatch: Dispatcher) {
   def render = {
     div(
       h3("Counter"),
@@ -32,7 +32,7 @@ val counter = new CounterView(AppCircuit.zoom(_.counter), AppCircuit)
 For our directory tree we need a more complex view that supports the recursive nature of the data.
 
 ```scala
-class TreeView(root: ModelR[FileNode], parent: Seq[String], selection: Seq[String], dispatcher: Dispatcher) {
+class TreeView(root: ModelR[_, FileNode], parent: Seq[String], selection: Seq[String], dispatcher: Dispatcher) {
   val id = root.value.id
   val path = parent :+ id
   val childSeq = build

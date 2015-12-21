@@ -10,6 +10,7 @@
 * [Advanced Topics](advanced/README.md)
   * [Async Model Data](advanced/Pot.md)
   * [Stateful Actions](advanced/PotActions.md)
+  * [Async Virtual Collections](advanced/PotCollection.md)
   * [Action Processors](advanced/ActionProcessors.md)
 * [Usage with React](UsageWithReact.md)
 * [Examples](examples/README.md)
