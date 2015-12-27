@@ -1,5 +1,8 @@
 package diode
 
+import scala.language.higherKinds
+import scala.reflect.ClassTag
+
 trait Dispatcher {
   def dispatch(action: AnyRef): Unit
 
@@ -52,20 +55,31 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * Zoom into the model using the `get` function
     *
     * @param get Function that returns the part of the model you are interested in
-    * @tparam T
     * @return A `ModelR[T]` giving you read-only access to part of the model
     */
-  def zoom[T](get: M => T): ModelR[M, T] = modelRW.zoom[T](get)
+  def zoom[T](get: M => T): ModelR[M, T] =
+    modelRW.zoom[T](get)
+
+  def zoomMap[F[_], A, B](fa: M => F[A])(f: A => B)(implicit functor: Functor[F], ct: ClassTag[B]): ModelR[M, F[B]] =
+    modelRW.zoomMap(fa)(f)
+
+  def zoomFlatMap[F[_], A, B](fa: M => F[A])(f: A => F[B])(implicit functor: Functor[F], ct: ClassTag[B]): ModelR[M, F[B]] =
+    modelRW.zoomFlatMap(fa)(f)
 
   /**
     * Zoom into the model using `get` and `set` functions
     *
     * @param get Function that returns the part of the model you are interested in
     * @param set Function that updates the part of the model you are interested in
-    * @tparam T
     * @return A `ModelRW[T]` giving you read/update access to part of the model
     */
   def zoomRW[T](get: M => T)(set: (M, T) => M): ModelRW[M, T] = modelRW.zoomRW(get)(set)
+
+  def zoomMapRW[F[_], A, B](fa: M => F[A])(f: A => B)(set: (M, F[B]) => M)(implicit functor: Functor[F], ct: ClassTag[B]): ModelRW[M, F[B]] =
+    modelRW.zoomMapRW(fa)(f)(set)
+
+  def zoomFlatMapRW[F[_], A, B](fa: M => F[A])(f: A => F[B])(set: (M, F[B]) => M)(implicit functor: Functor[F], ct: ClassTag[B]): ModelRW[M, F[B]] =
+    modelRW.zoomFlatMapRW(fa)(f)(set)
 
   /**
     * Subscribes to listen to changes in the model. By providing a `cursor` you can limit
@@ -114,6 +128,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
 
   /**
     * Combines multiple `ActionHandler`s into a single partial function
+    *
     * @param handlers
     * @return
     */
@@ -148,6 +163,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
 
   /**
     * The final action processor that does actual action handling.
+    *
     * @param action Action to be handled
     * @return
     */
@@ -157,6 +173,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
 
   /**
     * Dispatch the action, call change listeners when completed
+    *
     * @param action Action to dispatch
     */
   def dispatch(action: AnyRef): Unit = {

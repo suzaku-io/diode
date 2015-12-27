@@ -109,8 +109,6 @@ case class UpdateUsers(value: Pot[Map[String, User]] = Empty, keys: Set[String])
 class UserFetch(dispatch: Dispatcher) extends Fetch[String] {
   override def fetch(key: String): Unit = 
     dispatch(UpdateUsers(keys = Set(key)))
-  override def fetch(start: String, end: String): Unit = 
-    ??? // range is not supported
   override def fetch(keys: Traversable[String]): Unit = 
     dispatch(UpdateUsers(keys = Set() ++ keys))
 }
@@ -125,3 +123,23 @@ override def handle = {
     action.handleWith(this, updateEffect)(PotAction.mapHandler(action.keys, Retry(3)))
 }
 ```
+
+## Pot Streams
+
+Similar to `PotCollection` but with a slightly different API, Diode provides a `PotStream` for handling streaming data. Its use cases include things like chat
+room messages, monitoring events or infinite scrollers. Unlike `PotMap` or `PotVector` that allow more or less random access to the remote data, a `PotStream`
+always consists of consecutive entries with unique identifiers. The values stored in a `PotStream` are not automatically `Pot[V]`s but direct values because
+`PotStream` does not allow access to entries that are not currently present. You may of course choose to store `Pot[V]` if you wish to do so.
+
+Each value in `PotStream` is wrapped in a `StreamValue` case class that provides indices to previous and next entries in the stream.
+
+```scala
+case class StreamValue[K, V](key: K, value: Pot[V], stream: PotStream[K, V], prevKey: Option[K], nextKey: Option[K])
+```
+
+You can call `get(key)` to get a reference to a `StreamValue` that you can use to navigate up and down the stream with `next` and `prev` methods. If you need
+to iterate over all present entries in the stream, use `iterator` to get an instance of `Iterator[(K, V)]`
+ 
+To update data in a `PotStream` use `update` (only for existing entries), `append` or `prepend`. In a typical scenario the client is not directly adding
+new data to the stream but is requesting updates from the server, or updates are automatically delivered over WebSocket or so. The client can, however, initiate
+updates by calling `refresh`, `refreshNext` or `refreshPrev` methods.

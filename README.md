@@ -20,11 +20,11 @@ Full documentation [available here](http://ochrons.github.io/diode/index.html).
 
 Add following dependency declaration to your Scala project.
 
-<pre><code class="lang-scala">"me.chrons" %% "diode" % "0.2.0"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %% "diode" % "0.3.0"</code></pre>
 
 In a Scala.js project the dependency looks like this.
 
-<pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.2.0"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.3.0"</code></pre>
 
 <img align="right" src="doc/images/architecture.png">
 
@@ -163,6 +163,12 @@ A more complete application example is the [Scala.js SPA tutorial](https://githu
 features and async operations.
 
 # Change history
+
+### 0.3.0
+- Added virtual collections (`PotCollection`) to support lazy loading of data
+- Added `RefTo` for referencing data elsewhere in the model. 
+- Added `ModelR.zip` to combine two readers while maintaining reference equality 
+- Added an action processor for persisting application state
 
 ### 0.2.0
 - Upgraded `Effect`s to be real class(es) instead of just type alias for easier composition etc.

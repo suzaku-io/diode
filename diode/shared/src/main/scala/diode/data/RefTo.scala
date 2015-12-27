@@ -24,22 +24,22 @@ object RefTo {
     RefTo(target, (_: V) => None)
 
   /**
-    * Builds a `RefTo` to a potential value inside a `PotMap`
+    * Builds a `RefTo` to a potential value inside a `PotCollection`
     *
-    * @param key          Identifies the potential value inside the map
-    * @param mapTarget    Model reader for the `PotMap` containing the potential value
+    * @param key          Identifies the potential value inside the collection
+    * @param collTarget   Model reader for the `PotCollection` containing the potential value
     * @param updateAction Function to create an update action for the potential value this reference points to
     */
-  def apply[K, V, P](key: K, mapTarget: ModelR[_, P])(updateAction: (K, Pot[V]) => AnyRef)(implicit ev: P <:< PotMap[K, V]): RefTo[Pot[V]] =
-    RefTo[Pot[V]](mapTarget.zoom(_.get(key)), updateAction(key, _: Pot[V]))
+  def apply[K, V, P](key: K, collTarget: ModelR[_, P])(updateAction: (K, Pot[V]) => AnyRef)(implicit ev: P <:< PotCollection[K, V]): RefTo[Pot[V]] =
+    RefTo[Pot[V]](collTarget.zoom(_.get(key)), updateAction(key, _: Pot[V]))
 
   /**
-    * Builds a `RefTo` to a value inside a `PotVector`
+    * Builds a `RefTo` to a value inside a `PotStream`
     *
-    * @param idx          Index to the potential value inside the vector
-    * @param vectorTarget Model reader for the `PotVector` containing the potential value
+    * @param key          Identifies the value inside the stream
+    * @param streamTarget Model reader for the `PotStream` containing the value
     * @param updateAction Function to create an update action for the potential value this reference points to
     */
-  def apply[V, P](idx: Int, vectorTarget: ModelR[_, P])(updateAction: (Int, Pot[V]) => AnyRef)(implicit ev: P <:< PotVector[V]): RefTo[Pot[V]] =
-    RefTo[Pot[V]](vectorTarget.zoom(_.get(idx)), updateAction(idx, _: Pot[V]))
+  def stream[K, V, P](key: K, streamTarget: ModelR[_, P])(updateAction: (K, V) => AnyRef)(implicit ev: P <:< PotStream[K, V]): RefTo[V] =
+    RefTo[V](streamTarget.zoom(_.apply(key)), updateAction(key, _: V))
 }

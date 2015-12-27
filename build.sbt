@@ -73,7 +73,9 @@ lazy val diode = crossProject
   .settings(
     name := "diode"
   )
-  .jsSettings(scalacOptions ++= sourceMapSetting.value)
+  .jsSettings(
+    scalacOptions ++= sourceMapSetting.value,
+    scalaJSStage in Global := FastOptStage)
   .jvmSettings()
 
 lazy val diodeJS = diode.js

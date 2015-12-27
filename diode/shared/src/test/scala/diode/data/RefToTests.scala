@@ -6,6 +6,8 @@ import utest._
 object RefToTests extends TestSuite {
 
   case class Model(users: PotMap[String, User], employees: Seq[Employee])
+  case class ModelV(users: PotVector[User], employees: Seq[Employee])
+  case class ModelS(users: PotStream[String, Pot[User]], employees: Seq[Employee])
 
   case class User(name: String)
 
@@ -22,8 +24,24 @@ object RefToTests extends TestSuite {
     'refToMap - {
       val fetcher = new TestFetcher[String]
       val root = Model(PotMap(fetcher, Map("ceoID" -> Ready(User("Ms. CEO")))), Seq())
-      val modelRW = new RootModelRW[Model](root)
+      val modelRW = new RootModelRW(root)
       val m = root.copy(employees = Seq(Employee("CEO", RefTo("ceoID", modelRW.zoom(_.users))((id, value) => s"Update $id to $value"))))
+      assert(m.employees.head.user().get.name == "Ms. CEO")
+      assert(m.employees.head.user.updateAction(Ready(User("Ms. Kathy CEO"))) == "Update ceoID to Ready(User(Ms. Kathy CEO))")
+    }
+    'refToVector - {
+      val fetcher = new TestFetcher[Int]
+      val root = ModelV(PotVector(fetcher, 5, Vector(Ready(User("Ms. CEO")))), Seq())
+      val modelRW = new RootModelRW(root)
+      val m = root.copy(employees = Seq(Employee("CEO", RefTo(0, modelRW.zoom(_.users))((id, value) => s"Update $id to $value"))))
+      assert(m.employees.head.user().get.name == "Ms. CEO")
+      assert(m.employees.head.user.updateAction(Ready(User("Ms. Kathy CEO"))) == "Update 0 to Ready(User(Ms. Kathy CEO))")
+    }
+    'refToStream - {
+      val fetcher = new TestFetcher[String]
+      val root = ModelS(PotStream(fetcher, Seq("ceoID" -> Ready(User("Ms. CEO")))), Seq())
+      val modelRW = new RootModelRW(root)
+      val m = root.copy(employees = Seq(Employee("CEO", RefTo.stream("ceoID", modelRW.zoom(_.users))((id, value) => s"Update $id to $value"))))
       assert(m.employees.head.user().get.name == "Ms. CEO")
       assert(m.employees.head.user.updateAction(Ready(User("Ms. Kathy CEO"))) == "Update ceoID to Ready(User(Ms. Kathy CEO))")
     }

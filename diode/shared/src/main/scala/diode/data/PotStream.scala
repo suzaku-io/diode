@@ -2,8 +2,12 @@ package diode.data
 
 import scala.annotation.tailrec
 
-final case class StreamValue[K, V](key: K, value: Pot[V], prev: Option[K] = None, next: Option[K] = None) {
+final case class StreamValue[K, V](key: K, value: V, stream: PotStream[K, V], prevKey: Option[K] = None, nextKey: Option[K] = None) {
   def apply() = value
+
+  def prev = stream.get(prevKey)
+
+  def next = stream.get(nextKey)
 }
 
 class PotStream[K, V](
@@ -18,25 +22,25 @@ class PotStream[K, V](
   private def updatedLast(key: K) =
     lastKeyOption.orElse(Some(key))
 
-  def updated(key: K, value: Pot[V]): PotStream[K, V] = {
+  def updated(key: K, value: V): PotStream[K, V] = {
     if (!elems.contains(key))
       throw new NoSuchElementException("Can only update existing elements")
 
     new PotStream(fetcher, elems.updated(key, elems(key).copy(value = value)), headKeyOption, lastKeyOption)
   }
 
-  def append(key: K, value: Pot[V]): PotStream[K, V] = append(List(key -> value))
+  def append(key: K, value: V): PotStream[K, V] = append(List(key -> value))
 
-  def append(kvs: Seq[(K, Pot[V])]): PotStream[K, V] = {
+  def append(kvs: Seq[(K, V)]): PotStream[K, V] = {
     if (kvs.isEmpty)
       this
     else {
       @tailrec
-      def buildStream(prev: Option[K], next: Option[K], head: (K, Pot[V]), tail: Seq[(K, Pot[V])], acc: List[StreamValue[K, V]]): List[StreamValue[K, V]] = {
+      def buildStream(prev: Option[K], next: Option[K], head: (K, V), tail: Seq[(K, V)], acc: List[StreamValue[K, V]]): List[StreamValue[K, V]] = {
         if (tail.isEmpty) {
-          StreamValue(head._1, head._2, prev, next) :: acc
+          StreamValue(head._1, head._2, this, prev, next) :: acc
         } else {
-          buildStream(Some(head._1), tail.tail.headOption.map(_._1), tail.head, tail.tail, StreamValue(head._1, head._2, prev, next) :: acc)
+          buildStream(Some(head._1), tail.tail.headOption.map(_._1), tail.head, tail.tail, StreamValue(head._1, head._2, this, prev, next) :: acc)
         }
       }
 
@@ -46,23 +50,23 @@ class PotStream[K, V](
       val headKey = headKeyOption.getOrElse(firstKey)
       // join new values and update the previously last value to point to the first of the new values
       val newElems: Map[K, StreamValue[K, V]] =
-        elems ++ newValues.map(sv => sv.key -> sv) ++ lastKeyOption.map(lk => lk -> elems(lk).copy(next = Some(firstKey)))
+        elems ++ newValues.map(sv => sv.key -> sv) ++ lastKeyOption.map(lk => lk -> elems(lk).copy(nextKey = Some(firstKey)))
       new PotStream(fetcher, newElems, updatedHead(headKey), Some(lastKey))
     }
   }
 
-  def prepend(key: K, value: Pot[V]): PotStream[K, V] = prepend(List(key -> value))
+  def prepend(key: K, value: V): PotStream[K, V] = prepend(List(key -> value))
 
-  def prepend(kvs: Seq[(K, Pot[V])]): PotStream[K, V] = {
+  def prepend(kvs: Seq[(K, V)]): PotStream[K, V] = {
     if (kvs.isEmpty)
       this
     else {
       @tailrec
-      def buildStream(prev: Option[K], next: Option[K], head: (K, Pot[V]), tail: Seq[(K, Pot[V])], acc: List[StreamValue[K, V]]): List[StreamValue[K, V]] = {
+      def buildStream(prev: Option[K], next: Option[K], head: (K, V), tail: Seq[(K, V)], acc: List[StreamValue[K, V]]): List[StreamValue[K, V]] = {
         if (tail.isEmpty) {
-          StreamValue(head._1, head._2, prev, next) :: acc
+          StreamValue(head._1, head._2, this, prev, next) :: acc
         } else {
-          buildStream(tail.tail.headOption.map(_._1), Some(head._1), tail.head, tail.tail, StreamValue(head._1, head._2, prev, next) :: acc)
+          buildStream(tail.tail.headOption.map(_._1), Some(head._1), tail.head, tail.tail, StreamValue(head._1, head._2, this, prev, next) :: acc)
         }
       }
 
@@ -73,12 +77,12 @@ class PotStream[K, V](
       val lastKey = lastKeyOption.getOrElse(headKey)
       // join new values and update the previously head value to point to the last of the new values
       val newElems: Map[K, StreamValue[K, V]] =
-        elems ++ newValues.map(sv => sv.key -> sv) ++ headKeyOption.map(hk => hk -> elems(hk).copy(prev = Some(firstKey)))
+        elems ++ newValues.map(sv => sv.key -> sv) ++ headKeyOption.map(hk => hk -> elems(hk).copy(prevKey = Some(firstKey)))
       new PotStream(fetcher, newElems, Some(headKey), updatedLast(lastKey))
     }
   }
 
-  def apply(key: K): Pot[V] =
+  def apply(key: K): V =
     get(key).value
 
   def get(key: K): StreamValue[K, V] =
@@ -96,9 +100,6 @@ class PotStream[K, V](
   def refresh(key: K): Unit =
     fetcher.fetch(key)
 
-  def refresh(keys: Traversable[K]): Unit =
-    fetcher.fetch(keys)
-
   def refreshNext(count: Int = 1): Unit =
     fetcher.fetchNext(lastKeyOption.get, count)
 
@@ -110,15 +111,15 @@ class PotStream[K, V](
       throw new NoSuchElementException
 
     // fix prev/next references in prev/next values
-    val prev = elems(key).prev
-    val next = elems(key).next
+    val prev = elems(key).prevKey
+    val next = elems(key).nextKey
     new PotStream(
       fetcher,
       elems - key
-        ++ prev.map(k => k -> elems(k).copy(next = next))
-        ++ next.map(k => k -> elems(k).copy(prev = prev)),
-      headKeyOption.filterNot(_ == key).orElse(elems(headKeyOption.get).next),
-      lastKeyOption.filterNot(_ == key).orElse(elems(lastKeyOption.get).prev)
+        ++ prev.map(k => k -> elems(k).copy(nextKey = next))
+        ++ next.map(k => k -> elems(k).copy(prevKey = prev)),
+      headKeyOption.filterNot(_ == key).orElse(elems(headKeyOption.get).nextKey),
+      lastKeyOption.filterNot(_ == key).orElse(elems(lastKeyOption.get).prevKey)
     )
   }
 
@@ -146,26 +147,26 @@ class PotStream[K, V](
     remove(lastKeyOption.get)
   }
 
-  def map(f: (K, Pot[V]) => Pot[V]): PotStream[K, V] =
+  def map(f: (K, V) => V): PotStream[K, V] =
     new PotStream(fetcher, elems.map { case (k, sv) => k -> sv.copy(value = f(k, sv.value)) }, headKeyOption, lastKeyOption)
 
-  def seq: Traversable[(K, Pot[V])] = {
-    var res = List.empty[(K, Pot[V])]
+  def seq: Traversable[(K, V)] = {
+    var res = List.empty[(K, V)]
     var key = lastKeyOption
     while (key.isDefined) {
       val v = elems(key.get)
       res ::= v.key -> v.value
-      key = v.prev
+      key = v.prevKey
     }
     res
   }
 
-  def iterator: Iterator[(K, Pot[V])] = new Iterator[(K, Pot[V])] {
+  def iterator: Iterator[(K, V)] = new Iterator[(K, V)] {
     private var current = headOption
     override def hasNext: Boolean = current.nonEmpty
-    override def next(): (K, Pot[V]) = {
+    override def next(): (K, V) = {
       val r = current.map(sv => sv.key -> sv.value).get
-      current = current.flatMap(_.next).map(elems)
+      current = current.flatMap(_.nextKey).map(elems)
       r
     }
   }
@@ -176,7 +177,7 @@ class PotStream[K, V](
 }
 
 object PotStream {
-  def apply[K, V](fetcher: Fetch[K], elems: Seq[(K, Pot[V])] = Seq.empty): PotStream[K, V] = {
+  def apply[K, V](fetcher: Fetch[K], elems: Seq[(K, V)] = Seq.empty): PotStream[K, V] = {
     new PotStream(fetcher, Map(), None, None).append(elems)
   }
 }
