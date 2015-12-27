@@ -21,7 +21,7 @@ trait Functor[F[_]] {
   /**
     * Checks if the contents of two functors are equal, applying function `f` to the first value
     */
-  def isEqual[A, B](fa1: F[A], fa2: F[B])(f: A => B, eqF: (B, B) => Boolean): Boolean
+  def isEqual[B](fa1: F[B], fa2: F[B])(eqF: (B, B) => Boolean): Boolean
 }
 
 object Functor {
@@ -33,9 +33,9 @@ object Functor {
     override def flatMap[A, B](fa: Option[A])(f: A => Option[B]): Option[B] =
       fa.flatMap(f)
 
-    override def isEqual[A, B](fa1: Option[A], fa2: Option[B])(f: A => B, eqF: (B, B) => Boolean): Boolean = {
+    override def isEqual[B](fa1: Option[B], fa2: Option[B])(eqF: (B, B) => Boolean): Boolean = {
       (fa1, fa2) match {
-        case (Some(a1), Some(a2)) => eqF(f(a1), a2)
+        case (Some(a1), Some(a2)) => eqF(a1, a2)
         case (None, None) => true
         case _ => false
       }
@@ -49,9 +49,9 @@ object Functor {
     override def flatMap[A, B](fa: Pot[A])(f: A => Pot[B]): Pot[B] =
       fa.flatMap(f)
 
-    override def isEqual[A, B](fa1: Pot[A], fa2: Pot[B])(f: A => B, eqF: (B, B) => Boolean): Boolean = {
+    override def isEqual[B](fa1: Pot[B], fa2: Pot[B])(eqF: (B, B) => Boolean): Boolean = {
       if (fa1.nonEmpty && fa2.nonEmpty)
-        eqF(f(fa1.get), fa2.get)
+        eqF(fa1.get, fa2.get)
       else if (fa1 == fa2)
         true
       else

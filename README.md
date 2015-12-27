@@ -167,7 +167,8 @@ features and async operations.
 ### 0.3.0
 - Added virtual collections (`PotCollection`) to support lazy loading of data
 - Added `RefTo` for referencing data elsewhere in the model. 
-- Added `ModelR.zip` to combine two readers while maintaining reference equality 
+- Added `map` and `flatMap` to access model values inside containers (such as `Option`) while maintaining reference equality
+- Added `zip` to combine two readers while maintaining reference equality
 - Added an action processor for persisting application state
 
 ### 0.2.0
