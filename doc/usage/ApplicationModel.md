@@ -59,8 +59,8 @@ or deep equality checks to find out a change anywhere in the model. You can simp
 `ModelR.value` using `eq` or `ne` operators. In case your reader returns a `AnyVal` value (like a `Double` or `Boolean`), you should use regular `==` and
 `!=` instead.
 
-Reference equality is mostly important in views where a decision whether to re-render a view must be made very efficiently. In the _action handlers_ it rarely
-makes a difference whether reference equality can be utilized or not.
+Reference equality is mostly important in views where a decision whether to re-render a view must be made very efficiently. In the _action handlers_ checking
+for changes is rarely needed.
 
 ### `Option` and Other Containers in the Model
 
@@ -82,8 +82,12 @@ val reader: ModelR[Root, Option[Seq[Int]]] = AppCircuit.zoomMap(_.b.g)(_.h)
 assert(reader.value eq reader.value)
 ```
 
-These readers require a _functor_ type class to be implicitly available for the container type. Diode provides functors for `Option` and `Pot`, but if you need
-to use some other container, you must provide the functor yourself. The type class interface is defined in `diode.Functor`.
+Containers must support `map`, `flatMap` and (reference) equality check for the content to be compatible with Diode. In practice these readers require a _Monad_
+type class to be implicitly available for the container type. Diode provides monads for `Option` and `Pot`. If you use some other containers, you must provide
+the monad yourself. The type class interface is defined in `diode.Monad` and the implementation consists of just `map`, `flatMap` and `isEqual` methods.
+
+Note that the above is only necessary if you want to maintain efficient reference equality checking. If your code doesn't need this, it's better to just use
+the naive approach with a plain `zoom` call.
 
 ### Complex Access Patterns
 
@@ -104,6 +108,45 @@ val zipReader: ModelR[Root, (String, Int)] = reader.zip(AppCircuit.zoom(_.a.d))
 
 This helps detaching the application model from the UI hierarchy, as you can keep your data in a sensible structure while allowing your UI components to access
 it in a natural way.
+
+### References within the Model
+
+The application model being immutable, it makes sense to have a _normalized_ data model where a single piece of data occurs only in a single place within the
+model. For example if your model has `ProductGroup`s consisting of `Product`s but a product can belong to multiple groups, the group should hold only references
+to the product data, not the data itself.
+
+In Diode context a reference to a value of type `V` would be `ModelR[_, V]` but that provides no update mechanism. To facilitate easy referencing of other data
+within the model, Diode provides a `RefTo` class.
+
+```scala
+class RefTo[V](val target: ModelR[_, V], val updated: V => AnyRef) {
+  def apply() = target()
+}
+```
+
+It combines a model reader with a function to generate an update action for this particular reference. Using the Product example above, the model would be 
+defined as
+
+```scala
+case class RootModel(products: Map[String, Product], productGroups: Map[String, ProductGroup])
+
+case class Product(id: String, ...)
+
+case class ProductGroup(id: String, products: Seq[RefTo[Product]], ...)
+
+// action to update a product
+case class UpdateProduct(id: String, newProduct: Product)
+
+var model = RootModel(...)
+val rootReader = new RootModelR(model)
+
+// create a reference to a Product
+def productRef(id: String) = RefTo(rootReader.zoom(_.products(id), UpdateProduct(id, _))
+```
+
+The `RefTo` paradigm is especially useful with Diode's [async collections](../advanced/PotCollection.md) as you can easily reference data that has not yet
+been loaded into the client, but will be as soon as the reference is accessed. References can also be cyclic (which would be impossible in a normal immutable
+hierarchy), meaning a Product can have a reference (or several) back to ProductGroup(s).
 
 ## Modifications through Writers
 

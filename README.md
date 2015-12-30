@@ -170,6 +170,7 @@ features and async operations.
 - Added `map` and `flatMap` to access model values inside containers (such as `Option`) while maintaining reference equality
 - Added `zip` to combine two readers while maintaining reference equality
 - Added an action processor for persisting application state
+- Moved `Pot` and related classes from `diode.util` to `diode.data` package
 
 ### 0.2.0
 - Upgraded `Effect`s to be real class(es) instead of just type alias for easier composition etc.

@@ -26,7 +26,8 @@ trait ModelR[M, S] {
   def eval(model: M): S
 
   /**
-    * "Zooms" into the model using the provided accessor function
+    * Zooms into the model using the provided accessor function
+ *
     * @param get Function to go from current reader to a new value
     */
   def zoom[T](get: S => T): ModelR[M, T]
@@ -34,36 +35,41 @@ trait ModelR[M, S] {
   /**
     * Maps over current reader into a new value provided by `f`. Reader type `S` must be of type `F[A]`,
     * for example `Option[A]`.
+ *
     * @param f The function to apply
     */
-  def map[F[_], A, B](f: A => B)(implicit ev: S =:= F[A], functor: Functor[F], ct: ClassTag[B]): ModelR[M, F[B]] =
+  def map[F[_], A, B](f: A => B)(implicit ev: S =:= F[A], monad: Monad[F], ct: ClassTag[B]): ModelR[M, F[B]] =
     zoomMap((_: S) => ev(value))(f)
 
   /**
     * FlatMaps over current reader into a new value provided by `f`. Reader type `S` must be of type `F[A]`,
     * for example `Option[A]`.
+ *
     * @param f The function to apply, must return a value of type `F[B]`
     */
-  def flatMap[F[_], A, B](f: A => F[B])(implicit ev: S =:= F[A], functor: Functor[F], ct: ClassTag[B]): ModelR[M, F[B]] =
+  def flatMap[F[_], A, B](f: A => F[B])(implicit ev: S =:= F[A], monad: Monad[F], ct: ClassTag[B]): ModelR[M, F[B]] =
     zoomFlatMap((_: S) => ev(value))(f)
 
   /**
     * Zooms into the model and maps over the zoomed value, which must be of type `F[A]`
+ *
     * @param fa Zooming function
     * @param f The function to apply
     */
-  def zoomMap[F[_], A, B](fa: S => F[A])(f: A => B)(implicit functor: Functor[F], ct: ClassTag[B]): ModelR[M, F[B]]
+  def zoomMap[F[_], A, B](fa: S => F[A])(f: A => B)(implicit monad: Monad[F], ct: ClassTag[B]): ModelR[M, F[B]]
 
   /**
     * Zooms into the model and flatMaps over the zoomed value, which must be of type `F[A]`
+ *
     * @param fa Zooming function
     * @param f The function to apply, must return a value of type `F[B]`
     */
-  def zoomFlatMap[F[_], A, B](fa: S => F[A])(f: A => F[B])(implicit functor: Functor[F], ct: ClassTag[B]): ModelR[M, F[B]]
+  def zoomFlatMap[F[_], A, B](fa: S => F[A])(f: A => F[B])(implicit monad: Monad[F], ct: ClassTag[B]): ModelR[M, F[B]]
 
   /**
     * Combines this reader with another reader to provide a new reader returning a tuple of the values
     * of the two original readers.
+ *
     * @param that The other reader
     */
   def zip[SS](that: ModelR[M, SS])(implicit cts: ClassTag[S], ctss: ClassTag[SS]): ModelR[M, (S, SS)]
@@ -84,6 +90,7 @@ trait ModelRW[M, S] extends ModelR[M, S] {
   /**
     * Zooms into the model using the provided `get` function. The `set` function is used to
     * update the model with a new value.
+ *
     * @param get Function to go from current reader to a new value
     * @param set Function to update the model with a new value
     */
@@ -92,20 +99,22 @@ trait ModelRW[M, S] extends ModelR[M, S] {
   /**
     * Zooms into the model and maps over the zoomed value, which must be of type `F[A]`. The `set` function is used to
     * update the model with a new value.
+ *
     * @param fa Zooming function
     * @param f The function to apply
     * @param set Function to update the model with a new value
     */
-  def zoomMapRW[F[_], A, B](fa: S => F[A])(f: A => B)(set: (S, F[B]) => S)(implicit functor: Functor[F], ct: ClassTag[B]): ModelRW[M, F[B]]
+  def zoomMapRW[F[_], A, B](fa: S => F[A])(f: A => B)(set: (S, F[B]) => S)(implicit monad: Monad[F], ct: ClassTag[B]): ModelRW[M, F[B]]
 
   /**
     * Zooms into the model and flatMaps over the zoomed value, which must be of type `F[A]`. The `set` function is used to
     * update the model with a new value.
+ *
     * @param fa Zooming function
     * @param f The function to apply
     * @param set Function to update the model with a new value
     */
-  def zoomFlatMapRW[F[_], A, B](fa: S => F[A])(f: A => F[B])(set: (S, F[B]) => S)(implicit functor: Functor[F], ct: ClassTag[B]): ModelRW[M, F[B]]
+  def zoomFlatMapRW[F[_], A, B](fa: S => F[A])(f: A => F[B])(set: (S, F[B]) => S)(implicit monad: Monad[F], ct: ClassTag[B]): ModelRW[M, F[B]]
 }
 
 /**
@@ -157,10 +166,10 @@ trait BaseModelR[M, S] extends ModelR[M, S] {
   override def zip[SS](that: ModelR[M, SS])(implicit cts: ClassTag[S], ctss: ClassTag[SS]) =
     new ZipModelR[M, S, SS](root, eval, that.eval)
 
-  override def zoomMap[F[_], A, B](fa: S => F[A])(f: A => B)(implicit functor: Functor[F], ct: ClassTag[B]): ModelR[M, F[B]] =
+  override def zoomMap[F[_], A, B](fa: S => F[A])(f: A => B)(implicit monad: Monad[F], ct: ClassTag[B]): ModelR[M, F[B]] =
     new MapModelR(root, fa compose getF, f)
 
-  override def zoomFlatMap[F[_], A, B](fa: S => F[A])(f: A => F[B])(implicit functor: Functor[F], ct: ClassTag[B]): ModelR[M, F[B]] =
+  override def zoomFlatMap[F[_], A, B](fa: S => F[A])(f: A => F[B])(implicit monad: Monad[F], ct: ClassTag[B]): ModelR[M, F[B]] =
     new FlatMapModelR(root, fa compose getF, f)
 }
 
@@ -185,7 +194,7 @@ class ZoomModelR[M, S](protected val root: ModelR[M, M], get: M => S) extends Ba
 }
 
 trait MappedModelR[F[_], M, B] extends ValueRefEq {
-  def functor: Functor[F]
+  def monad: Monad[F]
   def ct: ClassTag[B]
   def mapValue: F[B]
 
@@ -194,8 +203,8 @@ trait MappedModelR[F[_], M, B] extends ValueRefEq {
 
   protected def getF(model: M): F[B] = {
     val v = mapValue
-    // update memoized value only when the value inside the functor changes
-    if (!functor.isEqual(v, memoized)(eqF)) {
+    // update memoized value only when the value inside the monad changes
+    if (!monad.isEqual(v, memoized)(eqF)) {
       memoized = v
     }
     memoized
@@ -205,19 +214,19 @@ trait MappedModelR[F[_], M, B] extends ValueRefEq {
 /**
   * Model reader for a mapped value
   */
-class MapModelR[F[_], M, A, B](protected val root: ModelR[M, M], get: M => F[A], f: A => B)(implicit val functor: Functor[F], val ct: ClassTag[B])
+class MapModelR[F[_], M, A, B](protected val root: ModelR[M, M], get: M => F[A], f: A => B)(implicit val monad: Monad[F], val ct: ClassTag[B])
   extends BaseModelR[M, F[B]] with MappedModelR[F, M, B] {
 
-  def mapValue = functor.map(get(root.value))(f)
+  def mapValue = monad.map(get(root.value))(f)
 }
 
 /**
   * Model reader for a flatMapped value
   */
-class FlatMapModelR[F[_], M, A, B](protected val root: ModelR[M, M], get: M => F[A], f: A => F[B])(implicit val functor: Functor[F], val ct: ClassTag[B])
+class FlatMapModelR[F[_], M, A, B](protected val root: ModelR[M, M], get: M => F[A], f: A => F[B])(implicit val monad: Monad[F], val ct: ClassTag[B])
   extends BaseModelR[M, F[B]] with MappedModelR[F, M, B] {
 
-  def mapValue = functor.flatMap(get(root.value))(f)
+  def mapValue = monad.flatMap(get(root.value))(f)
 }
 
 /**
@@ -257,10 +266,10 @@ trait BaseModelRW[M, S] extends ModelRW[M, S] with BaseModelR[M, S] {
   override def zoomRW[U](get: S => U)(set: (S, U) => S) =
     new ZoomModelRW[M, U](root, get compose getF, (s, u) => setF(s, set(getF(s), u)))
 
-  override def zoomMapRW[F[_], A, B](fa: S => F[A])(f: A => B)(set: (S, F[B]) => S)(implicit functor: Functor[F], ct: ClassTag[B]) =
+  override def zoomMapRW[F[_], A, B](fa: S => F[A])(f: A => B)(set: (S, F[B]) => S)(implicit monad: Monad[F], ct: ClassTag[B]) =
     new MapModelRW(root, fa compose getF, f)((s, u) => setF(s, set(getF(s), u)))
 
-  override def zoomFlatMapRW[F[_], A, B](fa: S => F[A])(f: A => F[B])(set: (S, F[B]) => S)(implicit functor: Functor[F], ct: ClassTag[B]) =
+  override def zoomFlatMapRW[F[_], A, B](fa: S => F[A])(f: A => F[B])(set: (S, F[B]) => S)(implicit monad: Monad[F], ct: ClassTag[B]) =
     new FlatMapModelRW(root, fa compose getF, f)((s, u) => setF(s, set(getF(s), u)))
 
   override def updated(newValue: S) = setF(root.value, newValue)
@@ -272,6 +281,7 @@ trait BaseModelRW[M, S] extends ModelRW[M, S] with BaseModelR[M, S] {
 class RootModelRW[M](get: => M) extends RootModelR(get) with BaseModelRW[M, M] {
   protected override def setF(model: M, value: M) = value
 
+  // override for root because it's a simpler case
   override def zoomRW[T](get: M => T)(set: (M, T) => M) =
     new ZoomModelRW[M, T](this, get, (s, u) => set(value, u))
 }
@@ -286,7 +296,7 @@ class ZoomModelRW[M, S](root: ModelR[M, M], get: M => S, set: (M, S) => M) exten
 /**
   * Model reader/writer for a mapped value
   */
-class MapModelRW[F[_], M, A, B](root: ModelR[M, M], get: M => F[A], f: A => B)(set: (M, F[B]) => M)(implicit functor: Functor[F], ct: ClassTag[B])
+class MapModelRW[F[_], M, A, B](root: ModelR[M, M], get: M => F[A], f: A => B)(set: (M, F[B]) => M)(implicit monad: Monad[F], ct: ClassTag[B])
   extends MapModelR(root, get, f) with BaseModelRW[M, F[B]] {
   protected override def setF(model: M, value: F[B]) = set(model, value)
 }
@@ -294,7 +304,7 @@ class MapModelRW[F[_], M, A, B](root: ModelR[M, M], get: M => F[A], f: A => B)(s
 /**
   * Model reader/writer for a flatMapped value
   */
-class FlatMapModelRW[F[_], M, A, B](root: ModelR[M, M], get: M => F[A], f: A => F[B])(set: (M, F[B]) => M)(implicit functor: Functor[F], ct: ClassTag[B])
+class FlatMapModelRW[F[_], M, A, B](root: ModelR[M, M], get: M => F[A], f: A => F[B])(set: (M, F[B]) => M)(implicit monad: Monad[F], ct: ClassTag[B])
   extends FlatMapModelR(root, get, f) with BaseModelRW[M, F[B]] {
   protected override def setF(model: M, value: F[B]) = set(model, value)
 }

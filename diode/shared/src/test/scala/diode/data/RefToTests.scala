@@ -27,7 +27,7 @@ object RefToTests extends TestSuite {
       val modelRW = new RootModelRW(root)
       val m = root.copy(employees = Seq(Employee("CEO", RefTo("ceoID", modelRW.zoom(_.users))((id, value) => s"Update $id to $value"))))
       assert(m.employees.head.user().get.name == "Ms. CEO")
-      assert(m.employees.head.user.updateAction(Ready(User("Ms. Kathy CEO"))) == "Update ceoID to Ready(User(Ms. Kathy CEO))")
+      assert(m.employees.head.user.updated(Ready(User("Ms. Kathy CEO"))) == "Update ceoID to Ready(User(Ms. Kathy CEO))")
     }
     'refToVector - {
       val fetcher = new TestFetcher[Int]
@@ -35,7 +35,7 @@ object RefToTests extends TestSuite {
       val modelRW = new RootModelRW(root)
       val m = root.copy(employees = Seq(Employee("CEO", RefTo(0, modelRW.zoom(_.users))((id, value) => s"Update $id to $value"))))
       assert(m.employees.head.user().get.name == "Ms. CEO")
-      assert(m.employees.head.user.updateAction(Ready(User("Ms. Kathy CEO"))) == "Update 0 to Ready(User(Ms. Kathy CEO))")
+      assert(m.employees.head.user.updated(Ready(User("Ms. Kathy CEO"))) == "Update 0 to Ready(User(Ms. Kathy CEO))")
     }
     'refToStream - {
       val fetcher = new TestFetcher[String]
@@ -43,7 +43,7 @@ object RefToTests extends TestSuite {
       val modelRW = new RootModelRW(root)
       val m = root.copy(employees = Seq(Employee("CEO", RefTo.stream("ceoID", modelRW.zoom(_.users))((id, value) => s"Update $id to $value"))))
       assert(m.employees.head.user().get.name == "Ms. CEO")
-      assert(m.employees.head.user.updateAction(Ready(User("Ms. Kathy CEO"))) == "Update ceoID to Ready(User(Ms. Kathy CEO))")
+      assert(m.employees.head.user.updated(Ready(User("Ms. Kathy CEO"))) == "Update ceoID to Ready(User(Ms. Kathy CEO))")
     }
   }
 }

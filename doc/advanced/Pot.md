@@ -28,7 +28,7 @@ myData = myData.pending() // myData is now Pending
 Assuming you get a successful response from the server, you can change the state to `Ready`.
 
 ```scala
-myData = myValue.ready(data) // myData is now Ready(data)
+myData = myData.ready(data) // myData is now Ready(data)
 ```
 
 In case something went wrong, you can store the exception in the `Failed` state.

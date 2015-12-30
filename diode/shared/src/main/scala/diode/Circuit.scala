@@ -60,10 +60,10 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   def zoom[T](get: M => T): ModelR[M, T] =
     modelRW.zoom[T](get)
 
-  def zoomMap[F[_], A, B](fa: M => F[A])(f: A => B)(implicit functor: Functor[F], ct: ClassTag[B]): ModelR[M, F[B]] =
+  def zoomMap[F[_], A, B](fa: M => F[A])(f: A => B)(implicit monad: Monad[F], ct: ClassTag[B]): ModelR[M, F[B]] =
     modelRW.zoomMap(fa)(f)
 
-  def zoomFlatMap[F[_], A, B](fa: M => F[A])(f: A => F[B])(implicit functor: Functor[F], ct: ClassTag[B]): ModelR[M, F[B]] =
+  def zoomFlatMap[F[_], A, B](fa: M => F[A])(f: A => F[B])(implicit monad: Monad[F], ct: ClassTag[B]): ModelR[M, F[B]] =
     modelRW.zoomFlatMap(fa)(f)
 
   /**
@@ -75,10 +75,10 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     */
   def zoomRW[T](get: M => T)(set: (M, T) => M): ModelRW[M, T] = modelRW.zoomRW(get)(set)
 
-  def zoomMapRW[F[_], A, B](fa: M => F[A])(f: A => B)(set: (M, F[B]) => M)(implicit functor: Functor[F], ct: ClassTag[B]): ModelRW[M, F[B]] =
+  def zoomMapRW[F[_], A, B](fa: M => F[A])(f: A => B)(set: (M, F[B]) => M)(implicit monad: Monad[F], ct: ClassTag[B]): ModelRW[M, F[B]] =
     modelRW.zoomMapRW(fa)(f)(set)
 
-  def zoomFlatMapRW[F[_], A, B](fa: M => F[A])(f: A => F[B])(set: (M, F[B]) => M)(implicit functor: Functor[F], ct: ClassTag[B]): ModelRW[M, F[B]] =
+  def zoomFlatMapRW[F[_], A, B](fa: M => F[A])(f: A => F[B])(set: (M, F[B]) => M)(implicit monad: Monad[F], ct: ClassTag[B]): ModelRW[M, F[B]] =
     modelRW.zoomFlatMapRW(fa)(f)(set)
 
   /**
