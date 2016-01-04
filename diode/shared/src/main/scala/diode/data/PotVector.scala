@@ -171,6 +171,12 @@ class PotVector[V](
 
   def resized(newLength: Int) =
     new PotVector(fetcher, newLength, if (newLength < elems.length) util.Arrays.copyOf(elems, newLength) else elems)
+
+  def contains(idx: Int) = {
+    if (idx < 0 || idx >= length)
+      throw new IndexOutOfBoundsException
+    elems(idx).isDefined
+  }
 }
 
 object PotVector {

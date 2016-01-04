@@ -1,17 +1,18 @@
 package diode.util
 
+import diode.Effect
 import utest._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
 import scala.concurrent.duration._
-import diode.Implicits.runAfter
+import diode.Implicits.runAfterImpl
 
 object RetryTests extends TestSuite {
   def tests = TestSuite {
     'Immediate - {
       val policy = Retry.Immediate(3)
-      val effect = () => Future("42")
+      val effect = (retryPolicy: RetryPolicy) => Effect(Future("42"))
       val r = policy.retry(new Exception, effect)
       assertMatch(r) {
         case Right((nextPolicy, newEffect)) =>
@@ -21,7 +22,7 @@ object RetryTests extends TestSuite {
     }
     'Backoff - {
       val policy = Retry.Backoff(3, 200.millis)
-      val effect = () => Future("42")
+      val effect = (retryPolicy: RetryPolicy) => Effect(Future("42"))
       val r = policy.retry(new Exception, effect)
       assert(r.isRight)
       val now = System.currentTimeMillis()

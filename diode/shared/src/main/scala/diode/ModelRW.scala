@@ -27,7 +27,7 @@ trait ModelR[M, S] {
 
   /**
     * Zooms into the model using the provided accessor function
- *
+    *
     * @param get Function to go from current reader to a new value
     */
   def zoom[T](get: S => T): ModelR[M, T]
@@ -35,7 +35,7 @@ trait ModelR[M, S] {
   /**
     * Maps over current reader into a new value provided by `f`. Reader type `S` must be of type `F[A]`,
     * for example `Option[A]`.
- *
+    *
     * @param f The function to apply
     */
   def map[F[_], A, B](f: A => B)(implicit ev: S =:= F[A], monad: Monad[F], ct: ClassTag[B]): ModelR[M, F[B]] =
@@ -44,7 +44,7 @@ trait ModelR[M, S] {
   /**
     * FlatMaps over current reader into a new value provided by `f`. Reader type `S` must be of type `F[A]`,
     * for example `Option[A]`.
- *
+    *
     * @param f The function to apply, must return a value of type `F[B]`
     */
   def flatMap[F[_], A, B](f: A => F[B])(implicit ev: S =:= F[A], monad: Monad[F], ct: ClassTag[B]): ModelR[M, F[B]] =
@@ -52,7 +52,7 @@ trait ModelR[M, S] {
 
   /**
     * Zooms into the model and maps over the zoomed value, which must be of type `F[A]`
- *
+    *
     * @param fa Zooming function
     * @param f The function to apply
     */
@@ -60,7 +60,7 @@ trait ModelR[M, S] {
 
   /**
     * Zooms into the model and flatMaps over the zoomed value, which must be of type `F[A]`
- *
+    *
     * @param fa Zooming function
     * @param f The function to apply, must return a value of type `F[B]`
     */
@@ -69,7 +69,7 @@ trait ModelR[M, S] {
   /**
     * Combines this reader with another reader to provide a new reader returning a tuple of the values
     * of the two original readers.
- *
+    *
     * @param that The other reader
     */
   def zip[SS](that: ModelR[M, SS])(implicit cts: ClassTag[S], ctss: ClassTag[SS]): ModelR[M, (S, SS)]
@@ -90,7 +90,7 @@ trait ModelRW[M, S] extends ModelR[M, S] {
   /**
     * Zooms into the model using the provided `get` function. The `set` function is used to
     * update the model with a new value.
- *
+    *
     * @param get Function to go from current reader to a new value
     * @param set Function to update the model with a new value
     */
@@ -99,7 +99,7 @@ trait ModelRW[M, S] extends ModelR[M, S] {
   /**
     * Zooms into the model and maps over the zoomed value, which must be of type `F[A]`. The `set` function is used to
     * update the model with a new value.
- *
+    *
     * @param fa Zooming function
     * @param f The function to apply
     * @param set Function to update the model with a new value
@@ -109,7 +109,7 @@ trait ModelRW[M, S] extends ModelR[M, S] {
   /**
     * Zooms into the model and flatMaps over the zoomed value, which must be of type `F[A]`. The `set` function is used to
     * update the model with a new value.
- *
+    *
     * @param fa Zooming function
     * @param f The function to apply
     * @param set Function to update the model with a new value
@@ -194,9 +194,9 @@ class ZoomModelR[M, S](protected val root: ModelR[M, M], get: M => S) extends Ba
 }
 
 trait MappedModelR[F[_], M, B] extends ValueRefEq {
-  def monad: Monad[F]
-  def ct: ClassTag[B]
-  def mapValue: F[B]
+  protected def monad: Monad[F]
+  protected def ct: ClassTag[B]
+  protected def mapValue: F[B]
 
   private var memoized = mapValue
   private val eqF = chooseEq(ct)
@@ -217,7 +217,7 @@ trait MappedModelR[F[_], M, B] extends ValueRefEq {
 class MapModelR[F[_], M, A, B](protected val root: ModelR[M, M], get: M => F[A], f: A => B)(implicit val monad: Monad[F], val ct: ClassTag[B])
   extends BaseModelR[M, F[B]] with MappedModelR[F, M, B] {
 
-  def mapValue = monad.map(get(root.value))(f)
+  override protected def mapValue = monad.map(get(root.value))(f)
 }
 
 /**
@@ -226,7 +226,7 @@ class MapModelR[F[_], M, A, B](protected val root: ModelR[M, M], get: M => F[A],
 class FlatMapModelR[F[_], M, A, B](protected val root: ModelR[M, M], get: M => F[A], f: A => F[B])(implicit val monad: Monad[F], val ct: ClassTag[B])
   extends BaseModelR[M, F[B]] with MappedModelR[F, M, B] {
 
-  def mapValue = monad.flatMap(get(root.value))(f)
+  override protected def mapValue = monad.flatMap(get(root.value))(f)
 }
 
 /**

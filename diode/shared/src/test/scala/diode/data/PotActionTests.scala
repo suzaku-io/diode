@@ -3,20 +3,28 @@ package diode.data
 import diode.ActionResult._
 import diode._
 import diode.data.PotState._
-import diode.util.Retry
+import diode.util.Retry.Immediate
+import diode.util.{RetryPolicy, Retry}
+import diode.Implicits.runAfterImpl
 import utest._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
+import scala.util.{Failure, Try}
 
 object PotActionTests extends TestSuite {
-
-  case class TestAction(value: Pot[String] = Empty) extends PotAction[String, TestAction] {
+  case class TestAction(potResult: Pot[String] = Empty) extends PotAction[String, TestAction] {
     override def next(newValue: Pot[String]) = TestAction(newValue)
   }
 
-  case class TestCollAction(value: Pot[Set[(String, Pot[String])]] = Empty) extends PotAction[Set[(String, Pot[String])], TestCollAction] {
-    override def next(newValue: Pot[Set[(String, Pot[String])]]) = TestCollAction(newValue)
+  case class TestActionRP(potResult: Pot[String] = Empty, retryPolicy: RetryPolicy = Retry.None) extends PotActionRetriable[String, TestActionRP] {
+    override def next(newValue: Pot[String], newRetryPolicy: RetryPolicy) = TestActionRP(newValue, newRetryPolicy)
+  }
+
+  case class TestCollAction(state: PotState = PotState.PotEmpty, result: Try[Set[(String, Pot[String])]] = Failure(new AsyncAction.PendingException))
+    extends AsyncAction[Set[(String, Pot[String])], TestCollAction] {
+    override def next(newState: PotState, newValue: Try[Set[(String, Pot[String])]]) =
+      TestCollAction(newState, newValue)
   }
 
   case class Model(s: Pot[String])
@@ -35,12 +43,15 @@ object PotActionTests extends TestSuite {
     override def handle = {
       case action: TestCollAction =>
         val updateF = action.effect(Future(42))(v => keys.map(k => (k, Ready(v.toString))))
-        action.handleWith(this, updateF)(PotAction.mapHandler(keys))
+        action.handleWith(this, updateF)(AsyncAction.mapHandler(keys))
     }
   }
 
   class TestFailHandler[M](modelRW: ModelRW[M, Pot[String]]) extends ActionHandler(modelRW) {
     override def handle = {
+      case action: TestActionRP =>
+        val updateF = action.effectWithRetry(Future(throw new TimeoutException))(_.toString)
+        action.handleWith(this, updateF)(PotActionRetriable.handler())
       case action: TestAction =>
         val updateF = action.effect(Future(throw new TimeoutException))(_.toString)
         action.handleWith(this, updateF)(PotAction.handler())
@@ -57,20 +68,20 @@ object PotActionTests extends TestSuite {
     'PotAction - {
       'CreateEmpty - {
         val ta = TestAction()
-        assert(ta.value.isEmpty)
+        assert(ta.potResult.isEmpty)
       }
       'Stages - {
         val ta = TestAction()
         val p = ta.pending
-        assert(p.value.isPending)
+        assert(p.potResult.isPending)
         val f = p.failed(new IllegalArgumentException("Test"))
-        assert(f.value.isFailed)
+        assert(f.potResult.isFailed)
         assert(f.state == PotFailed)
-        assert(f.value.exceptionOption.isDefined)
+        assert(f.potResult.exceptionOption.isDefined)
         val r = f.ready("Ready!")
-        assert(r.value.isReady)
+        assert(r.potResult.isReady)
         assert(r.state == PotReady)
-        assert(r.value.get == "Ready!")
+        assert(r.potResult.get == "Ready!")
       }
       'Effect - {
         val ta = TestAction()
@@ -78,7 +89,7 @@ object PotActionTests extends TestSuite {
         val eff = ta.effect(Future {completed = !completed; 42})(_.toString)
 
         eff.toFuture.map { action =>
-          assert(action.value == Ready("42"))
+          assert(action.potResult == Ready("42"))
           assert(completed == true)
         }
       }
@@ -87,7 +98,7 @@ object PotActionTests extends TestSuite {
         val eff = ta.effect(Future {if (true) throw new Exception("Oh no!") else 42})(_.toString, ex => new Exception(ex.getMessage * 2))
 
         eff.toFuture.map { action =>
-          assert(action.value.exceptionOption.exists(_.getMessage == "Oh no!Oh no!"))
+          assert(action.potResult.exceptionOption.exists(_.getMessage == "Oh no!Oh no!"))
         }
       }
     }
@@ -138,14 +149,11 @@ object PotActionTests extends TestSuite {
         }
       }
       'PotFailedRetry - {
-        val model = Model(PendingStale("41", Retry(1)))
+        val model = Model(PendingStale("41"))
         val modelRW = new RootModelRW(model)
         val handlerFail = new TestFailHandler(modelRW.zoomRW(_.s)((m, v) => m.copy(s = v)))
-        val nextAction = handlerFail.handle(TestAction(Failed(new TimeoutException))) match {
-          case ModelUpdateEffect(newModel, effects) =>
-            assert(newModel.s.isPending)
-            assert(newModel.s.nonEmpty)
-            assert(newModel.s.isInstanceOf[PendingStale[String]])
+        val nextAction = handlerFail.handle(TestActionRP(Failed(new TimeoutException), Immediate(1))) match {
+          case EffectOnly(effects) =>
             assert(effects.size == 1)
             // run effect
             effects.toFuture
@@ -153,7 +161,7 @@ object PotActionTests extends TestSuite {
             ???
         }
         nextAction.map {
-          case TestAction(value) if value.isFailed =>
+          case TestActionRP(value, _) if value.isFailed =>
             assert(value.exceptionOption.get.isInstanceOf[TimeoutException])
           case _ => assert(false)
         }
@@ -174,7 +182,7 @@ object PotActionTests extends TestSuite {
             ???
         }
         nextAction.map {
-          case TestCollAction(value) if value.isReady =>
+          case TestCollAction(state, value) if state == PotState.PotReady =>
             assert(value.get == Set(("A", Ready("42"))))
           case _ => assert(false)
         }

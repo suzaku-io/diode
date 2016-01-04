@@ -40,10 +40,8 @@ sealed abstract class Pot[+A] extends Product with Serializable {
   def isFailed: Boolean
   def isReady = !isEmpty && !isStale
   def isUnavailable: Boolean
-  def retryPolicy: RetryPolicy
   def ready[B >: A](value: B): Pot[B] = Ready(value)
-  def pending(policy: RetryPolicy = retryPolicy): Pot[A]
-  def retry(policy: RetryPolicy): Pot[A]
+  def pending(): Pot[A]
   def fail(exception: Throwable): Pot[A]
   def unavailable() = Unavailable
   def state: PotState
@@ -243,8 +241,8 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     if (isEmpty)
       Failure(new NoSuchElementException)
     else this match {
-      case Failed(ex, _) => Failure(ex)
-      case FailedStale(_, ex, _) => Failure(ex)
+      case Failed(ex) => Failure(ex)
+      case FailedStale(_, ex) => Failure(ex)
       case _ => Success(get)
     }
   }
@@ -302,9 +300,8 @@ case object Empty extends Pot[Nothing] {
   def retriesLeft = 0
   def state = PotState.PotEmpty
   def retryPolicy = Retry.None
-  def retry(policy: RetryPolicy) = throw new IllegalStateException("Cannot retry in Empty state")
 
-  override def pending(policy: RetryPolicy) = Pending(policy)
+  override def pending() = Pending()
   override def fail(exception: Throwable) = Failed(exception)
 }
 
@@ -318,9 +315,8 @@ case object Unavailable extends Pot[Nothing] {
   def retriesLeft = 0
   def state = PotState.PotUnavailable
   def retryPolicy = Retry.None
-  def retry(policy: RetryPolicy) = throw new IllegalStateException("Cannot retry in Empty state")
 
-  override def pending(policy: RetryPolicy) = Pending(policy)
+  override def pending() = Pending()
   override def fail(exception: Throwable) = Failed(exception)
 }
 
@@ -334,9 +330,8 @@ final case class Ready[+A](x: A) extends Pot[A] {
   def retriesLeft = 0
   def state = PotState.PotReady
   def retryPolicy = Retry.None
-  def retry(policy: RetryPolicy) = throw new IllegalStateException("Cannot retry in Ready state")
 
-  override def pending(policy: RetryPolicy) = PendingStale(x, policy)
+  override def pending() = PendingStale(x)
   override def fail(exception: Throwable) = FailedStale(x, exception)
 }
 
@@ -348,25 +343,23 @@ private[diode] sealed trait PendingBase {
   def duration(currentTime: Long = new Date().getTime) = (currentTime - startTime).toInt
 }
 
-final case class Pending(retryPolicy: RetryPolicy = Retry.None, startTime: Long = new Date().getTime) extends Pot[Nothing] with PendingBase {
+final case class Pending(startTime: Long = new Date().getTime) extends Pot[Nothing] with PendingBase {
   def get = throw new NoSuchElementException("Pending.get")
   def isEmpty = true
   def isFailed = false
   def isStale = false
-  def retry(policy: RetryPolicy) = Pending(policy, startTime)
 
-  override def pending(policy: RetryPolicy) = copy(policy)
+  override def pending() = copy()
   override def fail(exception: Throwable) = Failed(exception)
 }
 
-final case class PendingStale[+A](x: A, retryPolicy: RetryPolicy = Retry.None, startTime: Long = new Date().getTime) extends Pot[A] with PendingBase {
+final case class PendingStale[+A](x: A, startTime: Long = new Date().getTime) extends Pot[A] with PendingBase {
   def get = x
   def isEmpty = false
   def isFailed = false
   def isStale = true
-  def retry(policy: RetryPolicy) = PendingStale(x, policy, startTime)
 
-  override def pending(policy: RetryPolicy) = copy(x, policy)
+  override def pending() = copy(x)
   override def fail(exception: Throwable) = FailedStale(x, exception)
 }
 
@@ -378,12 +371,11 @@ private[diode] sealed trait FailedBase {
   def state = PotState.PotFailed
 }
 
-final case class Failed(exception: Throwable, retryPolicy: RetryPolicy = Retry.None) extends Pot[Nothing] with FailedBase {
+final case class Failed(exception: Throwable) extends Pot[Nothing] with FailedBase {
   def get = throw new NoSuchElementException("Failed.get")
   def isEmpty = true
   def isStale = false
   override def exceptionOption = Some(exception)
-  def retry(policy: RetryPolicy) = throw new IllegalStateException("Cannot retry in Failed state")
 
   override def recoverWith[B](f: PartialFunction[Throwable, Pot[B]]): Pot[B] = {
     if (f isDefinedAt exception)
@@ -394,16 +386,15 @@ final case class Failed(exception: Throwable, retryPolicy: RetryPolicy = Retry.N
 
   override def recover[B](f: PartialFunction[Throwable, B]): Pot[B] = this
 
-  override def pending(policy: RetryPolicy) = Pending(policy)
+  override def pending() = Pending()
   override def fail(exception: Throwable) = Failed(exception)
 }
 
-final case class FailedStale[+A](x: A, exception: Throwable, retryPolicy: RetryPolicy = Retry.None) extends Pot[A] with FailedBase {
+final case class FailedStale[+A](x: A, exception: Throwable) extends Pot[A] with FailedBase {
   def get = x
   def isEmpty = false
   def isStale = true
   override def exceptionOption = Some(exception)
-  def retry(policy: RetryPolicy) = throw new IllegalStateException("Cannot retry in Failed state")
 
   override def recoverWith[B >: A](f: PartialFunction[Throwable, Pot[B]]): Pot[B] = {
     if (f isDefinedAt exception)
@@ -414,6 +405,6 @@ final case class FailedStale[+A](x: A, exception: Throwable, retryPolicy: RetryP
 
   override def recover[B >: A](f: PartialFunction[Throwable, B]): Pot[B] = this
 
-  override def pending(policy: RetryPolicy) = PendingStale(x, policy)
+  override def pending() = PendingStale(x)
   override def fail(exception: Throwable) = FailedStale(x, exception)
 }

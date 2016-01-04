@@ -81,7 +81,7 @@ the `+` operator.
 
 ```scala
 case PotEmpty =>
-  updated(value.pending(retryPolicy), updateEffect + Effect.action(action.pending).after(someTime))
+  updated(value.pending(), updateEffect + Effect.action(action.pending).after(someTime))
 ```
 
 Now after `someTime` the effect completes and dispatches the `action.pending` action which is handled below:

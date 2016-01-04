@@ -84,6 +84,8 @@ class PotMap[K, V](
   def size = elems.size
 
   def keys = elems.keys
+
+  def keySet = elems.keySet
 }
 
 object PotMap {
