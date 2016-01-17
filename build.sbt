@@ -67,16 +67,44 @@ def preventPublication(p: Project) =
     publishTo := Some(Resolver.file("Unused transient repository", target.value / "fakepublish")),
     packagedArtifacts := Map.empty)
 
+lazy val diodeCore = crossProject.in(file("diode-core"))
+  .settings(commonSettings: _*)
+  .settings(publishSettings: _*)
+  .settings(
+    name := "diode-core"
+  )
+  .jsSettings(
+    scalacOptions ++= sourceMapSetting.value,
+    scalaJSStage in Global := FastOptStage)
+  .jvmSettings()
+
+lazy val diodeCoreJS = diodeCore.js
+
+lazy val diodeCoreJVM = diodeCore.jvm
+
+lazy val diodeData = crossProject.in(file("diode-data"))
+  .settings(commonSettings: _*)
+  .settings(publishSettings: _*)
+  .settings(
+    name := "diode-data"
+  )
+  .jsSettings(
+    scalacOptions ++= sourceMapSetting.value,
+    scalaJSStage in Global := FastOptStage)
+  .jvmSettings()
+  .dependsOn(diodeCore)
+
+lazy val diodeDataJS = diodeData.js
+
+lazy val diodeDataJVM = diodeData.jvm
+
 lazy val diode = crossProject
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
   .settings(
     name := "diode"
   )
-  .jsSettings(
-    scalacOptions ++= sourceMapSetting.value,
-    scalaJSStage in Global := FastOptStage)
-  .jvmSettings()
+  .dependsOn(diodeCore, diodeData)
 
 lazy val diodeJS = diode.js
 
@@ -95,7 +123,7 @@ lazy val diodeDevtools = crossProject.in(file("diode-devtools"))
     scalacOptions ++= sourceMapSetting.value
   )
   .jvmSettings()
-  .dependsOn(diode)
+  .dependsOn(diodeCore)
 
 lazy val diodeDevToolsJS = diodeDevtools.js
 
@@ -119,4 +147,4 @@ lazy val diodeReact = project.in(file("diode-react"))
 
 lazy val root = preventPublication(project.in(file(".")))
   .settings()
-  .aggregate(diodeJS, diodeJVM, diodeReact, diodeDevToolsJS, diodeDevToolsJVM)
+  .aggregate(diodeJS, diodeJVM, diodeCoreJS, diodeCoreJVM, diodeDataJS, diodeDataJVM, diodeReact, diodeDevToolsJS, diodeDevToolsJVM)

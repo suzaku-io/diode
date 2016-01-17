@@ -109,7 +109,7 @@ object PotActionRetriable {
         case PotReady =>
           updated(action.potResult)
         case PotFailed =>
-          action.retryPolicy.retry(action.potResult, updateEffect) match {
+          action.retryPolicy.retry(action.potResult.exceptionOption.getOrElse(new IllegalStateException("Pot is not in a failed state")), updateEffect) match {
             case Right((_, retryEffect)) =>
               effectOnly(retryEffect)
             case Left(ex) =>

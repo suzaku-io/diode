@@ -3,7 +3,6 @@ package diode.util
 import java.util.concurrent.TimeUnit
 
 import diode.Effect
-import diode.data.Pot
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -28,9 +27,6 @@ trait RetryPolicy {
     * @return
     */
   def retry[T <: AnyRef](reason: Throwable, effectProvider: RetryPolicy => Effect): Either[Throwable, (RetryPolicy, Effect)]
-
-  def retry[T <: AnyRef](pot: Pot[_], effectProvider: RetryPolicy => Effect): Either[Throwable, (RetryPolicy, Effect)] =
-    retry(pot.exceptionOption.getOrElse(new IllegalStateException("Pot is not in a failed state")), effectProvider)
 }
 
 object Retry {

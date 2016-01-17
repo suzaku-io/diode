@@ -1,7 +1,5 @@
 package diode
 
-import diode.data._
-
 import scala.language.higherKinds
 
 /**
@@ -42,26 +40,6 @@ object Monad {
         case (None, None) => true
         case _ => false
       }
-    }
-  }
-
-  /**
-    * Monad type class for `Pot`
-    */
-  implicit object potMonad extends Monad[Pot] {
-    override def map[A, B](fa: Pot[A])(f: A => B): Pot[B] =
-      fa.map(f)
-
-    override def flatMap[A, B](fa: Pot[A])(f: A => Pot[B]): Pot[B] =
-      fa.flatMap(f)
-
-    override def isEqual[A](fa1: Pot[A], fa2: Pot[A])(eqF: (A, A) => Boolean): Boolean = {
-      if (fa1.nonEmpty && fa2.nonEmpty)
-        eqF(fa1.get, fa2.get)
-      else if (fa1 == fa2)
-        true
-      else
-        false
     }
   }
 

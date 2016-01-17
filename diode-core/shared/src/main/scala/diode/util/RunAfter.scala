@@ -1,0 +1,29 @@
+package diode.util
+
+import scala.annotation.implicitNotFound
+import scala.concurrent.{Promise, Future}
+import scala.concurrent.duration.FiniteDuration
+
+@implicitNotFound("""Cannot find an implicit RunAfter. You might pass
+an (implicit runner: RunAfter) parameter to your method
+or import diode.Implicits.runAfterImpl""")
+trait RunAfter {
+  def runAfter[A](delay: FiniteDuration)(f: => A): Future[A]
+}
+
+object RunAfter {
+
+  /**
+    * A `RunAfter` implementation that never runs the given function
+    */
+  object infinity extends RunAfter {
+    override def runAfter[A](delay: FiniteDuration)(f: => A): Future[A] = Promise[A].future
+  }
+
+  /**
+    * A `RunAfter` implementation that immediately runs the given function
+    */
+  object immediately extends RunAfter {
+    override def runAfter[A](delay: FiniteDuration)(f: => A): Future[A] = Future.successful(f)
+  }
+}

@@ -18,6 +18,7 @@ object TodoView {
   case class State(editText: String)
 
   class Backend($: BackendScope[Props, State]) {
+    val x = $.props.map(_.isEditing)
     def editFieldSubmit(p: Props): Callback =
       $.state.flatMap(s =>
         if (s.editText.trim == "")

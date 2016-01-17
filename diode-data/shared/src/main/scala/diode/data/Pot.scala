@@ -2,7 +2,7 @@ package diode.data
 
 import java.util.Date
 
-import diode.data
+import diode.{Monad, data}
 import diode.util._
 
 import scala.util.{Failure, Success, Try}
@@ -134,14 +134,14 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     *
     * @example
       * {{{
-      *    // Returns true because Ready instance contains string "something" which equals "something".
-      *    Ready("something") contains "something"
+      *  // Returns true because Ready instance contains string "something" which equals "something".
+      *  Ready("something") contains "something"
       *
-      *    // Returns false because "something" != "anything".
-      *    Ready("something") contains "anything"
+      *  // Returns false because "something" != "anything".
+      *  Ready("something") contains "anything"
       *
-      *    // Returns false when method called on Empty.
-      *    Empty contains "anything"
+      *  // Returns false when method called on Empty.
+      *  Empty contains "anything"
       * }}}
       * @param elem the element to test.
     * @return `true` if the pot has an element that is equal (as
@@ -185,14 +185,14 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     *
     * @example
       * {{{
-      *    // Returns Ready(HTTP) because the partial function covers the case.
-      *    Ready("http") collect {case "http" => "HTTP"}
+      * // Returns Ready(HTTP) because the partial function covers the case.
+      * Ready("http") collect {case "http" => "HTTP"}
       *
-      *    // Returns Empty because the partial function doesn't cover the case.
-      *    Ready("ftp") collect {case "http" => "HTTP"}
+      * // Returns Empty because the partial function doesn't cover the case.
+      * Ready("ftp") collect {case "http" => "HTTP"}
       *
-      *    // Returns Empty because Empty is passed to the collect method.
-      *    Empty collect {case value => value}
+      * // Returns Empty because Empty is passed to the collect method.
+      * Empty collect {case value => value}
       * }}}
       * @param  pf the partial function.
     * @return the result of applying `pf` to this Pot's
@@ -288,6 +288,26 @@ object Pot {
     * the collections hierarchy.
     */
   def empty[A]: Pot[A] = Empty
+  /**
+    * Monad type class for `Pot`
+    */
+  implicit object potMonad extends Monad[Pot] {
+    override def map[A, B](fa: Pot[A])(f: A => B): Pot[B] =
+      fa.map(f)
+
+    override def flatMap[A, B](fa: Pot[A])(f: A => Pot[B]): Pot[B] =
+      fa.flatMap(f)
+
+    override def isEqual[A](fa1: Pot[A], fa2: Pot[A])(eqF: (A, A) => Boolean): Boolean = {
+      if (fa1.nonEmpty && fa2.nonEmpty)
+        eqF(fa1.get, fa2.get)
+      else if (fa1 == fa2)
+        true
+      else
+        false
+    }
+  }
+
 }
 
 case object Empty extends Pot[Nothing] {
