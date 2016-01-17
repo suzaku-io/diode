@@ -14,17 +14,17 @@ import scala.util.{Failure, Try}
 
 object PotActionTests extends TestSuite {
   case class TestAction(potResult: Pot[String] = Empty) extends PotAction[String, TestAction] {
-    override def next(newValue: Pot[String]) = TestAction(newValue)
+    override def next(newResult: Pot[String]) = TestAction(newResult)
   }
 
   case class TestActionRP(potResult: Pot[String] = Empty, retryPolicy: RetryPolicy = Retry.None) extends PotActionRetriable[String, TestActionRP] {
-    override def next(newValue: Pot[String], newRetryPolicy: RetryPolicy) = TestActionRP(newValue, newRetryPolicy)
+    override def next(newResult: Pot[String], newRetryPolicy: RetryPolicy) = TestActionRP(newResult, newRetryPolicy)
   }
 
   case class TestCollAction(state: PotState = PotState.PotEmpty, result: Try[Set[(String, Pot[String])]] = Failure(new AsyncAction.PendingException))
     extends AsyncAction[Set[(String, Pot[String])], TestCollAction] {
-    override def next(newState: PotState, newValue: Try[Set[(String, Pot[String])]]) =
-      TestCollAction(newState, newValue)
+    override def next(newState: PotState, newResult: Try[Set[(String, Pot[String])]]) =
+      TestCollAction(newState, newResult)
   }
 
   case class Model(s: Pot[String])

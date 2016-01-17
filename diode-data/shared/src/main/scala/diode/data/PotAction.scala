@@ -10,7 +10,7 @@ import scala.util.{Failure, Success, Try}
 trait PotAction[A, P <: PotAction[A, P]] extends AsyncAction[A, P] {
   def potResult: Pot[A]
 
-  def next(newValue: Pot[A]): P
+  def next(newResult: Pot[A]): P
 
   override def next(newState: PotState, newValue: Try[A]): P = (newState, newValue) match {
     case (PotState.PotEmpty, _) => next(Empty)

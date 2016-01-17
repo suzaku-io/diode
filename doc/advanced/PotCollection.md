@@ -47,80 +47,78 @@ a view rendering, so you need to use a listener to track model changes.
 
 ### Fetch Actions
 
-As with a regular `Pot` it makes sense to use `PotAction` to handle the details of fetching data for a `PotCollection`. `PotAction` provides handlers for
+As with a regular `Pot` it makes sense to use `AsyncAction` to handle the details of fetching data for a `PotCollection`. `AsyncAction` provides handlers for
 both `PotMap` and `PotVector`, to update values given a set of keys.
 
 ```scala
-def mapHandler[K, V, A <: Traversable[(K, Pot[V])], M, P <: PotAction[A, P]]
-  (keys: Set[K], retryPolicy: RetryPolicy = Retry.None)
+def mapHandler[K, V, A <: Traversable[(K, Pot[V])], M, P <: AsyncAction[A, P]](keys: Set[K])
   (implicit ec: ExecutionContext) = {
   require(keys.nonEmpty)
-  (action: PotAction[A, P], handler: ActionHandler[M, PotMap[K, V]], updateEffect: Effect) => {
+  (action: AsyncAction[A, P], handler: ActionHandler[M, PotMap[K, V]], updateEffect: Effect) => {
     import PotState._
     import handler._
-    // updates only those values whose key is in the `keys` list
-    def updateInCollection(f: Pot[V] => Pot[V]): PotMap[K, V] = {
+    // updates/adds only those values whose key is in the `keys` set
+    def updateInCollection(f: Pot[V] => Pot[V], default: Pot[V]): PotMap[K, V] = {
+      // update existing values
       value.map { (k, v) =>
         if (keys.contains(k))
           f(v)
         else
           v
-      }
+      } ++ (keys -- value.keySet).map(k => k -> default) // add new ones
     }
     action.state match {
       case PotEmpty =>
-        updated(updateInCollection(_.pending(retryPolicy)), updateEffect)
+        updated(updateInCollection(_.pending(), Pending()), updateEffect)
       case PotPending =>
         noChange
       case PotUnavailable =>
         noChange
       case PotReady =>
-        updated(value.updated(action.value.get))
+        updated(value.updated(action.result.get))
       case PotFailed =>
-        // get one retry policy, they're all the same
-        val rp = value.get(keys.head).retryPolicy
-        rp.retry(action.value, updateEffect) match {
-          case Right((nextPolicy, retryEffect)) =>
-            updated(updateInCollection(_.pending(nextPolicy)), retryEffect)
-          case Left(ex) =>
-            updated(updateInCollection(_.fail(ex)))
-        }
+        val ex = action.result.failed.get
+        updated(updateInCollection(_.fail(ex), Failed(ex)))
     }
   }
 }
 ```
 
-It works quite similarly to the regular `PotAction.handler` but instead of updating the whole collection, only a subset of values in the collection are updated,
-based on the set of given `keys`. The `updateEffect` must update values for all the `keys`, otherwise some of them will be left in `Pending` state. It's ok to
-have multiple simultaneous updates running for the same `PotCollection` but you should make sure they do not use overlapping key sets.
+It works quite similarly to the regular `AsyncAction.handler` but instead of updating the whole collection, only a subset of values in the collection are
+updated, based on the set of given `keys`. The `updateEffect` must update values for all the `keys`, otherwise some of them will be left in `Pending` state.
+It's ok to have multiple simultaneous updates running for the same `PotCollection` but you should make sure they do not use overlapping key sets.
 
 An example fetch implementation could be like following:
 
 ```scala
 case class User(id:String, name: String)
 
-// define a PotAction for updating users
-case class UpdateUsers(value: Pot[Map[String, User]] = Empty, keys: Set[String]) 
-  extends PotAction[Map[String, User], UpdateUsers] {
-  def next(newValue: Pot[Map[String, User]]) = UpdateUsers(newValue, keys)
+// define a AsyncAction for updating users
+case class UpdateUsers(
+  keys: Set[String],
+  state: PotState = PotState.PotEmpty,
+  result: Try[Map[String, Pot[User]]] = Failure(new AsyncAction.PendingException)
+) extends AsyncAction[Map[String, Pot[User]], UpdateUsers] {
+  def next(newState: PotState, newValue: Try[Map[String, Pot[User]]]) =
+    UpdateUsers(keys, newState, newValue)
 }
 
 // an implementation of Fetch for users
 class UserFetch(dispatch: Dispatcher) extends Fetch[String] {
-  override def fetch(key: String): Unit = 
+  override def fetch(key: String): Unit =
     dispatch(UpdateUsers(keys = Set(key)))
-  override def fetch(keys: Traversable[String]): Unit = 
+  override def fetch(keys: Traversable[String]): Unit =
     dispatch(UpdateUsers(keys = Set() ++ keys))
 }
 
 // function to load a set of users based on keys
-def loadUsers(keys: Set[String]): Future[Map[String, Option[User]]]
+def loadUsers(keys: Set[String]): Future[Map[String, Pot[User]]]
 
 // handle the action
 override def handle = {
   case action: UpdateUsers =>
-    val updateEffect = action.effect(loadUsers(action.keys))(users => users)
-    action.handleWith(this, updateEffect)(PotAction.mapHandler(action.keys, Retry(3)))
+    val updateEffect = action.effect(loadUsers(action.keys))(identity)
+    action.handleWith(this, updateEffect)(AsyncAction.mapHandler(action.keys))
 }
 ```
 

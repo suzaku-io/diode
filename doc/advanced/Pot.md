@@ -77,28 +77,6 @@ You can query specific state via `isX` functions, or use `state` for matching. N
 
 Otherwise a `Pot` works like an `Option` (`Empty`, `Unavailable`, `Pending` and `Failed` work like `None`).
 
-### Retries
-
-A common pattern with async data is to retry failed loads a few times. `Pot` supports this pattern by providing a retry policy (`retryPolicy`) and some state
-management to deal with retries. A typical case is to check for retry after `Pot` goes into failed state and then retry the operation like in the example below:
-
-```scala
-val value: Pot[A] = ...
-
-case PotEmpty =>
-  updated(value.pending(retryPolicy), updateEffect)
-case PotFailed =>
-  value.retryPolicy.retry(action.value, updateEffect) match {
-    case Right((nextPolicy, retryEffect)) =>
-      updated(value.retry(nextPolicy), retryEffect)
-    case Left(ex) =>
-      updated(value.fail(ex))
-  }
-```
-
-The `Pot.retry` function sets the `Pot` into `Pending` (or `PendingStale`) state and updates `retryPolicy`. Common retry policies `Immediate` and `Backoff` are
-available in the `Retry` object, but feel free to roll your own.
-
 ### Pending Time
 
 The pending states of `Pot` store a time stamp when created. You can access this through `startTime`, or you can directly get the duration of the operation

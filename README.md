@@ -20,14 +20,13 @@ Full documentation [available here](http://ochrons.github.io/diode/index.html).
 
 Add following dependency declaration to your Scala project.
 
-<pre><code class="lang-scala">"me.chrons" %% "diode" % "0.3.0"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %% "diode" % "0.4.0"</code></pre>
 
 In a Scala.js project the dependency looks like this.
 
-<pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.3.0"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.4.0"</code></pre>
 
 <img align="right" src="doc/images/architecture.png">
-
 
 ### The Model
 
@@ -164,21 +163,27 @@ features and async operations.
 
 # Change history
 
+### 0.4.0
+- Split Diode into `diode-core` and `diode-data` modules as the core functionality is quite stable but `diode-data` (`Pot` stuff) is still changing quite
+rapidly.
+- Added `AsyncAction` which is a more general base for `PotAction`.
+- Simplified `Pot` by moving everything RetryPolicy related into specific `AsyncActionRetriable`.
+
 ### 0.3.0
-- Added virtual collections (`PotCollection`) to support lazy loading of data
+- Added virtual collections (`PotCollection`) to support lazy loading of data.
 - Added `RefTo` for referencing data elsewhere in the model. 
-- Added `map` and `flatMap` to access model values inside containers (such as `Option`) while maintaining reference equality
-- Added `zip` to combine two readers while maintaining reference equality
-- Added an action processor for persisting application state
-- Moved `Pot` and related classes from `diode.util` to `diode.data` package
+- Added `map` and `flatMap` to access model values inside containers (such as `Option`) while maintaining reference equality.
+- Added `zip` to combine two readers while maintaining reference equality.
+- Added an action processor for persisting application state.
+- Moved `Pot` and related classes from `diode.util` to `diode.data` package.
 
 ### 0.2.0
 - Upgraded `Effect`s to be real class(es) instead of just type alias for easier composition etc.
-- Added animation example using `requestAnimationFrame`
-- Added TodoMVC example using React
+- Added animation example using `requestAnimationFrame`.
+- Added TodoMVC example using React.
 
 ### 0.1.0
-- Initial version
+- Initial version.
 
 # Contributors
 

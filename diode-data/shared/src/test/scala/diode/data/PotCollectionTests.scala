@@ -1,7 +1,12 @@
 package diode.data
 
+import diode.{ActionHandler, ModelRW, Dispatcher}
 import diode.data.PotState._
 import utest._
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.util._
 
 object PotCollectionTests extends TestSuite {
 
@@ -60,9 +65,9 @@ object PotCollectionTests extends TestSuite {
         val v1 = v.updated(5, Ready("0")).updated(8, Ready("1"))
         val it = v1.iterator
         assert(it.hasNext)
-        assert(it.next() == (5, Ready("0")))
+        assert(it.next() ==(5, Ready("0")))
         assert(it.hasNext)
-        assert(it.next() == (8, Ready("1")))
+        assert(it.next() ==(8, Ready("1")))
         assert(!it.hasNext)
       }
     }
@@ -156,11 +161,45 @@ object PotCollectionTests extends TestSuite {
       'map - {
         val fetcher = new TestFetcher[String]
         val ps = PotStream(fetcher, Seq("1" -> "test1", "2" -> "test2", "3" -> "test3", "4" -> "test4"))
-        val ps1 = ps.map((k, v) => if(k != "4") v + "x" else v)
+        val ps1 = ps.map((k, v) => if (k != "4") v + "x" else v)
         assert(ps1("1").endsWith("x"))
         assert(ps1("2").endsWith("x"))
         assert(ps1("3").endsWith("x"))
         assert(!ps1("4").endsWith("x"))
+      }
+    }
+    'VerifyDocs - {
+      case class User(id: String, name: String)
+
+      // define a AsyncAction for updating users
+      case class UpdateUsers(
+        keys: Set[String],
+        state: PotState = PotState.PotEmpty,
+        result: Try[Map[String, Pot[User]]] = Failure(new AsyncAction.PendingException)
+      ) extends AsyncAction[Map[String, Pot[User]], UpdateUsers] {
+        def next(newState: PotState, newValue: Try[Map[String, Pot[User]]]) =
+          UpdateUsers(keys, newState, newValue)
+      }
+
+      // an implementation of Fetch for users
+      class UserFetch(dispatch: Dispatcher) extends Fetch[String] {
+        override def fetch(key: String): Unit =
+          dispatch(UpdateUsers(keys = Set(key)))
+        override def fetch(keys: Traversable[String]): Unit =
+          dispatch(UpdateUsers(keys = Set() ++ keys))
+      }
+
+      abstract class Handler[M](modelRW: ModelRW[M, PotMap[String, User]], keys: Set[String]) extends ActionHandler(modelRW) {
+
+        // function to load a set of users based on keys
+        def loadUsers(keys: Set[String]): Future[Map[String, Pot[User]]]
+
+        // handle the action
+        override def handle = {
+          case action: UpdateUsers =>
+            val updateEffect = action.effect(loadUsers(action.keys))(identity)
+            action.handleWith(this, updateEffect)(AsyncAction.mapHandler(action.keys))
+        }
       }
     }
   }

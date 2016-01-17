@@ -18,8 +18,8 @@ The `PotAction` trait simplifies creation of stateful actions for `Pot` data. To
 function to build a new instance of your action.
 
 ```scala
-case class UpdateTodos(value: Pot[Todos] = Empty) extends PotAction[Todos, UpdateTodos] {
-  def next(newValue: Pot[Todos]) = UpdateTodos(newValue)
+case class UpdateTodos(result: Pot[Todos] = Empty) extends PotAction[Todos, UpdateTodos] {
+  def next(newResult: Pot[Todos]) = UpdateTodos(newResult)
 }
 ```
 
@@ -31,7 +31,7 @@ override def handle = {
     val updateEffect = action.effect(loadTodos())(todos => Todos(todos))
     action.handle {
       case PotEmpty =>
-        updated(value.pending(retryPolicy), updateEffect)
+        updated(value.pending(), updateEffect)
       case PotPending =>
         noChange
       case PotReady =>
@@ -39,12 +39,7 @@ override def handle = {
       case PotUnavailable =>
         updated(value.unavailable())
       case PotFailed =>
-        value.retryPolicy.retry(action.value, updateEffect) match {
-          case Right((nextPolicy, retryEffect)) =>
-            updated(value.retry(nextPolicy), retryEffect)
-          case Left(ex) =>
-            updated(value.fail(ex))
-        }
+        updated(value.fail(ex))
     }
 }
 ```
@@ -60,17 +55,16 @@ The state management of your `PotAction`s is typically identical, so it makes se
 action via an external handler function through `handleWith`.
 
 ```scala
-import scala.concurrent.duration._
-
 val updateEffect = action.effect(loadTodos())(todos => Todos(todos))
+
 override def handle = {
   case action: UpdateTodos =>
-    action.handleWith(this, updateEffect)(PotAction.handler(Retry(3), 100.millis))
+    action.handleWith(this, updateEffect)(PotAction.handler())
 }
 ```
-    
-Here we use a predefined handler from the `PotAction` object, which supports retries and periodic notification of pending actions. Note how the `updateEffect`
-definition can be moved outside the handling function because it's immutable.
+
+Here we use a predefined handler from the `PotAction` object. Note how the `updateEffect` definition can be moved outside the handling function because it's
+immutable.
 
 ### Notifications while Pending
 
@@ -98,11 +92,62 @@ First we check if the `Pot` is still pending (it hasn't transitioned into failed
 state (which makes a copy of the `Pot`, creating a new reference, triggering an update in the view) and resubmit a delayed effect. This continues while the
 `PotAction` is in pending state, updating the model at a steady interval.
 
+The common handlers also support sending updates while pending. You just need to provide the interval time to the handler
+
+```scala
+import scala.concurrent.duration._
+
+override def handle = {
+  case action: UpdateTodos =>
+    action.handleWith(this, updateEffect)(PotAction.handler(400.milliseconds))
+}
+```
+
 In the view you can check how long the `Pot` has been pending by calling `duration()` and act accordingly.
- 
+
 ```scala
 if (pot.isPending) {
   val duration = pot.asInstanceOf[PendingBase].duration()
   ...
 ```
-  
+
+## `AsyncAction`
+
+For actions not involving `Pot` data you can use `AsyncAction`. It provides the same functionality but the state is separated from the value and the type of
+value is `Try[A]` to indicate success/failure.
+
+```scala
+case class UpdateTodos(
+  state: PotState = PotState.Empty, 
+  result: Try[Todos] = Failure(new AsyncAction.PendingException)
+) extends AsyncAction[Todos, UpdateTodos] {
+  def next(newState: PotState, newResult: Try[Todos]): P = UpdateTodos(newState, newResult)
+}
+```
+
+## Retries
+
+A common pattern with async data is to retry failed operations a few times. `AsyncActionRetriable` and `PotActionRetriable` support this pattern by providing
+a retry policy. The retry policy resides in the action and it's updated on every retry. Therefore you need to pass it forward in the `next` method.
+
+```scala
+case class UpdateTodos(result: Pot[Todos] = Empty, retryPolicy: RetryPolicy = Retry.None) 
+  extends PotAction[Todos, UpdateTodos] {
+  def next(newResult: Pot[Todos], newRetryPolicy: RetryPolicy) = UpdateTodos(newResult, newRetryPolicy)
+}
+```
+
+When a failure is encountered, the retry policy is consulted on what to do next:
+
+```scala
+case PotFailed =>
+  // extract exception from action and call retryPolicy
+  action.retryPolicy.retry(action.result.failed.get, updateEffect) match {
+    case Right((_, retryEffect)) =>
+      effectOnly(retryEffect)
+    case Left(ex) =>
+      updated(value.fail(ex))
+  }
+```
+
+Common retry policies `Immediate` and `Backoff` are available in the `Retry` object, but feel free to roll your own.
