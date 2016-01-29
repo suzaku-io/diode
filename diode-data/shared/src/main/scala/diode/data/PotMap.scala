@@ -77,7 +77,11 @@ class PotMap[K, V](
           (key, Pending().asInstanceOf[Pot[V]])
       }
     }(collection.breakOut)
-    fetcher.fetch(toFetch)
+
+    if(toFetch.nonEmpty) {
+      fetcher.fetch(toFetch)
+    }
+
     values
   }
 

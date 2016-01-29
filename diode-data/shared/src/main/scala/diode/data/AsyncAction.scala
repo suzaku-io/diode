@@ -60,7 +60,7 @@ object AsyncAction {
 
   def mapHandler[K, V, A <: Traversable[(K, Pot[V])], M, P <: AsyncAction[A, P]](keys: Set[K])
     (implicit ec: ExecutionContext) = {
-    require(keys.nonEmpty)
+    require(keys.nonEmpty, "AsyncAction:mapHandler - The set of keys to update can't be empty")
     (action: AsyncAction[A, P], handler: ActionHandler[M, PotMap[K, V]], updateEffect: Effect) => {
       import PotState._
       import handler._
@@ -92,7 +92,7 @@ object AsyncAction {
 
   def vectorHandler[V, A <: Traversable[(Int, Pot[V])], M, P <: AsyncAction[A, P]](indices: Set[Int])
     (implicit ec: ExecutionContext) = {
-    require(indices.nonEmpty)
+    require(indices.nonEmpty, "AsyncAction:vectorHandler - The set of indices to update can't be empty")
     (action: AsyncAction[A, P], handler: ActionHandler[M, PotVector[V]], updateEffect: Effect) => {
       import PotState._
       import handler._
@@ -131,7 +131,7 @@ object AsyncActionRetriable {
 
   def mapHandler[K, V, A <: Traversable[(K, Pot[V])], M, P <: AsyncActionRetriable[A, P]](keys: Set[K])
     (implicit ec: ExecutionContext) = {
-    require(keys.nonEmpty)
+    require(keys.nonEmpty, "AsyncActionRetriable:mapHandler - The set of keys to update can't be empty")
     (action: AsyncActionRetriable[A, P], handler: ActionHandler[M, PotMap[K, V]], updateEffect: RetryPolicy => Effect) => {
       import PotState._
       import handler._
@@ -167,7 +167,7 @@ object AsyncActionRetriable {
 
   def vectorHandler[V, A <: Traversable[(Int, Pot[V])], M, P <: AsyncActionRetriable[A, P]](indices: Set[Int])
     (implicit ec: ExecutionContext) = {
-    require(indices.nonEmpty)
+    require(indices.nonEmpty, "AsyncActionRetriable:vectorHandler - The set of indices to update can't be empty")
     (action: AsyncActionRetriable[A, P], handler: ActionHandler[M, PotVector[V]], updateEffect: RetryPolicy => Effect) => {
       import PotState._
       import handler._
