@@ -9,7 +9,7 @@ object ReactPot {
 
   implicit def potRenderer[A](pot: Pot[A]) : potWithReact[A] = potWithReact(pot, Nil)
 
-  implicit def toReact(p : potWithReact[_]) : ReactNode = p.nodes
+  implicit def toReact(p : potWithReact[_]) : ReactNode = p.nodes.reverse
 
 
   case class potWithReact[A](pot: Pot[A], nodes: List[ReactNode]) {
