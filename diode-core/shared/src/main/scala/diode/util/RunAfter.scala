@@ -1,5 +1,7 @@
 package diode.util
 
+import java.util.concurrent.TimeUnit
+
 import scala.annotation.implicitNotFound
 import scala.concurrent.{Promise, Future}
 import scala.concurrent.duration.FiniteDuration
@@ -9,6 +11,9 @@ an (implicit runner: RunAfter) parameter to your method
 or import diode.Implicits.runAfterImpl""")
 trait RunAfter {
   def runAfter[A](delay: FiniteDuration)(f: => A): Future[A]
+
+  def runAfter[A](delay: Int)(f: => A): Future[A] =
+    runAfter(FiniteDuration(delay, TimeUnit.MILLISECONDS))(f)
 }
 
 object RunAfter {

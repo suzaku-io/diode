@@ -15,18 +15,25 @@ trait ActionProcessor[M <: AnyRef] {
 
 trait Circuit[M <: AnyRef] extends Dispatcher {
 
-  type Listener = () => Unit
   type HandlerFunction = PartialFunction[AnyRef, ActionResult[M]]
-  type Cursor = (M) => AnyRef
 
-  private case class Subscription(listener: Listener, cursor: Cursor, lastValue: AnyRef)
+  private case class Subscription[T](listener: ModelR[M, T] => Unit, cursor: ModelR[M, T], lastValue: T) {
+    def changed: Option[Subscription[T]] = {
+      if (cursor === lastValue)
+        None
+      else
+        Some(copy(lastValue = cursor.eval(model)))
+    }
+
+    def call(): Unit = listener(cursor)
+  }
 
   protected var model: M
   protected def actionHandler: HandlerFunction
 
   private val modelRW = new RootModelRW[M](model)
   private var listenerId = 0
-  private var listeners = Map.empty[Int, Subscription]
+  private var listeners = Map.empty[Int, Subscription[_]]
   private var processors = List.empty[ActionProcessor[M]]
   private var processChain = buildProcessChain
 
@@ -57,13 +64,15 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * @param get Function that returns the part of the model you are interested in
     * @return A `ModelR[T]` giving you read-only access to part of the model
     */
-  def zoom[T](get: M => T): ModelR[M, T] =
+  def zoom[T](get: M => T)(implicit feq: FastEq[_ >: T]): ModelR[M, T] =
     modelRW.zoom[T](get)
 
-  def zoomMap[F[_], A, B](fa: M => F[A])(f: A => B)(implicit monad: Monad[F], ct: ClassTag[B]): ModelR[M, F[B]] =
+  def zoomMap[F[_] <: AnyRef, A, B](fa: M => F[A])(f: A => B)
+    (implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelR[M, F[B]] =
     modelRW.zoomMap(fa)(f)
 
-  def zoomFlatMap[F[_], A, B](fa: M => F[A])(f: A => F[B])(implicit monad: Monad[F], ct: ClassTag[B]): ModelR[M, F[B]] =
+  def zoomFlatMap[F[_] <: AnyRef, A, B](fa: M => F[A])(f: A => F[B])
+    (implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelR[M, F[B]] =
     modelRW.zoomFlatMap(fa)(f)
 
   /**
@@ -73,12 +82,14 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * @param set Function that updates the part of the model you are interested in
     * @return A `ModelRW[T]` giving you read/update access to part of the model
     */
-  def zoomRW[T](get: M => T)(set: (M, T) => M): ModelRW[M, T] = modelRW.zoomRW(get)(set)
+  def zoomRW[T](get: M => T)(set: (M, T) => M)(implicit feq: FastEq[_ >: T]): ModelRW[M, T] = modelRW.zoomRW(get)(set)
 
-  def zoomMapRW[F[_], A, B](fa: M => F[A])(f: A => B)(set: (M, F[B]) => M)(implicit monad: Monad[F], ct: ClassTag[B]): ModelRW[M, F[B]] =
+  def zoomMapRW[F[_] <: AnyRef, A, B](fa: M => F[A])(f: A => B)(set: (M, F[B]) => M)
+    (implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelRW[M, F[B]] =
     modelRW.zoomMapRW(fa)(f)(set)
 
-  def zoomFlatMapRW[F[_], A, B](fa: M => F[A])(f: A => F[B])(set: (M, F[B]) => M)(implicit monad: Monad[F], ct: ClassTag[B]): ModelRW[M, F[B]] =
+  def zoomFlatMapRW[F[_] <: AnyRef, A, B](fa: M => F[A])(f: A => F[B])(set: (M, F[B]) => M)
+    (implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelRW[M, F[B]] =
     modelRW.zoomFlatMapRW(fa)(f)(set)
 
   /**
@@ -86,17 +97,16 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * what part of the model must change for your listener to be called. If omitted, all changes
     * result in a call.
     *
-    * @param listener Function to be called when model is updated
-    * @param cursor Cursor function returning the part of the model you are interested in. By
-    *               default this is the root model, which means your listener is called on any
-    *               change in the model.
+    * @param cursor   Model reader returning the part of the model you are interested in.
+    * @param listener Function to be called when model is updated. The listener function gets
+    *                 the model reader as a parameter.
     * @return A function to unsubscribe your listener
     */
-  def subscribe(listener: Listener, cursor: Cursor = m => m): () => Unit = {
+  def subscribe[T](cursor: ModelR[M, T])(listener: ModelR[M, T] => Unit): () => Unit = {
     this.synchronized {
       listenerId += 1
       val id = listenerId
-      listeners += id -> Subscription(listener, cursor, cursor(model))
+      listeners += id -> Subscription(listener, cursor, cursor.eval(model))
       () => this.synchronized(listeners -= id)
     }
   }
@@ -141,7 +151,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * occur while dispatching actions.
     *
     * @param action Action that caused the exception
-    * @param e Exception that was thrown
+    * @param e      Exception that was thrown
     */
   def handleFatal(action: AnyRef, e: Throwable): Unit = throw e
 
@@ -183,14 +193,14 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
       if (oldModel ne model) {
         // walk through all listeners and update subscriptions when model has changed
         listeners = listeners.foldLeft(listeners) { case (l, (key, sub)) =>
-          val curValue = sub.cursor(model)
-          if (curValue ne sub.lastValue) {
-            // value at the cursor has changed, call listener and update subscription
-            sub.listener()
-            l.updated(key, sub.copy(lastValue = curValue))
-          } else {
-            // nothing interesting happened
-            l
+          sub.changed match {
+            case Some(newSub) =>
+              // value at the cursor has changed, call listener and update subscription
+              sub.call()
+              l.updated(key, newSub)
+            case None =>
+              // nothing interesting happened
+              l
           }
         }
       }

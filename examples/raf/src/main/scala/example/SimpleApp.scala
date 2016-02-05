@@ -13,7 +13,7 @@ object SimpleApp extends JSApp {
     // connect the RAF batcher
     AppCircuit.addProcessor(new RAFBatcher)
     // subscribe to changes in the animations
-    AppCircuit.subscribe(() => renderAnimations(AppCircuit.zoom(_.animations).value), _.animations)
+    AppCircuit.subscribe(AppCircuit.zoom(_.animations))(reader => renderAnimations(reader()))
     // first render
     render(root)
   }

@@ -2,6 +2,8 @@ package diode.data
 
 import java.util
 
+import diode.Implicits.runAfterImpl
+
 import scala.annotation.tailrec
 
 class PotVector[V](
@@ -110,13 +112,13 @@ class PotVector[V](
   override def refresh(idx: Int): Unit = {
     if (idx < 0 || idx >= length)
       throw new IndexOutOfBoundsException
-    fetcher.fetch(idx)
+    runAfterImpl.runAfter(0)(fetcher.fetch(idx))
   }
 
   override def refresh(indices: Traversable[Int]): Unit = {
     if (indices.exists(idx => idx < 0 || idx >= length))
       throw new IndexOutOfBoundsException
-    fetcher.fetch(indices)
+    runAfterImpl.runAfter(0)(fetcher.fetch(indices))
   }
 
   override def clear =
@@ -126,7 +128,7 @@ class PotVector[V](
     if (idx < 0 || idx >= length)
       throw new IndexOutOfBoundsException
     if (idx >= elems.length || elems(idx).isEmpty) {
-      fetcher.fetch(idx)
+      refresh(idx)
       Pending().asInstanceOf[Pot[V]]
     } else {
       elems(idx).get
@@ -162,9 +164,9 @@ class PotVector[V](
     }
     // are all missing?
     if (missing.size == end - start)
-      fetcher.fetch(start, end)
+      runAfterImpl.runAfter(0)(fetcher.fetch(start, end))
     else if (missing.nonEmpty)
-      fetcher.fetch(missing)
+      refresh(missing)
 
     values
   }

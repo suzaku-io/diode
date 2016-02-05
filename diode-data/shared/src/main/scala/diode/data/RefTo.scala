@@ -1,6 +1,6 @@
 package diode.data
 
-import diode.ModelR
+import diode.{FastEq, ModelR}
 
 import scala.language.existentials
 
@@ -43,6 +43,6 @@ object RefTo {
     * @param streamTarget Model reader for the `PotStream` containing the value
     * @param updated      Function to create an update action for the potential value this reference points to
     */
-  @inline def stream[K, V, P](key: K, streamTarget: ModelR[_, P])(updated: (K, V) => AnyRef)(implicit ev: P <:< PotStream[K, V]): RefTo[V] =
+  @inline def stream[K, V, P](key: K, streamTarget: ModelR[_, P])(updated: (K, V) => AnyRef)(implicit ev: P <:< PotStream[K, V], feq: FastEq[_ >: V]): RefTo[V] =
     new RefTo[V](streamTarget.zoom(_.apply(key)), updated(key, _: V))
 }

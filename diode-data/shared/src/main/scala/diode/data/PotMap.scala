@@ -1,5 +1,7 @@
 package diode.data
 
+import diode.Implicits.runAfterImpl
+
 class PotMap[K, V](
   private val fetcher: Fetch[K],
   private val elems: Map[K, Pot[V]]
@@ -30,11 +32,11 @@ class PotMap[K, V](
     new PotMap(fetcher, elems - key)
 
   override def refresh(key: K): Unit = {
-    fetcher.fetch(key)
+    runAfterImpl.runAfter(0)(fetcher.fetch(key))
   }
 
   override def refresh(keys: Traversable[K]): Unit = {
-    fetcher.fetch(keys)
+    runAfterImpl.runAfter(0)(fetcher.fetch(keys))
   }
 
   override def clear =
@@ -43,12 +45,12 @@ class PotMap[K, V](
   override def get(key: K) = {
     elems.get(key) match {
       case Some(elem) if elem.state == PotState.PotEmpty =>
-        fetcher.fetch(key)
+        refresh(key)
         Pending().asInstanceOf[Pot[V]]
       case Some(elem) =>
         elem
       case None =>
-        fetcher.fetch(key)
+        refresh(key)
         Pending().asInstanceOf[Pot[V]]
     }
   }
@@ -79,9 +81,8 @@ class PotMap[K, V](
     }(collection.breakOut)
 
     if(toFetch.nonEmpty) {
-      fetcher.fetch(toFetch)
+      refresh(toFetch)
     }
-
     values
   }
 

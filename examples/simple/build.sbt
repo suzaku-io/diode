@@ -11,5 +11,5 @@ bootSnippet := "SimpleApp().main();"
 libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "0.8.2",
   "com.lihaoyi" %%% "scalatags" % "0.5.3",
-  "me.chrons" %%% "diode-core" % "0.4.0"
+  "me.chrons" %%% "diode-core" % "0.5.0-SNAPSHOT"
 )

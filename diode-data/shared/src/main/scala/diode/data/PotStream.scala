@@ -1,5 +1,7 @@
 package diode.data
 
+import diode.Implicits.runAfterImpl
+
 import scala.annotation.tailrec
 
 final case class StreamValue[K, V](key: K, value: V, stream: PotStream[K, V], prevKey: Option[K] = None, nextKey: Option[K] = None) {
@@ -98,13 +100,13 @@ class PotStream[K, V](
     PotStream(fetcher)
 
   def refresh(key: K): Unit =
-    fetcher.fetch(key)
+    runAfterImpl.runAfter(0)(fetcher.fetch(key))
 
   def refreshNext(count: Int = 1): Unit =
-    fetcher.fetchNext(lastKeyOption.get, count)
+    runAfterImpl.runAfter(0)(fetcher.fetchNext(lastKeyOption.get, count))
 
   def refreshPrev(count: Int = 1): Unit =
-    fetcher.fetchPrev(headKeyOption.get, count)
+    runAfterImpl.runAfter(0)(fetcher.fetchPrev(headKeyOption.get, count))
 
   def remove(key: K): PotStream[K, V] = {
     if(elems.isEmpty || !elems.contains(key))

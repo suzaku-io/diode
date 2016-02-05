@@ -110,11 +110,11 @@ object CircuitJVMTests extends TestSuite {
       val c = circuit
       class Listen {
         var called = false
-        def listener(): Unit = called = !called
+        def listener(cursor: ModelR[Model, Vector[Int]]): Unit = called = !called
       }
       val listeners = for (i <- 0 until 1000) yield new Listen
       // add in parallel
-      val futures = listeners.map(l => Future(c.subscribe(l.listener)))
+      val futures = listeners.map(l => Future(c.subscribe(c.zoom(_.list))(l.listener)))
       // wait for futures to complete
       Await.ready(Future.sequence(futures), 1000.millis)
       c.dispatch(Append(0))

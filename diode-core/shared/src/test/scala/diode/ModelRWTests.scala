@@ -14,7 +14,51 @@ object ModelRWTests extends TestSuite {
 
   case class C(i: Int, s: String, o: Option[A])
 
+  case class ComplexModel(a: A, b: B, c: C)
+
+  case class Partial(i: Int, s: String) extends UseValueEq
+
+  case class PartialToo(s: String, i: Int)
+
+  object PartialToo {
+    implicit object partialEq extends FastEq[PartialToo] {
+      override def eqv(a: PartialToo, b: PartialToo): Boolean = a.s == b.s
+    }
+  }
+
   def tests = TestSuite {
+    'eq - {
+      var m = ComplexModel(A(999, "string"), B(Seq(1.0f, 2.0f, 3.0f), 3.0f), C(42, "c", Some(A(998, "A"))))
+      val mr = new RootModelR(m)
+      // use ref eq for "A"
+      val r1 = mr.zoom(_.a)
+      assert(!(r1 === A(999, "string")))
+      // use value eq for "Partial" class
+      val r2 = mr.zoom(m => Partial(m.a.i, m.c.s))
+      assert(r2 === Partial(999, "c"))
+      // use value eq for values
+      val r3 = mr.zoom(_.a.i)
+      val r4 = mr.zoom(_.a.s)
+      assert(r3 === 999)
+      assert(r4 === "string")
+      val oldA = r1()
+      val oldP = r2()
+      m = m.copy(a = A(999, "string"))
+      assert(r3 === 999)
+      assert(r4 === "string")
+      // reference changes, non equal
+      assert(!(r1 === oldA))
+      // reference changes, still equal
+      assert(r2 === oldP)
+
+      // need explicit import due to implicit priorities
+      import PartialToo._
+      val r5 = mr.zoom(m => PartialToo(m.c.s, m.a.i))
+      val oldPT = r5()
+      m = m.copy(a = A(9, "str"))
+      // use custom FastEq
+      assert(r5 === oldPT)
+    }
     'zip - {
       var m = Model(A(42, "test"), B(Seq(1, 2, 3), 4))
       val mr = new RootModelR(m)
@@ -92,7 +136,7 @@ object ModelRWTests extends TestSuite {
         case class B(f: Boolean, g: Option[D])
         case class D(h: Seq[Int], i: Int)
 
-        val root = Root(A(42, "42"), B(true, Some(D(Seq(42,42,42), 43))), "c")
+        val root = Root(A(42, "42"), B(true, Some(D(Seq(42, 42, 42), 43))), "c")
         object AppCircuit extends Circuit[Root] {
           override protected var model: Root = root
           override protected def actionHandler: AppCircuit.HandlerFunction = ???
@@ -117,6 +161,29 @@ object ModelRWTests extends TestSuite {
         'ex6 - {
           val reader: ModelR[Root, String] = AppCircuit.zoom(_.a.e)
           val zipReader: ModelR[Root, (String, Int)] = reader.zip(AppCircuit.zoom(_.a.d))
+        }
+        'ex7 - {
+          case class FromAB(e: String, g: Option[D]) extends UseValueEq
+          val abReader: ModelR[Root, FromAB] =
+            AppCircuit.zoom(r => FromAB(r.a.e, r.b.g))
+          assert(abReader === FromAB("42", Some(D(Seq(42, 42, 42), 43))))
+        }
+        'ex8 - {
+          case class ExtData(age: Int, name: String)
+
+          implicit object extDataEq extends FastEq[ExtData] {
+            override def eqv(a: ExtData, b: ExtData): Boolean = a == b
+          }
+
+          val extReader: ModelR[Root, ExtData] =
+            AppCircuit.zoom(r => ExtData(r.a.d, r.c))
+
+          assert(extReader === ExtData(42, "c"))
+
+          val valReader: ModelR[Root, String] =
+            AppCircuit.zoom(r => s"${r.a.d}:${r.a.e}")(FastEq.ValueEq)
+
+          assert(valReader === "42:42")
         }
       }
     }

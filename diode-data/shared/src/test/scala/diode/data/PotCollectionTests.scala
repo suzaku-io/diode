@@ -2,6 +2,7 @@ package diode.data
 
 import diode.{ActionHandler, ModelRW, Dispatcher}
 import diode.data.PotState._
+import diode.Implicits.runAfterImpl
 import utest._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -39,9 +40,14 @@ object PotCollectionTests extends TestSuite {
         val m = PotMap[String, String](fetcher)
         val m1 = m + ("test1" -> Ready("Yeaa"))
         assert(m1.get("test2").isPending)
-        assert(fetcher.lastFetch == "test2")
-        assert(m1.get(Seq("test1", "test2", "test3")).values.map(_.state) == Seq(PotReady, PotPending, PotPending))
-        assert(fetcher.lastFetch == Seq("test3", "test2"))
+        runAfterImpl.runAfter(10) {
+          assert(fetcher.lastFetch == "test2")
+        }.flatMap { _ =>
+          assert(m1.get(Seq("test1", "test2", "test3")).values.map(_.state) == Seq(PotReady, PotPending, PotPending))
+          runAfterImpl.runAfter(10) {
+            assert(fetcher.lastFetch == Seq("test3", "test2"))
+          }
+        }
       }
     }
     'PotVector - {

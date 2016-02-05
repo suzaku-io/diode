@@ -94,11 +94,11 @@ object CircuitTests extends TestSuite {
         val c = circuit
         var state: Model = null
         var callbackCount = 0
-        def listener(): Unit = {
+        def listener(cursor: ModelR[Model, String]): Unit = {
           state = c.model
           callbackCount += 1
         }
-        val unsubscribe = c.subscribe(listener)
+        val unsubscribe = c.subscribe(c.zoom(_.s))(listener)
         c.dispatch(SetS("Listen"))
         assert(state.s == "Listen")
         assert(callbackCount == 1)
@@ -115,16 +115,16 @@ object CircuitTests extends TestSuite {
         var state: Model = null
         var state2: Model = null
         var callbackCount = 0
-        def listener1(): Unit = {
+        def listener1(cursor: ModelR[Model, Data]): Unit = {
           state = c.model
           callbackCount += 1
         }
-        def listener2(): Unit = {
+        def listener2(cursor: ModelR[Model, String]): Unit = {
           state2 = c.model
           callbackCount += 1
         }
-        c.subscribe(listener1, _.data)
-        c.subscribe(listener2, _.s)
+        c.subscribe(c.zoom(_.data))(listener1)
+        c.subscribe(c.zoom(_.s))(listener2)
         // check that only listener2 is called
         c.dispatch(SetS("Listen"))
         assert(state == null)

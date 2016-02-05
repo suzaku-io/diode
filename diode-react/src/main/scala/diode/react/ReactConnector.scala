@@ -2,24 +2,26 @@ package diode.react
 
 import diode._
 import japgolly.scalajs.react._
-import scala.language.existentials
+
 import scala.language.existentials
 
 /**
   * Wraps a model reader, dispatcher and React connector to be passed to React components
   * in props.
   */
-case class ModelProxy[S](modelReader: ModelR[_, S], dispatch: AnyRef => Callback, connector: ReactConnector[_ <: AnyRef]) {
+case class ModelProxy[S](modelReader: ModelR[_, S], dispatch: AnyRef => Callback,
+  connector: ReactConnector[_ <: AnyRef]) {
   def value = modelReader()
 
   def apply() = modelReader()
 
-  def zoom[T](f: S => T) = ModelProxy(modelReader.zoom(f), dispatch, connector)
+  def zoom[T](f: S => T)(implicit feq: FastEq[_ >: T]) = ModelProxy(modelReader.zoom(f), dispatch, connector)
 
-  def wrap[T <: AnyRef, C](f: S => T)(compB: ModelProxy[T] => C)(implicit ev: C => ReactElement): C = compB(zoom(f))
+  def wrap[T <: AnyRef, C](f: S => T)(compB: ModelProxy[T] => C)
+    (implicit ev: C => ReactElement, feq: FastEq[_ >: T]): C = compB(zoom(f))
 
   def connect[T <: AnyRef, C](f: S => T)(compB: ModelProxy[T] => C)
-    (implicit ev: C => ReactElement): ReactComponentU[Unit, T, _, TopNode] = {
+    (implicit ev: C => ReactElement, feq: FastEq[_ >: T]): ReactComponentU[Unit, T, _, TopNode] = {
     connector.connect(modelReader.zoom(f))(compB)
   }
 }
@@ -34,7 +36,8 @@ trait ReactConnector[M <: AnyRef] {
     * @param compB    Function that creates the wrapped component
     * @return The component returned by `compB`
     */
-  def wrap[S <: AnyRef, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)(implicit ev: C => ReactElement): C = {
+  def wrap[S <: AnyRef, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)
+    (implicit ev: C => ReactElement, feq: FastEq[_ >: S]): C = {
     wrap(circuit.zoom(zoomFunc))(compB)
   }
 
@@ -45,7 +48,8 @@ trait ReactConnector[M <: AnyRef] {
     * @param compB       Function that creates the wrapped component
     * @return The component returned by `compB`
     */
-  def wrap[S <: AnyRef, C](modelReader: ModelR[_, S])(compB: ModelProxy[S] => C)(implicit ev: C => ReactElement): C = {
+  def wrap[S <: AnyRef, C](modelReader: ModelR[_, S])(compB: ModelProxy[S] => C)
+    (implicit ev: C => ReactElement, feq: FastEq[_ >: S]): C = {
     compB(ModelProxy(modelReader, action => Callback(circuit.dispatch(action)), ReactConnector.this))
   }
 
@@ -58,7 +62,7 @@ trait ReactConnector[M <: AnyRef] {
     * @return A React component
     */
   def connect[S <: AnyRef, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)
-    (implicit ev: C => ReactElement): ReactComponentU[Unit, S, _, TopNode] = {
+    (implicit ev: C => ReactElement, feq: FastEq[_ >: S]): ReactComponentU[Unit, S, _, TopNode] = {
     connect(circuit.zoom(zoomFunc))(compB)
   }
 
@@ -71,15 +75,14 @@ trait ReactConnector[M <: AnyRef] {
     * @return A React component
     */
   def connect[S <: AnyRef, C](modelReader: ModelR[_, S])(compB: ModelProxy[S] => C)
-    (implicit ev: C => ReactElement): ReactComponentU[Unit, S, _, TopNode] = {
+    (implicit ev: C => ReactElement, feq: FastEq[_ >: S]): ReactComponentU[Unit, S, _, TopNode] = {
 
     class Backend(t: BackendScope[Unit, S]) {
       private var unsubscribe = Option.empty[() => Unit]
 
       def willMount = Callback {
         // subscribe to model changes
-        // we can provide a cursor that ignores the model parameter, because we know the model already :)
-        unsubscribe = Some(circuit.subscribe(changeHandler, _ => modelReader()))
+        unsubscribe = Some(circuit.subscribe(modelReader.asInstanceOf[ModelR[M, S]])(changeHandler))
       }
 
       def willUnmount = Callback {
@@ -87,9 +90,9 @@ trait ReactConnector[M <: AnyRef] {
         unsubscribe = None
       }
 
-      private def changeHandler(): Unit = {
+      private def changeHandler(cursor: ModelR[M, S]): Unit = {
         // modify state if we are mounted and state has actually changed
-        if (t.isMounted() && (t.accessDirect.state ne modelReader()))
+        if (t.isMounted() && modelReader =!= t.accessDirect.state)
           t.accessDirect.setState(modelReader())
       }
 
