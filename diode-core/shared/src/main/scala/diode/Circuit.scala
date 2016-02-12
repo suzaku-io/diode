@@ -1,7 +1,6 @@
 package diode
 
 import scala.language.higherKinds
-import scala.reflect.ClassTag
 
 trait Dispatcher {
   def dispatch(action: AnyRef): Unit
@@ -28,7 +27,17 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     def call(): Unit = listener(cursor)
   }
 
-  protected var model: M
+  private[diode] var model: M = initialModel
+
+  /**
+    * Provides the initial value for the model
+    */
+  protected def initialModel: M
+
+  /**
+    * Handles all dispatched actions
+    * @return
+    */
   protected def actionHandler: HandlerFunction
 
   private val modelRW = new RootModelRW[M](model)
@@ -67,11 +76,11 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   def zoom[T](get: M => T)(implicit feq: FastEq[_ >: T]): ModelR[M, T] =
     modelRW.zoom[T](get)
 
-  def zoomMap[F[_] <: AnyRef, A, B](fa: M => F[A])(f: A => B)
+  def zoomMap[F[_], A, B](fa: M => F[A])(f: A => B)
     (implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelR[M, F[B]] =
     modelRW.zoomMap(fa)(f)
 
-  def zoomFlatMap[F[_] <: AnyRef, A, B](fa: M => F[A])(f: A => F[B])
+  def zoomFlatMap[F[_], A, B](fa: M => F[A])(f: A => F[B])
     (implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelR[M, F[B]] =
     modelRW.zoomFlatMap(fa)(f)
 
@@ -84,11 +93,11 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     */
   def zoomRW[T](get: M => T)(set: (M, T) => M)(implicit feq: FastEq[_ >: T]): ModelRW[M, T] = modelRW.zoomRW(get)(set)
 
-  def zoomMapRW[F[_] <: AnyRef, A, B](fa: M => F[A])(f: A => B)(set: (M, F[B]) => M)
+  def zoomMapRW[F[_], A, B](fa: M => F[A])(f: A => B)(set: (M, F[B]) => M)
     (implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelRW[M, F[B]] =
     modelRW.zoomMapRW(fa)(f)(set)
 
-  def zoomFlatMapRW[F[_] <: AnyRef, A, B](fa: M => F[A])(f: A => F[B])(set: (M, F[B]) => M)
+  def zoomFlatMapRW[F[_], A, B](fa: M => F[A])(f: A => F[B])(set: (M, F[B]) => M)
     (implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelRW[M, F[B]] =
     modelRW.zoomFlatMapRW(fa)(f)(set)
 

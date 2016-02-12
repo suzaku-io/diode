@@ -15,7 +15,9 @@ cd _examples
 for i in "${examples[@]}"
 do
    :
-   pushd ../examples/$i && sbt fullOptJS && popd
+   pushd ../examples/$i 
+   sbt fullOptJS 
+   popd
    copyExample $i
 done
 exit

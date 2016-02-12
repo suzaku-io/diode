@@ -45,7 +45,7 @@ case class Select(selected: Seq[String])
   */
 object AppCircuit extends Circuit[RootModel] {
   // define initial value for the application model
-  var model = RootModel(Tree(Directory("", "", Vector.empty), Seq.empty))
+  def initialModel = RootModel(Tree(Directory("", "", Vector.empty), Seq.empty))
 
   // zoom into the model, providing access only to the `root` directory of the tree
   val treeHandler = new DirectoryTreeHandler(

@@ -18,7 +18,7 @@ case object Reset
   */
 object AppCircuit extends Circuit[RootModel] {
   // define initial value for the application model
-  var model = RootModel(0)
+  def initialModel = RootModel(0)
 
   // zoom into the model, providing access only to the
   val counterHandler = new ActionHandler(zoomRW(_.counter)((m, v) => m.copy(counter = v))) {

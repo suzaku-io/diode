@@ -26,7 +26,7 @@ object CircuitTests extends TestSuite {
 
   class AppCircuit(implicit ec: ExecutionContext) extends Circuit[Model] {
     import diode.ActionResult._
-    override var model = Model("Testing", Data(42, true))
+    override def initialModel = Model("Testing", Data(42, true))
     override protected def actionHandler: HandlerFunction = {
       case SetS(s) =>
         ModelUpdate(model.copy(s = s))
@@ -158,7 +158,8 @@ object CircuitTests extends TestSuite {
       'ModAction - {
         val c = circuit
         val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model], currentModel: Model) = {
+          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model],
+            currentModel: Model) = {
             next(action match {
               case s: String =>
                 SetS(s)
@@ -176,7 +177,8 @@ object CircuitTests extends TestSuite {
       'Filter - {
         val c = circuit
         val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model], currentModel: Model) = {
+          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model],
+            currentModel: Model) = {
             action match {
               case SetS(_) =>
                 ActionResult.NoChange
@@ -192,9 +194,10 @@ object CircuitTests extends TestSuite {
         val c = circuit
         var log = "log"
         val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model], currentModel: Model) = {
+          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model],
+            currentModel: Model) = {
             next(action) match {
-              case m: ModelUpdated[Model @unchecked] =>
+              case m: ModelUpdated[Model@unchecked] =>
                 log += m.newValue.s
                 m
               case r => r
@@ -210,7 +213,8 @@ object CircuitTests extends TestSuite {
         class AP extends ActionProcessor[Model] {
           val pending = mutable.Queue.empty[(AnyRef, Dispatcher)]
 
-          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model], currentModel: Model) = {
+          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model],
+            currentModel: Model) = {
             action match {
               case Delay(a) =>
                 pending.enqueue((a, dispatcher))

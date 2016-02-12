@@ -21,7 +21,7 @@ object CircuitJVMTests extends TestSuite {
 
   class TestCircuit(implicit ec: ExecutionContext) extends Circuit[Model] {
     import diode.ActionResult._
-    override var model = Model(Vector.empty)
+    override def initialModel = Model(Vector.empty)
     override protected def actionHandler: HandlerFunction = {
       case Append(i) =>
         ModelUpdate(Model(model.list :+ i))

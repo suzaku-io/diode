@@ -168,6 +168,7 @@ features and async operations.
 - Introduced `FastEq` typeclass to provide suitable equality checking in various cases using `===` and `=!=` operators.
 - `PotCollection` fetching is always asynchronous to prevent nasty corner cases
 - Circuit subscription requires a `ModelR` instead of a simple function
+- The `model` in Circuit is now private, override `initialModel` method to set the initial value 
 
 ### 0.4.0
 - Split Diode into `diode-core` and `diode-data` modules as the core functionality is quite stable but `diode-data` (`Pot` stuff) is still changing quite

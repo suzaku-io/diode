@@ -112,12 +112,14 @@ class PotVector[V](
   override def refresh(idx: Int): Unit = {
     if (idx < 0 || idx >= length)
       throw new IndexOutOfBoundsException
+    // perform fetch asynchronously
     runAfterImpl.runAfter(0)(fetcher.fetch(idx))
   }
 
   override def refresh(indices: Traversable[Int]): Unit = {
     if (indices.exists(idx => idx < 0 || idx >= length))
       throw new IndexOutOfBoundsException
+    // perform fetch asynchronously
     runAfterImpl.runAfter(0)(fetcher.fetch(indices))
   }
 

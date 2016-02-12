@@ -2,7 +2,7 @@ package diode.data
 
 import java.util.Date
 
-import diode.{Monad, data}
+import diode.Monad
 import diode.util._
 
 import scala.util.{Failure, Success, Try}
@@ -26,7 +26,7 @@ object PotState {
 /**
   * Represents a potential value that may be in different states.
   *
-  * @define pot   [[data.Pot]]
+  * @define pot   [[Pot]]
   * @define ready [[Ready]]
   * @define empty [[Empty]]
   */

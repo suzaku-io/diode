@@ -32,10 +32,12 @@ class PotMap[K, V](
     new PotMap(fetcher, elems - key)
 
   override def refresh(key: K): Unit = {
+    // perform fetch asynchronously
     runAfterImpl.runAfter(0)(fetcher.fetch(key))
   }
 
   override def refresh(keys: Traversable[K]): Unit = {
+    // perform fetch asynchronously
     runAfterImpl.runAfter(0)(fetcher.fetch(keys))
   }
 

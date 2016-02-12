@@ -67,7 +67,7 @@ case class DeleteAnimation(id: Int) extends RAFAction
   */
 object AppCircuit extends Circuit[RootModel] {
   // define initial value for the application model
-  var model = RootModel(Map(), System.currentTimeMillis())
+  def initialModel = RootModel(Map(), System.currentTimeMillis())
 
   // zoom into the model, providing access only to the animations
   val animationHandler = new AnimationHandler(zoomRW(_.animations)((m, v) => m.copy(animations = v)), zoom(_.now))

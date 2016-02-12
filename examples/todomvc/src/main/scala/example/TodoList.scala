@@ -13,8 +13,7 @@ object TodoList {
   case class State(editing: Option[TodoId])
 
   class Backend($: BackendScope[Props, State]) {
-    def mounted(props: Props) =
-      props.proxy.dispatch(InitTodos)
+    def mounted(props: Props) = Callback {}
 
     def handleNewTodoKeyDown(dispatch: AnyRef => Callback)(e: ReactKeyboardEventI): Option[Callback] = {
       val title = e.target.value.trim

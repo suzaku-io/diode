@@ -138,7 +138,7 @@ object ModelRWTests extends TestSuite {
 
         val root = Root(A(42, "42"), B(true, Some(D(Seq(42, 42, 42), 43))), "c")
         object AppCircuit extends Circuit[Root] {
-          override protected var model: Root = root
+          override protected def initialModel: Root = root
           override protected def actionHandler: AppCircuit.HandlerFunction = ???
         }
         'ex1 - {
