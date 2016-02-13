@@ -13,10 +13,10 @@ class PersistStateIDB[M <: AnyRef, P <: js.Any](pickleF: M => P, unpickleF: P =>
   // Opens (and creates) a database for snapshots
   // Contains the DB in a future, for easy async access
   private lazy val dbF = {
-    if (js.isUndefined(dom.indexedDB)) {
+    if (js.isUndefined(dom.window.indexedDB)) {
       Future.failed(new Exception("IndexedDB is not supported"))
     } else {
-      val req = dom.indexedDB.open("DiodePersistence")
+      val req = dom.window.indexedDB.open("DiodePersistence")
       val p = Promise[IDBDatabase]
       req.onsuccess = (_: Event) => {
         println("Open onsuccess")

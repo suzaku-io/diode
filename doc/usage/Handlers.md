@@ -1,23 +1,27 @@
 # Action Handlers
 
 <img src="../images/architecture-circuit.png" style="float: right; padding: 10px">
-For dispatched actions to actually do anything, they need to be processed by _action handlers_. In principle, an action handler is a pure function of type
-`(model, action) => model` that takes in the current model and the dispatched action, and returns a new model. In practice, the handlers are typically partial
-functions that process different (related) actions, access only part of the model through a `ModelRW` trait and return an `ActionResult`.
+For dispatched actions to actually do anything, they need to be processed by _action handlers_. In principle, an action
+handler is a pure function of type `(model, action) => model` that takes in the current model and the dispatched action,
+and returns a new model. In practice, the handlers are typically partial functions that process different (related)
+actions, access only part of the model through a `ModelRW` trait and return an `ActionResult`.
 
 ## In the Circuit
 
-All action handling takes place within the `Circuit`, which has a single `actionHandler` that takes care of all actions. Actually your application must define
-this function, typically by combining multiple `ActionHandler` classes together to form the final _partial function_ that then handles the actions. There is
-also a `baseHandler` that handles any action that was not handled by the `actionHandler`, ensuring we don't get a runtime `MatchError`.
+All action handling takes place within the `Circuit`, which has a single `actionHandler` method that takes care of all
+actions. Actually your application must define this function, typically by combining multiple `ActionHandler` classes
+together to form the final _partial function_ that then handles the actions. There is also a `baseHandler` that handles
+any action that was not handled by the `actionHandler`, ensuring we don't get a runtime `MatchError`.
 
-You may define your action handlers within your application `Circuit` singleton object as anonymous classes, or use external classes. The former is simpler to
-implement while the latter is better for independent testing. In our examples the handlers are defined using both strategies.
+You may define your action handlers within your application `Circuit` singleton object as anonymous classes, or use
+external classes. The former is simpler to implement while the latter is better for independent testing. In our examples
+the handlers are defined using both strategies.
 
-## Learn by Example
+## Example Tree data model
 
-Let's use a bit more complex example for building our action handlers, to show how you would do it in real-life applications. Our data will represent a 
-hierarchical directory structure with both files and directories. This can be defined as a trait and two case classes.
+Let's use a bit more complex example for building our action handlers, to show how you would do it in real-life
+applications. Our data will represent a hierarchical directory structure with both files and directories. This can be
+defined as a trait and two case classes.
 
 ```scala
 sealed trait FileNode {
@@ -40,8 +44,8 @@ final case class File(id: String, name: String) extends FileNode {
 }
 ```
 
-In our root model we don't want to have anything like a `Directory` so let's further define an intermediate model `Tree` to hold the root of the hierarchy and
-also some additional data.
+In our root model we don't want to have anything like a `Directory` so let's further define an intermediate model `Tree`
+to hold the root of the hierarchy and also some additional data.
 
 ```scala
 case class Tree(root: Directory, selected: Seq[String])
@@ -62,8 +66,8 @@ case class Select(selected: Seq[String])
 
 ### Writing an Action Handler
 
-Our action handler needs to deal with the directory hierarchy, so we need to zoom into it in our `ActionHandler`. To get started, we handle only the most
-simple action of replacing the whole tree.
+Our action handler needs to deal with the directory hierarchy, so we need to zoom into it in our `ActionHandler`. To get
+started, we handle only the most simple action of replacing the whole tree.
 
 ```scala
 // zoom into the model, providing access only to the `root` directory of the tree
@@ -87,7 +91,8 @@ but it's easier to understand when it's split up.
 
 Now our application is ready to handle dispatched `ReplaceTree` actions successfully!
 
-`ActionHandler` is just an utility class providing common patterns for defining action handlers. If we look at its code, it's rather straightforward:
+`ActionHandler` is just an utility class providing common patterns for defining action handlers. If we look at its code,
+it's rather straightforward:
 
 ```scala
 abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
@@ -100,12 +105,14 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
 
 ### Deep Diving
 
-The handler for `ReplaceTree` was trivial, since there was no need to dive into the directory hierarchy, but how would something like `AddNode` be handled? It
-gets a path as a parameter, defining the directory we are interested in. This is actually a sequence of identifiers, so we need to walk down the hierarchy to
-reach our goal. Because the same is needed in the other actions as well, let's define a common function to perform this traversal.
+The handler for `ReplaceTree` was trivial, since there was no need to dive into the directory hierarchy, but how would
+something like `AddNode` be handled? It gets a path as a parameter, defining the directory we are interested in. This is
+actually a sequence of identifiers, so we need to walk down the hierarchy to reach our goal. Because the same is needed
+in the other actions as well, let's define a common function to perform this traversal.
 
-We are actually interested in the `children` sequence of the directory, not the directory itself, so our traversal function should return a `ModelRW` that
-allows us to manipulate that indexed sequence directly. It may also fail to find a valid path, so we should wrap the result in an `Option`.
+We are actually interested in the `children` sequence of the directory, not the directory itself, so our traversal
+function should return a `ModelRW` that allows us to manipulate that indexed sequence directly. It may also fail to find
+a valid path, so we should wrap the result in an `Option`.
 
 ```scala
 def zoomToChildren[M](path: Seq[String], rw: ModelRW[M, Directory])
@@ -117,7 +124,8 @@ def zoomToChildren[M](path: Seq[String], rw: ModelRW[M, Directory])
   }
 }
 ```
-In the trivial case (and at the end of the recursion) the path is empty and we'll return a `ModelRW` for the current directory's `children`.
+In the trivial case (and at the end of the recursion) the path is empty and we'll return a `ModelRW` for the current
+directory's `children`.
 
 Let's take a look at the full implementation.
 
@@ -142,9 +150,10 @@ def zoomToChildren[M](path: Seq[String], rw: ModelRW[M, Directory])
 }
 ```
 
-First we try to find the index to the `children` sequence, where the next directory in our path resides and depending on the result we either return `None` for 
-failure, or dive deeper into the hierarchy by recursively calling the same function again with am updated reader/writer and path. The writer function copies all
-nodes preceding the one we are interested in, then adds a new node and then any nodes succeeding the original node.
+First we try to find the index to the `children` sequence, where the next directory in our path resides and depending on
+the result we either return `None` for failure, or dive deeper into the hierarchy by recursively calling the same
+function again with am updated reader/writer and path. The writer function copies all nodes preceding the one we are
+interested in, then adds a new node and then any nodes succeeding the original node.
  
 Now we are ready to write action handlers for rest of the tree manipulation functions.
 
@@ -157,8 +166,8 @@ case AddNode(path, node) =>
   }
 ```
 
-With the helper function to navigate the hierarchy the actual implementation of `AddNode` turns out to be quite trivial. Since we have access to the `children`
-of the parent directory, we simply need to add the new node at the end of it.
+With the helper function to navigate the hierarchy the actual implementation of `AddNode` turns out to be quite trivial.
+Since we have access to the `children` of the parent directory, we simply need to add the new node at the end of it.
 
 ```scala
 case RemoveNode(path) =>
@@ -187,13 +196,13 @@ case ReplaceNode(path, node) =>
   }
 ```
 
-Removal and replacement are almost identical, except for the final transformation of the `children` sequence. Here we also prevent removal or change of the root
-directory.
+Removal and replacement are almost identical, except for the final transformation of the `children` sequence. Here we
+also prevent removal or change of the root directory.
 
 ### Handling Selection
 
-As the `Select` action affects the `Tree` and not something under the root directory, we cannot handle it within the `treeHandler`. We'll need another action 
-handler for it.
+As the `Select` action affects the `Tree` and not something under the root directory, we cannot handle it within the
+`treeHandler`. We'll need another action handler for it.
 
 ```scala
 val selectionHandler = new ActionHandler(
@@ -207,13 +216,14 @@ val selectionHandler = new ActionHandler(
 override val actionHandler = combineHandlers(treeHandler, selectionHandler)
 ```
 
-Again we zoom into the `tree` but this time we continue to `selected`. The handler implementation is as trivial as with `ReplaceTree`. To inform `Circuit` about
-this new handler, we include it into the call to the `combineHandlers` function.
+Again we zoom into the `tree` but this time we continue to `selected`. The handler implementation is as trivial as with
+`ReplaceTree`. To inform `Circuit` about this new handler, we include it into the call to the `combineHandlers`
+function.
 
 ## Testing
 
-As action handlers are pure functions, testing them is rather trivial. Although you can define handlers inline within your `Circuit` implementation, it's
-usually better to have them as separate classes for easy testing. For example:
+As action handlers are pure functions, testing them is rather trivial. Although you can define handlers inline within
+your `Circuit` implementation, it's usually better to have them as separate classes for easy testing. For example:
 
 ```scala
 class DirectoryTreeHandler[M](modelRW: ModelRW[M, Directory]) extends ActionHandler(modelRW) {
@@ -228,8 +238,8 @@ object AppCircuit extends Circuit[RootModel] {
 }
 ```
 
-In your test class you can instantiate the handler by supplying it with an appropriate reader/writer. Since the handler doesn't care about the root model type,
-usually easiest is just to use the data what your handler expects.
+In your test class you can instantiate the handler by supplying it with an appropriate reader/writer. Since the handler
+doesn't care about the root model type, usually easiest is just to use the data what your handler expects.
 
 ```scala
 object DirectoryTreeHandlerTests extends TestSuite {

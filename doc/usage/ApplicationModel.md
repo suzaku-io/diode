@@ -16,7 +16,10 @@ case class A(d: Int, e: String)
 case class B(f: Boolean, g: Option[D])
 case class D(h: Seq[Int], i: Int)
 
-object AppCircuit extends Circuit[Root] { ... }
+object AppCircuit extends Circuit[Root] {
+  // provides initial model to the Circuit
+  override def initialModel = Root( ... )
+}
 ```
 
 Making modifications to an immutable model means making a copy of the model every time something changes. Naturally
@@ -33,13 +36,14 @@ re-rendering `root.b.g` for example.
 
 ## Accessing the Model
 
-In Diode your application model is safely tucked inside the Circuit class, without any direct access. Instead you will
-get _indirect_ access via readers and writers. These are defined as `ModelR` and `ModelRW` traits.
+In Diode your application model is safely tucked inside the Circuit class, without any direct access. To initialize the
+model, override the `initialModel` function to return your initial model. Instead of directly accessing the model you
+will get _indirect_ access via readers and writers. These are defined as `ModelR` and `ModelRW` traits.
 
-For example if your view needs to render the string `e` in class `A`, it doesn't care where that data comes from as long
-as it has access to it. Furthermore, since the state changes always create a new root model, we cannot simply give the
-current value and expect that to work in the future. What we need is a chain of functions going from `root` all the way
-to the piece of data we are interested in. The classes implementing `ModelR` and `ModelRW` provide this. To build a
+For example if your view needs to render the string `e` in class `A`, it doesn't care where that data comes from, as
+long as it has access to it. Furthermore, since the state changes always create a new root model, we cannot simply give
+the current value and expect that to work in the future. What we need is a chain of functions going from `root` all the
+way to the piece of data we are interested in. The classes implementing `ModelR` and `ModelRW` provide this. To build a
 reader to `root.a.e` we would write:
 
 ```scala

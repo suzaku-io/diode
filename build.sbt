@@ -118,7 +118,7 @@ lazy val diodeDevtools = crossProject.in(file("diode-devtools"))
   )
   .jsSettings(
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.8.2"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.0"
     ),
     scalacOptions ++= sourceMapSetting.value
   )
@@ -135,7 +135,7 @@ lazy val diodeReact = project.in(file("diode-react"))
   .settings(
     name := "diode-react",
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "core" % "0.10.0"
+      "com.github.japgolly.scalajs-react" %%% "core" % "0.10.4"
     ),
     // use PhantomJS for testing, because we need real browser JS stuff
     scalaJSStage in Global := FastOptStage,
