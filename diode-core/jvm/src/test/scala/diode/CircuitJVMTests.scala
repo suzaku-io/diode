@@ -22,7 +22,7 @@ object CircuitJVMTests extends TestSuite {
   class TestCircuit(implicit ec: ExecutionContext) extends Circuit[Model] {
     import diode.ActionResult._
     override def initialModel = Model(Vector.empty)
-    override protected def actionHandler: HandlerFunction = {
+    override protected def actionHandler: HandlerFunction = (model, action) => ({
       case Append(i) =>
         ModelUpdate(Model(model.list :+ i))
       case Prepend(i) =>
@@ -34,7 +34,7 @@ object CircuitJVMTests extends TestSuite {
           ModelUpdateEffect(model, effects.reduce(_ + _))
         else
           ModelUpdateEffect(model, effects.reduce(_ >> _))
-    }
+    }: PartialFunction[AnyRef, ActionResult[Model]]).lift.apply(action)
   }
 
   def tests = TestSuite {

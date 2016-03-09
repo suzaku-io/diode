@@ -28,13 +28,16 @@ object AppCircuit extends Circuit[RootModel] {
       case Reset => updated(0)
     }
   }
-  val actionHandler = combineHandlers(counterHandler)
+
+  override val actionHandler: HandlerFunction = counterHandler
   /*
     // without the ActionHandler class, we would define the handler like this
-    val actionHandler: PartialFunction[AnyRef, ActionResult[RootModel]] = {
-      case Increase(a) => ModelUpdate(model.copy(counter = model.counter + a))
-      case Decrease(a) => ModelUpdate(model.copy(counter = model.counter - a))
-      case Reset => ModelUpdate(model.copy(counter = 0))
-    }
+    override val actionHandler: HandlerFunction =
+      (model, action) => action match {
+        case Increase(a) => Some(ModelUpdate(model.copy(counter = model.counter + a)))
+        case Decrease(a) => Some(ModelUpdate(model.copy(counter = model.counter - a)))
+        case Reset => Some(ModelUpdate(model.copy(counter = 0)))
+        case _ => None
+      }
   */
 }

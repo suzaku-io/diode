@@ -11,7 +11,7 @@ object AppCircuit extends Circuit[AppModel] with ReactConnector[AppModel] {
   // define initial value for the application model
   def initialModel = AppModel(Todos(Seq()))
 
-  override val actionHandler = combineHandlers(
+  override val actionHandler = composeHandlers(
     new TodoHandler(zoomRW(_.todos)((m, v) => m.copy(todos = v)).zoomRW(_.todoList)((m, v) => m.copy(todoList = v)))
   )
 }

@@ -27,7 +27,7 @@ object CircuitTests extends TestSuite {
   class AppCircuit(implicit ec: ExecutionContext) extends Circuit[Model] {
     import diode.ActionResult._
     override def initialModel = Model("Testing", Data(42, true))
-    override protected def actionHandler: HandlerFunction = {
+    override protected def actionHandler: HandlerFunction = (model, action) => ({
       case SetS(s) =>
         ModelUpdate(model.copy(s = s))
       case SetEffectOnly(effect) =>
@@ -37,7 +37,8 @@ object CircuitTests extends TestSuite {
       case SetEffect(s, effect) =>
         // run effect twice!
         ModelUpdateEffect(model.copy(s = s), Effect(effect()) + effect)
-    }
+    }: PartialFunction[AnyRef, ActionResult[Model]]).lift.apply(action)
+
     var lastFatal: (AnyRef, Throwable) = ("", null)
     var lastError = ""
 
@@ -198,7 +199,7 @@ object CircuitTests extends TestSuite {
             currentModel: Model) = {
             next(action) match {
               case m: ModelUpdated[Model@unchecked] =>
-                log += m.newValue.s
+                log += m.newModel.s
                 m
               case r => r
             }

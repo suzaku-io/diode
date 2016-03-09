@@ -109,8 +109,8 @@ object PotActionTests extends TestSuite {
       val handler = new TestHandler(modelRW.zoomRW(_.s)((m, v) => m.copy(s = v)))
       val handlerFail = new TestFailHandler(modelRW.zoomRW(_.s)((m, v) => m.copy(s = v)))
       'PotEmptyOK - {
-        val nextAction = handler.handle(TestAction()) match {
-          case ModelUpdateEffect(newModel, effects) =>
+        val nextAction = handler.handleAction(model, TestAction()) match {
+          case Some(ModelUpdateEffect(newModel, effects)) =>
             assert(newModel.s.isPending)
             assert(effects.size == 1)
             // run effect
@@ -125,8 +125,8 @@ object PotActionTests extends TestSuite {
         }
       }
       'PotEmptyFail - {
-        val nextAction = handlerFail.handle(TestAction()) match {
-          case ModelUpdateEffect(newModel, effects) =>
+        val nextAction = handlerFail.handleAction(model, TestAction()) match {
+          case Some(ModelUpdateEffect(newModel, effects)) =>
             assert(newModel.s.isPending)
             assert(effects.size == 1)
             // run effect
@@ -141,8 +141,8 @@ object PotActionTests extends TestSuite {
         }
       }
       'PotFailed - {
-        handler.handle(TestAction(Failed(new Exception("Oh no!")))) match {
-          case ModelUpdate(newModel) =>
+        handler.handleAction(model, TestAction(Failed(new Exception("Oh no!")))) match {
+          case Some(ModelUpdate(newModel)) =>
             assert(newModel.s.isFailed)
             assert(newModel.s.exceptionOption.get.getMessage == "Oh no!")
           case _ => assert(false)
@@ -152,8 +152,8 @@ object PotActionTests extends TestSuite {
         val model = Model(PendingStale("41"))
         val modelRW = new RootModelRW(model)
         val handlerFail = new TestFailHandler(modelRW.zoomRW(_.s)((m, v) => m.copy(s = v)))
-        val nextAction = handlerFail.handle(TestActionRP(Failed(new TimeoutException), Immediate(1))) match {
-          case EffectOnly(effects) =>
+        val nextAction = handlerFail.handleAction(model, TestActionRP(Failed(new TimeoutException), Immediate(1))) match {
+          case Some(EffectOnly(effects)) =>
             assert(effects.size == 1)
             // run effect
             effects.toFuture
@@ -172,8 +172,8 @@ object PotActionTests extends TestSuite {
       val modelRW = new RootModelRW(model)
       val handler = new TestCollHandler(modelRW.zoomRW(_.c)((m, v) => m.copy(c = v)), Set("A"))
       'empty - {
-        val nextAction = handler.handle(TestCollAction()) match {
-          case ModelUpdateEffect(newModel, effects) =>
+        val nextAction = handler.handleAction(model, TestCollAction()) match {
+          case Some(ModelUpdateEffect(newModel, effects)) =>
             assert(newModel.c("A").isPending)
             assert(effects.size == 1)
             // run effect

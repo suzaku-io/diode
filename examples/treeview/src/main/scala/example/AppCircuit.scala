@@ -58,10 +58,16 @@ object AppCircuit extends Circuit[RootModel] {
       .zoomRW(_.selected)((m, v) => m.copy(selected = v))) {
     override def handle = {
       case Select(sel) => updated(sel)
+      case RemoveNode(path) =>
+        // select parent node if removed
+        if(path == value)
+          updated(path.init)
+        else
+          noChange
     }
   }
 
-  override val actionHandler = combineHandlers(treeHandler, selectionHandler)
+  override val actionHandler = composeHandlers(treeHandler, selectionHandler)
 }
 
 class DirectoryTreeHandler[M](modelRW: ModelRW[M, Directory]) extends ActionHandler(modelRW) {

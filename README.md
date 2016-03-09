@@ -62,17 +62,20 @@ you'd typically define a singleton object extending the Circuit. Your only respo
 ```scala
 object AppCircuit extends Circuit[RootModel] {
   def initialModel = RootModel(0)
-  val actionHandler: PartialFunction[AnyRef, ActionResult[RootModel]] = {
-    case Increase(a) => ModelUpdate(model.copy(counter = model.counter + a))
-    case Decrease(a) => ModelUpdate(model.copy(counter = model.counter - a))
-    case Reset => ModelUpdate(model.copy(counter = 0))
+  override val actionHandler: HandlerFunction =
+    (model, action) => action match {
+      case Increase(a) => Some(ModelUpdate(model.copy(counter = model.counter + a)))
+      case Decrease(a) => Some(ModelUpdate(model.copy(counter = model.counter - a)))
+      case Reset => Some(ModelUpdate(model.copy(counter = 0)))
+      case _ => None
+    }
   }
-}
 ```
 
-The `actionHandler` is a partial function receiving the action and returning a result of type `ActionResult[RootModel]`.
-Each action must return a new copy of the (root)model so we use the convenient case class `copy` function. Note that we
-are _not updating_ the `model` variable here, just returning a copy. The actual update is performed by the Circuit.
+The `actionHandler` is a function receiving the current model and action and returning a result of type
+`Option[ActionResult[RootModel]]`. Each action must return a new copy of the (root)model so we use the convenient case
+class `copy` function. Note that we are _not updating_ the `model` variable here, just returning a copy. The actual
+update is performed by the Circuit.
 
 Because we want to keep the code clean and DRY, let's use the `ActionHandler` helper class to define our actions
 instead.
@@ -85,7 +88,7 @@ val counterHandler = new ActionHandler(zoomRW(_.counter)((m, v) => m.copy(counte
     case Reset => updated(0)
   }
 }
-val actionHandler = combineHandlers(counterHandler)
+val actionHandler = composeHandlers(counterHandler)
 ```
 
 Note how in the `ActionHandler`'s constructor call we _zoom_ into the model, defining a reader/writer pair to access the
@@ -94,8 +97,8 @@ inadvertently accessing other parts of our application model and also simplifyin
 in (provided through the `value` function). The class also provides helper functions like `updated`, making it trivial
 to perform model updates in our code.
 
-Finally we convert the `ActionHandler` into a partial function with `combineHandlers`. As its name implies, you can
-supply several handlers that are chained together to form a single partial function taking care of all your actions.
+Finally we convert the `ActionHandler` into a handler function with `composeHandlers`. As its name implies, you can
+supply several handlers that are composed together to form a single handler function taking care of all your actions.
 
 ### The View
 
@@ -175,6 +178,12 @@ A more complete application example is the [Scala.js SPA tutorial](https://githu
 demonstrating the use of React integration features and async operations.
 
 # Change history
+
+### 0.5.1-SNAPSHOT
+- Changed Circuit `actionHandler` type to take current model as parameter to enable chaining of handlers
+- Added `composeHandlers` and `foldHandlers` to help building action handler hierarchies
+- `combineHandlers` is deprecated and replaced with `composeHandlers`
+- Exposed `root` model reader in the `ModelR` trait
 
 ### 0.5.0
 - Introduced `FastEq` typeclass to provide suitable equality checking in various cases using `===` and `=!=` operators.

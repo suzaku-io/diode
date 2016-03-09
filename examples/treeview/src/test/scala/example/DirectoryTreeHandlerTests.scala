@@ -20,14 +20,14 @@ object DirectoryTreeHandlerTests extends TestSuite {
 
     'ReplaceTree - {
       val handler = build
-      val result = handler.handle(ReplaceTree(dir2))
-      assert(result == ModelUpdate(dir2))
+      val result = handler.handleAction(dir, ReplaceTree(dir2))
+      assert(result.contains(ModelUpdate(dir2)))
     }
 
     'AddNode - {
       val handler = build
-      val result = handler.handle(AddNode(Seq("/", "2"), File("new", "new")))
-      assert(result == ModelUpdate(Directory("/", "/", Vector(
+      val result = handler.handleAction(dir, AddNode(Seq("/", "2"), File("new", "new")))
+      assert(result.contains(ModelUpdate(Directory("/", "/", Vector(
         Directory("2", "My files", Vector(
           Directory("3", "Documents", Vector(
             File("F3", "HaukiOnKala.doc")
@@ -35,22 +35,22 @@ object DirectoryTreeHandlerTests extends TestSuite {
           File("new", "new")
         )), File("F1", "boot.sys")
       ))
-      ))
+      )))
     }
 
     'RemoveNode - {
       val handler = build
-      val result = handler.handle(RemoveNode(Seq("/", "2")))
+      val result = handler.handleAction(dir, RemoveNode(Seq("/", "2")))
       assertMatch(result) {
-        case ModelUpdate(Directory("/", "/", Vector(File("F1", "boot.sys")))) =>
+        case Some(ModelUpdate(Directory("/", "/", Vector(File("F1", "boot.sys"))))) =>
       }
     }
 
     'ReplaceNode - {
       val handler = build
-      val result = handler.handle(ReplaceNode(Seq("/", "F1"), File("F1", "bootRenamed.sys")))
+      val result = handler.handleAction(dir, ReplaceNode(Seq("/", "F1"), File("F1", "bootRenamed.sys")))
       assertMatch(result) {
-        case ModelUpdate(m) => m == Directory("/", "/", Vector(
+        case Some(ModelUpdate(m)) => m == Directory("/", "/", Vector(
           Directory("2", "My files", Vector(
             Directory("3", "Documents", Vector(
               File("F3", "HaukiOnKala.doc")

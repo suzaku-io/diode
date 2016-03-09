@@ -12,9 +12,42 @@ trait ActionProcessor[M <: AnyRef] {
   def process(dispatch: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M], currentModel: M): ActionResult[M]
 }
 
+sealed trait ActionResult[+M] {
+  def newModelOpt: Option[M] = None
+  def effectOpt: Option[Effect] = None
+}
+
+sealed trait ModelUpdated[+M] extends ActionResult[M] {
+  def newModel: M
+  override def newModelOpt: Option[M] = Some(newModel)
+}
+
+sealed trait HasEffect[+M] extends ActionResult[M] {
+  def effect: Effect
+  override def effectOpt: Option[Effect] = Some(effect)
+}
+
+object ActionResult {
+
+  case object NoChange extends ActionResult[Nothing]
+
+  final case class ModelUpdate[M](newModel: M) extends ModelUpdated[M]
+
+  final case class EffectOnly(effect: Effect) extends ActionResult[Nothing] with HasEffect[Nothing]
+
+  final case class ModelUpdateEffect[M](newModel: M, effect: Effect) extends ModelUpdated[M] with HasEffect[M]
+
+  def apply[M](model: Option[M], effect: Option[Effect]): ActionResult[M] = (model, effect) match {
+    case (Some(m), Some(e)) => ModelUpdateEffect(m, e)
+    case (Some(m), None) => ModelUpdate(m)
+    case (None, Some(e)) => EffectOnly(e)
+    case _ => NoChange
+  }
+}
+
 trait Circuit[M <: AnyRef] extends Dispatcher {
 
-  type HandlerFunction = PartialFunction[AnyRef, ActionResult[M]]
+  type HandlerFunction = (M, AnyRef) => Option[ActionResult[M]]
 
   private case class Subscription[T](listener: ModelR[M, T] => Unit, cursor: ModelR[M, T], lastValue: T) {
     def changed: Option[Subscription[T]] = {
@@ -36,6 +69,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
 
   /**
     * Handles all dispatched actions
+    *
     * @return
     */
   protected def actionHandler: HandlerFunction
@@ -53,7 +87,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     )
   }
 
-  private val baseHandler: HandlerFunction = {
+  private def baseHandler(action: AnyRef) = action match {
     case seq: Seq[_] =>
       // dispatch all actions in the sequence using internal dispatchBase to prevent
       // additional calls to subscribed listeners
@@ -62,8 +96,8 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     case None =>
       // ignore
       ActionResult.NoChange
-    case action =>
-      handleError(s"Action $action was not handled by any action handler")
+    case unknown =>
+      handleError(s"Action $unknown was not handled by any action handler")
       ActionResult.NoChange
   }
 
@@ -146,16 +180,6 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   }
 
   /**
-    * Combines multiple `ActionHandler`s into a single partial function
-    *
-    * @param handlers
-    * @return
-    */
-  def combineHandlers(handlers: ActionHandler[M, _]*): HandlerFunction = {
-    handlers.foldLeft(PartialFunction.empty[AnyRef, ActionResult[M]])((a, b) => a orElse b.handle)
-  }
-
-  /**
     * Handle a fatal error. Override this function to do something with exceptions that
     * occur while dispatching actions.
     *
@@ -187,8 +211,54 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * @return
     */
   private def process(action: AnyRef): ActionResult[M] = {
-    (actionHandler orElse baseHandler) (action)
+    actionHandler(model, action).getOrElse(baseHandler(action))
   }
+
+  /**
+    * Composes multiple handlers into a single handler. Processing stops as soon as a handler is able to handle
+    * the action. If none of them handle the action, `None` is returned
+    */
+  def composeHandlers(handlers: HandlerFunction*): HandlerFunction =
+    (model, action) => {
+      handlers.foldLeft(Option.empty[ActionResult[M]]) {
+        (a, b) => a.orElse(b(model, action))
+      }
+    }
+
+  @deprecated("Use composeHandlers or foldHandlers instead", "0.5.1")
+  def combineHandlers(handlers: HandlerFunction*): HandlerFunction = composeHandlers(handlers: _*)
+
+  /**
+    * Folds multiple handlers into a single function so that each handler is called
+    * in turn and an updated model is passed on to the next handler. Returned `ActionResult` contains the final model
+    * and combined effects.
+    */
+  def foldHandlers(handlers: HandlerFunction*): HandlerFunction =
+    (initialModel, action) => {
+      handlers.foldLeft((initialModel, Option.empty[ActionResult[M]])) { case ((currentModel, currentResult), handler) =>
+        handler(currentModel, action) match {
+          case None =>
+            (currentModel, currentResult)
+          case Some(result) =>
+            val nextModel = result.newModelOpt.getOrElse(currentModel)
+            val nextResult = currentResult match {
+              case Some(cr) =>
+                val newEffect = (cr.effectOpt, result.effectOpt) match {
+                  case (Some(e1), Some(e2)) => Some(e1 + e2)
+                  case (Some(e1), None) => Some(e1)
+                  case (None, Some(e2)) => Some(e2)
+                  case (None, None) => None
+                }
+                val newModel = result.newModelOpt.orElse(cr.newModelOpt)
+                ActionResult(newModel, newEffect)
+              case None =>
+                result
+            }
+            (nextModel, Some(nextResult))
+        }
+      }._2
+    }
+
 
   /**
     * Dispatch the action, call change listeners when completed

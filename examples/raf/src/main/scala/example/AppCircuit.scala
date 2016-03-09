@@ -79,7 +79,7 @@ object AppCircuit extends Circuit[RootModel] {
     }
   }
 
-  val actionHandler = combineHandlers(animationHandler, timestampHandler)
+  val actionHandler = composeHandlers(animationHandler, timestampHandler)
 }
 
 class AnimationHandler[M](modelRW: ModelRW[M, Map[Int, Animated]], now: ModelR[_, Double]) extends ActionHandler(modelRW) {
