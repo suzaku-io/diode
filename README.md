@@ -23,11 +23,11 @@ Full documentation [available here](http://ochrons.github.io/diode/index.html).
 
 Add following dependency declaration to your Scala project.
 
-<pre><code class="lang-scala">"me.chrons" %% "diode" % "0.5.0"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %% "diode" % "0.5.1"</code></pre>
 
 In a Scala.js project the dependency looks like this.
 
-<pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.5.0"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.5.1"</code></pre>
 
 <img align="right" src="doc/images/architecture.png">
 
@@ -179,7 +179,7 @@ demonstrating the use of React integration features and async operations.
 
 # Change history
 
-### 0.5.1-SNAPSHOT
+### 0.5.1
 - Changed Circuit `actionHandler` type to take current model as parameter to enable chaining of handlers
 - Added `composeHandlers` and `foldHandlers` to help building action handler hierarchies
 - `combineHandlers` is deprecated and replaced with `composeHandlers`
