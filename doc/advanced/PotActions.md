@@ -132,7 +132,7 @@ a retry policy. The retry policy resides in the action and it's updated on every
 
 ```scala
 case class UpdateTodos(result: Pot[Todos] = Empty, retryPolicy: RetryPolicy = Retry.None) 
-  extends PotAction[Todos, UpdateTodos] {
+  extends PotActionRetriable[Todos, UpdateTodos] {
   def next(newResult: Pot[Todos], newRetryPolicy: RetryPolicy) = UpdateTodos(newResult, newRetryPolicy)
 }
 ```
@@ -140,6 +140,9 @@ case class UpdateTodos(result: Pot[Todos] = Empty, retryPolicy: RetryPolicy = Re
 When a failure is encountered, the retry policy is consulted on what to do next:
 
 ```scala
+// create an effect function that takes retry policy
+val updateEffect = action.effectWithRetry(loadTodos())(todos => Todos(todos))
+
 case PotFailed =>
   // extract exception from action and call retryPolicy
   action.retryPolicy.retry(action.result.failed.get, updateEffect) match {
