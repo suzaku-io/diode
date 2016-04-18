@@ -3,7 +3,7 @@
 <img src="../images/architecture-view.png" style="float: right; padding: 10px">
 
 In Diode a _view_ is a component that renders data from a model and reacts to model updates. It doesn't necessarily have
-to be a visual component (although it typically is), you could also make one to automatically store changed model data
+to be a visual component (although it typically is); you could also make one to automatically store changed model data
 into local storage.
 
 ## Building a View
