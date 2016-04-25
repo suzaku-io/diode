@@ -286,7 +286,7 @@ class RootModelRW[M <: AnyRef](get: => M) extends RootModelR(get) with BaseModel
 
   // override for root because it's a simpler case
   override def zoomRW[T](get: M => T)(set: (M, T) => M)(implicit feq: FastEq[_ >: T]) =
-    new ZoomModelRW[M, T](this, get, (s, u) => set(value, u))
+    new ZoomModelRW[M, T](this, get, set)
 }
 
 /**

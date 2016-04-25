@@ -197,5 +197,13 @@ object ModelRWTests extends TestSuite {
       val m2 = crw.updated(Some(A(42, "new")))
       assert(m2.c.flatMap(_.o.map(_.s)).contains("new"))
     }
+    'zoomRW - {
+      val m = A(1, "old")
+      val mrw = new RootModelRW(m)
+      val zoomRW = mrw.zoomRW(_.i)((m, v) ⇒ m.copy(i = v))
+      val r = zoomRW.updatedWith(m.copy(s = "new"), 2)
+      assert(r.i == 2)
+      assert(r.s == "new")
+    }
   }
 }
