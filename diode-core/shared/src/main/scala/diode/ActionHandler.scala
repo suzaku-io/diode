@@ -47,6 +47,16 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
     ModelUpdate(modelRW.updatedWith(currentModel, newValue))
 
   /**
+    * Helper function to create a `ModelUpdateSilent` result from a new value. Being silent, the
+    * update prevents any calls to listeners.
+    *
+    * @param newValue
+    * @return
+    */
+  def updatedSilent(newValue: T): ActionResult[M] =
+    ModelUpdateSilent(modelRW.updatedWith(currentModel, newValue))
+
+  /**
     * Helper function to create a `ModelUpdateEffect` result from a new value and an effect.
     *
     * @param newValue
@@ -55,6 +65,17 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
     */
   def updated(newValue: T, effect: Effect): ActionResult[M] =
     ModelUpdateEffect(modelRW.updatedWith(currentModel, newValue), effect)
+
+  /**
+    * Helper function to create a `ModelUpdateSilentEffect` result from a new value and an effect. Being silent, the
+    * update prevents any calls to listeners.
+    *
+    * @param newValue
+    * @param effect
+    * @return
+    */
+  def updatedSilent(newValue: T, effect: Effect): ActionResult[M] =
+    ModelUpdateSilentEffect(modelRW.updatedWith(currentModel, newValue), effect)
 
   /**
     * Helper function when the action does no model changes or effects.

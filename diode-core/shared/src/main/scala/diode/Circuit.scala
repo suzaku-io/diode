@@ -27,15 +27,22 @@ sealed trait HasEffect[+M] extends ActionResult[M] {
   override def effectOpt: Option[Effect] = Some(effect)
 }
 
+sealed trait UpdateSilent
+
 object ActionResult {
 
   case object NoChange extends ActionResult[Nothing]
 
   final case class ModelUpdate[M](newModel: M) extends ModelUpdated[M]
 
+  final case class ModelUpdateSilent[M](newModel: M) extends ModelUpdated[M] with UpdateSilent
+
   final case class EffectOnly(effect: Effect) extends ActionResult[Nothing] with HasEffect[Nothing]
 
   final case class ModelUpdateEffect[M](newModel: M, effect: Effect) extends ModelUpdated[M] with HasEffect[M]
+
+  final case class ModelUpdateSilentEffect[M](newModel: M, effect: Effect)
+    extends ModelUpdated[M] with HasEffect[M] with UpdateSilent
 
   def apply[M](model: Option[M], effect: Option[Effect]): ActionResult[M] = (model, effect) match {
     case (Some(m), Some(e)) => ModelUpdateEffect(m, e)
@@ -75,6 +82,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   protected def actionHandler: HandlerFunction
 
   private val modelRW = new RootModelRW[M](model)
+  private var isDispatching = false
   private var listenerId = 0
   private var listeners = Map.empty[Int, Subscription[_]]
   private var processors = List.empty[ActionProcessor[M]]
@@ -266,42 +274,58 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * @param action Action to dispatch
     */
   def dispatch(action: AnyRef): Unit = {
-    this.synchronized {
-      val oldModel = model
-      dispatchBase(action)
-      if (oldModel ne model) {
-        // walk through all listeners and update subscriptions when model has changed
-        listeners = listeners.foldLeft(listeners) { case (l, (key, sub)) =>
-          sub.changed match {
-            case Some(newSub) =>
-              // value at the cursor has changed, call listener and update subscription
-              sub.call()
-              l.updated(key, newSub)
-            case None =>
-              // nothing interesting happened
-              l
+    if(!isDispatching) {
+      try {
+        isDispatching = true
+        val oldModel = model
+        val silent = dispatchBase(action)
+        if (oldModel ne model) {
+          // walk through all listeners and update subscriptions when model has changed
+          listeners = listeners.foldLeft(listeners) { case (l, (key, sub)) =>
+            sub.changed match {
+              case Some(newSub) =>
+                // value at the cursor has changed, call listener and update subscription
+                if (!silent) sub.call()
+                l.updated(key, newSub)
+              case None =>
+                // nothing interesting happened
+                l
+            }
           }
         }
+      } catch {
+        case e: Throwable =>
+          handleFatal(action, e)
+      } finally {
+        isDispatching = false
       }
+    } else {
+      handleFatal(action, new IllegalStateException(s"Cannot dispatch action $action while another dispatch is running!"))
     }
   }
 
   /**
     * Perform actual dispatching, without calling change listeners
     */
-  protected def dispatchBase(action: AnyRef): Unit = {
+  protected def dispatchBase(action: AnyRef): Boolean = {
     try {
       processChain(action) match {
         case ActionResult.NoChange =>
-        // no-op
+          // no-op
+          false
         case ActionResult.ModelUpdate(newModel) =>
           update(newModel)
+          false
+        case ActionResult.ModelUpdateSilent(newModel) =>
+          update(newModel)
+          true
         case ActionResult.EffectOnly(effects) =>
           // run effects
           effects.run(dispatch).recover {
             case e: Throwable =>
               handleError(s"Error in processing effects for action $action: $e")
           }(effects.ec)
+          true
         case ActionResult.ModelUpdateEffect(newModel, effects) =>
           update(newModel)
           // run effects
@@ -309,10 +333,20 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
             case e: Throwable =>
               handleError(s"Error in processing effects for action $action: $e")
           }(effects.ec)
+          false
+        case ActionResult.ModelUpdateSilentEffect(newModel, effects) =>
+          update(newModel)
+          // run effects
+          effects.run(dispatch).recover {
+            case e: Throwable =>
+              handleError(s"Error in processing effects for action $action: $e")
+          }(effects.ec)
+          true
       }
     } catch {
       case e: Throwable =>
         handleFatal(action, e)
+        true
     }
   }
 }

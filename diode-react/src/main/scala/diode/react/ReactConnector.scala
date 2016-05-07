@@ -92,8 +92,9 @@ trait ReactConnector[M <: AnyRef] {
 
       private def changeHandler(cursor: ModelR[M, S]): Unit = {
         // modify state if we are mounted and state has actually changed
-        if (t.isMounted() && modelReader =!= t.accessDirect.state)
+        if (t.isMounted() && modelReader =!= t.accessDirect.state) {
           t.accessDirect.setState(modelReader())
+        }
       }
 
       def render(s: S) = wrap(modelReader)(compB)

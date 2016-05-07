@@ -102,3 +102,7 @@ if (dirRoot =!= currentModel) {
 
 If only `selected` is changed, we don't need to rebuild the tree as its structure has stayed the same. We do, however,
 need to re-render the tree to reflect this change.
+
+Warning! You must not dispatch actions while your listener function is running. This is because listeners are called
+while the previous dispatch is still being processed. If you have a need to dispatch actions in the listener, use a
+deferred call with, for example, `RunAfter`.
