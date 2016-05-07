@@ -17,6 +17,8 @@ object CircuitTests extends TestSuite {
   // actions
   case class SetS(s: String)
 
+  case class SetSSilent(s: String)
+
   case class SetD(d: Data)
 
   case class SetEffect(s: String, effect: () => Future[AnyRef])
@@ -31,6 +33,8 @@ object CircuitTests extends TestSuite {
     override protected def actionHandler: HandlerFunction = (model, action) => ({
       case SetS(s) =>
         ModelUpdate(model.copy(s = s))
+      case SetSSilent(s) =>
+        ModelUpdateSilent(model.copy(s = s))
       case SetEffectOnly(effect) =>
         ModelUpdateEffect(model, effect)
       case SetD(d) =>
@@ -137,6 +141,21 @@ object CircuitTests extends TestSuite {
         assert(state.data.i == 43)
         assert(state2.data.i == 42)
         assert(callbackCount == 2)
+      }
+      'Silent - {
+        val c = circuit
+        var state: Model = null
+        var callbackCount = 0
+        def listener(cursor: ModelR[Model, String]): Unit = {
+          state = c.model
+          callbackCount += 1
+        }
+        val unsubscribe = c.subscribe(c.zoom(_.s))(listener)
+        c.dispatch(SetSSilent("Listen"))
+        assert(c.model.s == "Listen")
+        // no callback called due to silent update
+        assert(callbackCount == 0)
+        unsubscribe()
       }
       'NestedSubscribe - {
         val c = circuit
