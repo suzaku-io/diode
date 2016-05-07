@@ -355,7 +355,7 @@ final case class Ready[+A](x: A) extends Pot[A] {
   override def fail(exception: Throwable) = FailedStale(x, exception)
 }
 
-private[diode] sealed trait PendingBase {
+ sealed trait PendingBase {
   def startTime: Long
   def isPending = true
   def isUnavailable = false
@@ -383,7 +383,7 @@ final case class PendingStale[+A](x: A, startTime: Long = new Date().getTime) ex
   override def fail(exception: Throwable) = FailedStale(x, exception)
 }
 
-private[diode] sealed trait FailedBase {
+ sealed trait FailedBase {
   def exception: Throwable
   def isPending = false
   def isFailed = true
