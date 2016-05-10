@@ -16,29 +16,29 @@ object EffectTests extends TestSuite {
     'Effect - {
       'run - {
         var x = ""
-        efA.run( y => x = y.asInstanceOf[String] ).foreach { _ =>
+        efA.run( y => x = y.asInstanceOf[String] ).map { _ =>
           assert(x == "A")
         }
       }
       'toFuture - {
-        efA.toFuture.foreach { z =>
+        efA.toFuture.map { z =>
           assert(z == "A")
         }
       }
       'map - {
-        efA.map(x => s"$x$x").toFuture.foreach { z =>
+        efA.map(x => s"$x$x").toFuture.map { z =>
           assert(z == "AA")
         }
       }
       'flatMap - {
-        efA.flatMap(x => Future(s"$x$x")).toFuture.foreach { z =>
+        efA.flatMap(x => Future(s"$x$x")).toFuture.map { z =>
           assert(z == "AA")
         }
       }
       'after - {
         import diode.Implicits._
         val now = System.currentTimeMillis()
-        efA.after(100.milliseconds).map(x => s"$x$x").toFuture.foreach { z =>
+        efA.after(100.milliseconds).map(x => s"$x$x").toFuture.map { z =>
           assert(z == "AA")
           assert(System.currentTimeMillis() - now > 80)
         }
@@ -46,21 +46,21 @@ object EffectTests extends TestSuite {
       '+ - {
         val e = efA + efB
         val ai = new AtomicInteger(0)
-        e.run(x => ai.incrementAndGet()).foreach { _ =>
+        e.run(x => ai.incrementAndGet()).map { _ =>
           assert(ai.intValue() == 2)
         }
       }
       '>> - {
         val e = efA >> efB >> efC
         var r = List.empty[String]
-        e.run(x => r = r :+ x.asInstanceOf[String] ).foreach { _ =>
+        e.run(x => r = r :+ x.asInstanceOf[String] ).map { _ =>
           assert(r == List("A", "B", "C"))
         }
       }
       '<< - {
         val e = efA << efB << efC
         var r = List.empty[String]
-        e.run(x => r = r :+ x.asInstanceOf[String] ).foreach { _ =>
+        e.run(x => r = r :+ x.asInstanceOf[String] ).map { _ =>
           assert(r == List("C", "B", "A"))
         }
       }
@@ -69,21 +69,21 @@ object EffectTests extends TestSuite {
       'map - {
         val e = efA >> efB >> efC
         assert(e.size == 3)
-        e.map(x => s"$x$x").toFuture.foreach { z =>
+        e.map(x => s"$x$x").toFuture.map { z =>
           assert(z == "CC")
         }
       }
       'flatMap - {
         val e = efA >> efB >> efC
         assert(e.size == 3)
-        e.flatMap(x => Future(s"$x$x")).toFuture.foreach { z =>
+        e.flatMap(x => Future(s"$x$x")).toFuture.map { z =>
           assert(z == "CC")
         }
       }
       'complex - {
         val e = (efA + efB) >> efC
         assert(e.size == 3)
-        e.map(x => s"$x$x").toFuture.foreach { z =>
+        e.map(x => s"$x$x").toFuture.map { z =>
           assert(z == "CC")
         }
 
@@ -94,7 +94,7 @@ object EffectTests extends TestSuite {
         val e = efA + efB + efC
         println(s"size = ${e.size}")
         assert(e.size == 3)
-        e.map(x => s"$x$x").toFuture.foreach { z =>
+        e.map(x => s"$x$x").toFuture.map { z =>
           assert(z == Set("AA", "BB", "CC"))
         }
       }
@@ -102,14 +102,14 @@ object EffectTests extends TestSuite {
         val e = efA + efB + efC
         println(s"size = ${e.size}")
         assert(e.size == 3)
-        e.flatMap(x => Future(s"$x$x")).toFuture.foreach { z =>
+        e.flatMap(x => Future(s"$x$x")).toFuture.map { z =>
           assert(z == Set("AA", "BB", "CC"))
         }
       }
       'complex - {
         val e = (efA >> efB) + efC
         assert(e.size == 3)
-        e.map(x => s"$x$x").toFuture.foreach { z =>
+        e.map(x => s"$x$x").toFuture.map { z =>
           assert(z == Set("BB", "CC"))
         }
       }
