@@ -53,7 +53,7 @@ val sourceMapSetting =
     else Seq({
       val a = baseDirectory.value.toURI.toString.replaceFirst("[^/]+/?$", "")
       val g = "https://raw.githubusercontent.com/ochrons/diode"
-      s"-P:scalajs:mapSourceURI:$a->$g/v${version.value}/"
+      s"-P:scalajs:mapSourceURI:$a->$g/v${version.value}/${name.value}/"
     })
   )
 
