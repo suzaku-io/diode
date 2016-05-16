@@ -204,7 +204,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     *
     * @param msg Error message
     */
-  def handleError(msg: String): Unit = ()
+  def handleError(msg: String): Unit = throw new Exception(s"handleError called with: $msg")
 
   /**
     * Updates the model if it has changed (reference equality check)
