@@ -23,11 +23,11 @@ Full documentation [available here](http://ochrons.github.io/diode/index.html).
 
 Add following dependency declaration to your Scala project.
 
-<pre><code class="lang-scala">"me.chrons" %% "diode" % "0.5.1"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %% "diode" % "0.5.2"</code></pre>
 
 In a Scala.js project the dependency looks like this.
 
-<pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.5.1"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.5.2"</code></pre>
 
 <img align="right" src="doc/images/architecture.png">
 
