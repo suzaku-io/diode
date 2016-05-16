@@ -240,8 +240,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
           case None =>
             (currentModel, currentResult)
           case Some(result) =>
-            val nextModel = result.newModelOpt.getOrElse(currentModel)
-            val nextResult = currentResult match {
+            val (nextModel, nextResult) = currentResult match {
               case Some(cr) =>
                 val newEffect = (cr.effectOpt, result.effectOpt) match {
                   case (Some(e1), Some(e2)) => Some(e1 + e2)
@@ -250,9 +249,9 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
                   case (None, None) => None
                 }
                 val newModel = result.newModelOpt.orElse(cr.newModelOpt)
-                ActionResult(newModel, newEffect)
+                (newModel.getOrElse(currentModel), ActionResult(newModel, newEffect))
               case None =>
-                result
+                (currentModel, result)
             }
             (nextModel, Some(nextResult))
         }

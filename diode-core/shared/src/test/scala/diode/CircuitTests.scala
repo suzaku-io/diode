@@ -1,5 +1,6 @@
 package diode
 
+import diode.ActionResult.ModelUpdate
 import utest._
 
 import scala.collection.mutable
@@ -143,7 +144,7 @@ object CircuitTests extends TestSuite {
         var state2: Model = null
         var callback1Count = 0
         var callback2Count = 0
-        var unsubscribe2: () => Unit  = null
+        var unsubscribe2: () => Unit = null
 
         def listener1(cursor: ModelR[Model, String]): Unit = {
           state1 = c.model
@@ -340,6 +341,26 @@ object CircuitTests extends TestSuite {
         p.run
         assert(c.model.s == "Test")
       }
+    }
+    'FoldHandler - {
+      val c = circuit
+      val origModel = c.model
+      val h1 = new ActionHandler[Model, Int](c.zoomRW(_.data.i)((m, t) => m.copy(data = m.data.copy(i = t)))) {
+        override protected def handle = {
+          case SetS(newS) =>
+            updated(value + 1)
+        }
+      }
+      val h2 = new ActionHandler[Model, String](c.zoomRW(_.s)((m, t) => m.copy(s = t))) {
+        override protected def handle = {
+          case SetS(newS) =>
+            updated(value + newS.toUpperCase * 2)
+        }
+      }
+      val fh = circuit.foldHandlers(h1, h2)
+
+      val res = fh(c.model, SetS("test"))
+      assert(res.contains(ModelUpdate(origModel.copy(s = "TestingTESTTEST", data = Data(42, true)))))
     }
   }
 }
