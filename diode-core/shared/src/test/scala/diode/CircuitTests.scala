@@ -78,6 +78,13 @@ object CircuitTests extends TestSuite {
         assert(c.model.data.i == 43)
         assert(c.model.data.b == false)
       }
+      'NoHandler - {
+        val c = circuit
+        case class TestMissing(i: Int)
+
+        c.dispatch(TestMissing)
+        assert(c.lastFatal._2.isInstanceOf[IllegalArgumentException])
+      }
     }
     'Zooming - {
       'read - {

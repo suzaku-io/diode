@@ -104,6 +104,9 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     case None =>
       // ignore
       ActionResult.NoChange
+    case a if a.getClass.getName.endsWith("$") =>
+      handleFatal(action, new IllegalArgumentException(s"Action $action was not handled by any action handler. It seems to be a singleton object, so please check that you have not accidentally dispatched a companion object instead of a case class."))
+      ActionResult.NoChange
     case unknown =>
       handleError(s"Action $unknown was not handled by any action handler")
       ActionResult.NoChange
@@ -273,56 +276,58 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * @param action Action to dispatch
     */
   def dispatch(action: AnyRef): Unit = {
-    if(!isDispatching) {
-      try {
-        isDispatching = true
-        val oldModel = model
-        val silent = dispatchBase(action)
-        if (oldModel ne model) {
-          // walk through all listeners and update subscriptions when model has changed
-          val updated = listeners.foldLeft(listeners) { case (l, (key, sub)) =>
-            if (listeners.isDefinedAt(key)) {
-              // Listener still exists
-              sub.changed match {
-                case Some(newSub) => {
-                  // value at the cursor has changed, call listener and update subscription
-                  if (!silent) sub.call()
-                  l.updated(key, newSub)
-                }
+    this.synchronized {
+      if (!isDispatching) {
+        try {
+          isDispatching = true
+          val oldModel = model
+          val silent = dispatchBase(action)
+          if (oldModel ne model) {
+            // walk through all listeners and update subscriptions when model has changed
+            val updated = listeners.foldLeft(listeners) { case (l, (key, sub)) =>
+              if (listeners.isDefinedAt(key)) {
+                // Listener still exists
+                sub.changed match {
+                  case Some(newSub) => {
+                    // value at the cursor has changed, call listener and update subscription
+                    if (!silent) sub.call()
+                    l.updated(key, newSub)
+                  }
 
-                case None => {
-                  // nothing interesting happened
-                  l
+                  case None => {
+                    // nothing interesting happened
+                    l
+                  }
                 }
               }
+              else {
+                // Listener was removed since we started
+                l
+              }
             }
-            else {
-              // Listener was removed since we started
-              l
-            }
-          }
 
-          // Listeners may have changed during processing (subscribe or unsubscribe)
-          // so only update the listeners that are still there, and leave any new listeners that may be there now.
-          listeners = updated.foldLeft(listeners) { case (l, (key, sub)) =>
-            if (l.isDefinedAt(key)) {
-              // Listener still exists for this key
-              l.updated(key, sub)
-            }
-            else {
-              // Listener was removed for this key, skip it
-              l
+            // Listeners may have changed during processing (subscribe or unsubscribe)
+            // so only update the listeners that are still there, and leave any new listeners that may be there now.
+            listeners = updated.foldLeft(listeners) { case (l, (key, sub)) =>
+              if (l.isDefinedAt(key)) {
+                // Listener still exists for this key
+                l.updated(key, sub)
+              }
+              else {
+                // Listener was removed for this key, skip it
+                l
+              }
             }
           }
+        } catch {
+          case e: Throwable =>
+            handleFatal(action, e)
+        } finally {
+          isDispatching = false
         }
-      } catch {
-        case e: Throwable =>
-          handleFatal(action, e)
-      } finally {
-        isDispatching = false
+      } else {
+        handleFatal(action, new IllegalStateException(s"Cannot dispatch action $action while another dispatch is running!"))
       }
-    } else {
-      handleFatal(action, new IllegalStateException(s"Cannot dispatch action $action while another dispatch is running!"))
     }
   }
 
