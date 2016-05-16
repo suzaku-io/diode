@@ -179,6 +179,11 @@ demonstrating the use of React integration features and async operations.
 
 # Change history
 
+### 0.5.2
+- Fixed a bug in `foldHandlers` where model changes in earlier handles were not always taken into account
+- Fixed a bug in `Circuit` where subscribing to a listener while other listeners were being called resulted in that new
+  subscription being ignored.
+
 ### 0.5.1
 - Changed Circuit `actionHandler` type to take current model as parameter to enable chaining of handlers
 - Added `composeHandlers` and `foldHandlers` to help building action handler hierarchies
