@@ -4,6 +4,7 @@ import diode._
 import japgolly.scalajs.react._
 
 import scala.language.existentials
+import scala.scalajs.js
 
 /**
   * Wraps a model reader, dispatcher and React connector to be passed to React components
@@ -58,9 +59,15 @@ trait ReactConnector[M <: AnyRef] {
     * relevant state changes and updates the wrapped component as needed.
     *
     * @param zoomFunc Function to retrieve relevant piece from the model
+    * @param key      Optional parameter specifying a unique React key for this component.
     * @param compB    Function that creates the wrapped component
     * @return A React component
     */
+  def connect[S <: AnyRef, C](zoomFunc: M => S, key: js.Any)(compB: ModelProxy[S] => C)
+    (implicit ev: C => ReactElement, feq: FastEq[_ >: S]): ReactComponentU[Unit, S, _, TopNode] = {
+    connect(circuit.zoom(zoomFunc), key)(compB)
+  }
+
   def connect[S <: AnyRef, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)
     (implicit ev: C => ReactElement, feq: FastEq[_ >: S]): ReactComponentU[Unit, S, _, TopNode] = {
     connect(circuit.zoom(zoomFunc))(compB)
@@ -71,10 +78,12 @@ trait ReactConnector[M <: AnyRef] {
     * relevant state changes and updates the wrapped component as needed.
     *
     * @param modelReader A reader that returns the piece of model we are interested in
+    * @param key         Optional parameter specifying a unique React key for this component.
     * @param compB       Function that creates the wrapped component
     * @return A React component
     */
-  def connect[S <: AnyRef, C](modelReader: ModelR[_, S])(compB: ModelProxy[S] => C)
+  def connect[S <: AnyRef, C](modelReader: ModelR[_, S], key: js.UndefOr[js.Any] = js.undefined)
+    (compB: ModelProxy[S] => C)
     (implicit ev: C => ReactElement, feq: FastEq[_ >: S]): ReactComponentU[Unit, S, _, TopNode] = {
 
     class Backend(t: BackendScope[Unit, S]) {
@@ -106,6 +115,7 @@ trait ReactConnector[M <: AnyRef] {
       .componentWillMount(scope => scope.backend.willMount)
       .componentWillUnmount(scope => scope.backend.willUnmount)
       .shouldComponentUpdate(scope => scope.currentState ne scope.nextState)
-      .buildU.apply()
+      .buildU
+      .set(key).apply()
   }
 }
