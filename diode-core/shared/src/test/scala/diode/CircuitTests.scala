@@ -137,6 +137,110 @@ object CircuitTests extends TestSuite {
         assert(state2.data.i == 42)
         assert(callbackCount == 2)
       }
+      'NestedSubscribe - {
+        val c = circuit
+        var state1: Model = null
+        var state2: Model = null
+        var callback1Count = 0
+        var callback2Count = 0
+        var unsubscribe2: () => Unit  = null
+
+        def listener1(cursor: ModelR[Model, String]): Unit = {
+          state1 = c.model
+          callback1Count += 1
+
+          if (unsubscribe2 == null) {
+            unsubscribe2 = c.subscribe(c.zoom(_.s))(listener2)
+          }
+        }
+
+        def listener2(cursor: ModelR[Model, String]): Unit = {
+          state2 = c.model
+          callback2Count += 1
+        }
+
+        val unsubscribe1 = c.subscribe(c.zoom(_.s))(listener1)
+        c.dispatch(SetS("Listen"))
+        assert(state1.s == "Listen")
+        assert(callback1Count == 1)
+        assert(state2 == null)
+        assert(callback2Count == 0)
+
+        // check listener2 was registered correctly during the last dispatch
+        c.dispatch(SetS("Listen1"))
+        assert(state1.s == "Listen1")
+        assert(callback1Count == 2)
+        assert(state2 != null)
+        assert(state2.s == "Listen1")
+        assert(callback2Count == 1)
+
+        unsubscribe1()
+        c.dispatch(SetS("Listen2"))
+        assert(state1.s == "Listen1")
+        assert(callback1Count == 2)
+        assert(state2.s == "Listen2")
+        assert(callback2Count == 2)
+
+        unsubscribe2()
+        c.dispatch(SetS("Listen3"))
+        assert(state1.s == "Listen1")
+        assert(callback1Count == 2)
+        assert(state2.s == "Listen2")
+        assert(callback2Count == 2)
+      }
+      'NestedUnsubscribe - {
+        val c = circuit
+        var state1: Model = null
+        var state2: Model = null
+        var callback1Count = 0
+        var callback2Count = 0
+        var unsubscribe2: () => Unit = null
+        var executeUnsubscribe2 = false
+
+        def listener1(cursor: ModelR[Model, String]): Unit = {
+          state1 = c.model
+          callback1Count += 1
+
+          if (executeUnsubscribe2) {
+            unsubscribe2()
+            unsubscribe2 = null
+          }
+        }
+
+        def listener2(cursor: ModelR[Model, String]): Unit = {
+          state2 = c.model
+          callback2Count += 1
+        }
+
+        val unsubscribe1 = c.subscribe(c.zoom(_.s))(listener1)
+        unsubscribe2 = c.subscribe(c.zoom(_.s))(listener2)
+
+        c.dispatch(SetS("Listen"))
+        assert(state1.s == "Listen")
+        assert(callback1Count == 1)
+        assert(state2.s == "Listen")
+        assert(callback2Count == 1)
+
+        executeUnsubscribe2 = true
+
+        c.dispatch(SetS("Listen1"))
+        assert(state1.s == "Listen1")
+        assert(callback1Count == 2)
+        // Note that you can't reliably test for change or no change in state2 at this point
+        // since listener execution order isn't necessarily equal to listener registration order
+
+        executeUnsubscribe2 = false
+
+        // Check that only listener1 is called
+        val state2Snapshot = state2
+        val callback2CountSnapshot = callback2Count
+
+        c.dispatch(SetS("Listen2"))
+        assert(state1.s == "Listen2")
+        assert(callback1Count == 3)
+        assert(state2.s == state2Snapshot.s)
+        assert(callback2Count == callback2CountSnapshot)
+      }
     }
     'Effects - {
       'Run - {
