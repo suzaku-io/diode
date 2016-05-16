@@ -179,6 +179,12 @@ demonstrating the use of React integration features and async operations.
 
 # Change history
 
+### 0.6.0-SNAPSHOT
+- Support for silent model changes that do not trigger listeners
+- Dispatcher now reports a special error if an unknown action is potentially a companion object (fixes #11)
+- React Connector `connect` accepts an optional `key` for the React component it creates (fixes #17) 
+- Fixed `map`, `flatMap` and `flatten` in `Pot` to return a correct type of `Pot` instead of Empty/Ready
+
 ### 0.5.2
 - Fixed a bug in `foldHandlers` where model changes in earlier handles were not always taken into account
 - Fixed a bug in `Circuit` where subscribing to a listener while other listeners were being called resulted in that new

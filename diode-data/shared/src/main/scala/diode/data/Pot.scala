@@ -41,7 +41,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
   def isReady = !isEmpty && !isStale
   def isUnavailable: Boolean
   def ready[B >: A](value: B): Pot[B] = Ready(value)
-  def pending(): Pot[A]
+  def pending(startTime: Long = new Date().getTime): Pot[A]
   def fail(exception: Throwable): Pot[A]
   def unavailable() = Unavailable
   def state: PotState
@@ -57,7 +57,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
 
   /** Returns a Ready containing the result of applying $f to this Pot's
     * value if this Pot is nonempty.
-    * Otherwise return Empty.
+    * Otherwise return current Pot.
     *
     * @note This is similar to `flatMap` except here,
     *       $f does not need to wrap its result in a pot.
@@ -65,8 +65,15 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     * @see flatMap
     * @see foreach
     */
-  @inline final def map[B](f: A => B): Pot[B] =
-    if (isEmpty) Empty else Ready(f(this.get))
+  final def map[B](f: A => B): Pot[B] = this match {
+    case Empty => Empty
+    case Ready(x) => Ready(f(x))
+    case Pending(t) => Pending(t)
+    case PendingStale(x, t) => PendingStale(f(x), t)
+    case Failed(e) => Failed(e)
+    case FailedStale(x, e) => FailedStale(f(x), e)
+    case Unavailable => Unavailable
+  }
 
   /** Returns the result of applying $f to this Pot's
     * value if the Pot is nonempty.  Otherwise, evaluates
@@ -81,7 +88,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
 
   /** Returns the result of applying $f to this Pot's value if
     * this Pot is nonempty.
-    * Returns Empty if this Pot is empty.
+    * Returns current Pot if this Pot does not have a value.
     * Slightly different from `map` in that $f is expected to
     * return a pot (which could be Empty).
     *
@@ -89,11 +96,26 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     * @see map
     * @see foreach
     */
-  @inline final def flatMap[B](f: A => Pot[B]): Pot[B] =
-    if (isEmpty) Empty else f(this.get)
+  def flatMap[B](f: A => Pot[B]): Pot[B] = map(f).flatten
 
-  def flatten[B](implicit ev: A <:< Pot[B]): Pot[B] =
-    if (isEmpty) Empty else ev(this.get)
+  def flatten[B](implicit ev: A <:< Pot[B]): Pot[B] = this match {
+    case Empty => Empty
+    case Ready(x) => x
+    case Pending(t) => Pending(t)
+    case PendingStale(x, t) => ev(x) match {
+      case Empty => Pending(t)
+      case Ready(y) => PendingStale(y, t)
+      case Pending(s) => Pending(math.min(s, t))
+      case PendingStale(y, s) => PendingStale(y, math.min(s, t))
+      case other => other
+    }
+    case Failed(e) => Failed(e)
+    case FailedStale(x, e) => ev(x) match {
+      case Empty => Failed(e)
+      case other => other
+    }
+    case Unavailable => Unavailable
+  }
 
   /** Returns this Pot if it is nonempty '''and''' applying the predicate $p to
     * this Pot's value returns true. Otherwise, return Empty.
@@ -133,17 +155,17 @@ sealed abstract class Pot[+A] extends Product with Serializable {
   /** Tests whether the pot contains a given value as an element.
     *
     * @example
-      * {{{
-      *  // Returns true because Ready instance contains string "something" which equals "something".
-      *  Ready("something") contains "something"
-      *
-      *  // Returns false because "something" != "anything".
-      *  Ready("something") contains "anything"
-      *
-      *  // Returns false when method called on Empty.
-      *  Empty contains "anything"
-      * }}}
-      * @param elem the element to test.
+    * {{{
+    *  // Returns true because Ready instance contains string "something" which equals "something".
+    *  Ready("something") contains "something"
+    *
+    *  // Returns false because "something" != "anything".
+    *  Ready("something") contains "anything"
+    *
+    *  // Returns false when method called on Empty.
+    *  Empty contains "anything"
+    * }}}
+    * @param elem the element to test.
     * @return `true` if the pot has an element that is equal (as
     *         determined by `==`) to `elem`, `false` otherwise.
     */
@@ -184,17 +206,17 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     * Returns Empty otherwise.
     *
     * @example
-      * {{{
-      * // Returns Ready(HTTP) because the partial function covers the case.
-      * Ready("http") collect {case "http" => "HTTP"}
-      *
-      * // Returns Empty because the partial function doesn't cover the case.
-      * Ready("ftp") collect {case "http" => "HTTP"}
-      *
-      * // Returns Empty because Empty is passed to the collect method.
-      * Empty collect {case value => value}
-      * }}}
-      * @param  pf the partial function.
+    * {{{
+    * // Returns Ready(HTTP) because the partial function covers the case.
+    * Ready("http") collect {case "http" => "HTTP"}
+    *
+    * // Returns Empty because the partial function doesn't cover the case.
+    * Ready("ftp") collect {case "http" => "HTTP"}
+    *
+    * // Returns Empty because Empty is passed to the collect method.
+    * Empty collect {case value => value}
+    * }}}
+    * @param  pf the partial function.
     * @return the result of applying `pf` to this Pot's
     *         value (if possible), or Empty.
     */
@@ -288,6 +310,7 @@ object Pot {
     * the collections hierarchy.
     */
   def empty[A]: Pot[A] = Empty
+
   /**
     * Monad type class for `Pot`
     */
@@ -321,7 +344,7 @@ case object Empty extends Pot[Nothing] {
   def state = PotState.PotEmpty
   def retryPolicy = Retry.None
 
-  override def pending() = Pending()
+  override def pending(startTime: Long = new Date().getTime) = Pending()
   override def fail(exception: Throwable) = Failed(exception)
 }
 
@@ -336,7 +359,7 @@ case object Unavailable extends Pot[Nothing] {
   def state = PotState.PotUnavailable
   def retryPolicy = Retry.None
 
-  override def pending() = Pending()
+  override def pending(startTime: Long = new Date().getTime) = Pending()
   override def fail(exception: Throwable) = Failed(exception)
 }
 
@@ -351,7 +374,7 @@ final case class Ready[+A](x: A) extends Pot[A] {
   def state = PotState.PotReady
   def retryPolicy = Retry.None
 
-  override def pending() = PendingStale(x)
+  override def pending(startTime: Long = new Date().getTime) = PendingStale(x)
   override def fail(exception: Throwable) = FailedStale(x, exception)
 }
 
@@ -369,7 +392,7 @@ final case class Pending(startTime: Long = new Date().getTime) extends Pot[Nothi
   def isFailed = false
   def isStale = false
 
-  override def pending() = copy()
+  override def pending(startTime: Long) = copy()
   override def fail(exception: Throwable) = Failed(exception)
 }
 
@@ -379,7 +402,7 @@ final case class PendingStale[+A](x: A, startTime: Long = new Date().getTime) ex
   def isFailed = false
   def isStale = true
 
-  override def pending() = copy(x)
+  override def pending(startTime: Long) = copy(x)
   override def fail(exception: Throwable) = FailedStale(x, exception)
 }
 
@@ -406,7 +429,7 @@ final case class Failed(exception: Throwable) extends Pot[Nothing] with FailedBa
 
   override def recover[B](f: PartialFunction[Throwable, B]): Pot[B] = this
 
-  override def pending() = Pending()
+  override def pending(startTime: Long = new Date().getTime) = Pending()
   override def fail(exception: Throwable) = Failed(exception)
 }
 
@@ -425,6 +448,6 @@ final case class FailedStale[+A](x: A, exception: Throwable) extends Pot[A] with
 
   override def recover[B >: A](f: PartialFunction[Throwable, B]): Pot[B] = this
 
-  override def pending() = PendingStale(x)
+  override def pending(startTime: Long = new Date().getTime) = PendingStale(x)
   override def fail(exception: Throwable) = FailedStale(x, exception)
 }
