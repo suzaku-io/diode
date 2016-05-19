@@ -3,14 +3,12 @@ package diode
 import scala.language.higherKinds
 
 
-
 /**
-  * Base trait for all model readers
+  * A read-only version of ModelR that doesn't know about the root model.
   *
-  * @tparam M Type of the base model
   * @tparam S Type of the reader value
   */
-trait ModelR[M, S] {
+trait ModelRO[S] {
   /**
     * Returns the value of the reader
     */
@@ -22,16 +20,6 @@ trait ModelR[M, S] {
   def apply(): S = value
 
   /**
-    * Evaluates the reader against a supplied `model`
-    */
-  def eval(model: M): S
-
-  /**
-    * Returns the root model reader of this reader
-    */
-  def root: ModelR[M, M]
-
-  /**
     * Checks if `that` is equal to `this` using an appropriate equality check
     *
     * @param that Value to compare with
@@ -40,6 +28,24 @@ trait ModelR[M, S] {
   def ===(that: S): Boolean
 
   def =!=(that: S): Boolean = ! ===(that)
+}
+
+/**
+  * Base trait for all model readers
+  *
+  * @tparam M Type of the base model
+  * @tparam S Type of the reader value
+  */
+trait ModelR[M, S] extends ModelRO[S] {
+  /**
+    * Evaluates the reader against a supplied `model`
+    */
+  def eval(model: M): S
+
+  /**
+    * Returns the root model reader of this reader
+    */
+  def root: ModelR[M, M]
 
   /**
     * Zooms into the model using the provided accessor function

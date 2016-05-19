@@ -1,5 +1,6 @@
 package diode
 
+import scala.collection.immutable.Queue
 import scala.language.higherKinds
 
 trait Dispatcher {
@@ -83,6 +84,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
 
   private val modelRW = new RootModelRW[M](model)
   private var isDispatching = false
+  private var dispatchQueue = Queue.empty[AnyRef]
   private var listenerId = 0
   private var listeners = Map.empty[Int, Subscription[_]]
   private var processors = List.empty[ActionProcessor[M]]
@@ -262,7 +264,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
                 val newModel = result.newModelOpt.orElse(cr.newModelOpt)
                 (newModel.getOrElse(currentModel), ActionResult(newModel, newEffect))
               case None =>
-                (currentModel, result)
+                (result.newModelOpt.getOrElse(currentModel), result)
             }
             (nextModel, Some(nextResult))
         }
@@ -325,8 +327,14 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
         } finally {
           isDispatching = false
         }
+        // if there is an item in the queue, dispatch it
+        dispatchQueue.dequeueOption foreach { case (nextAction, queue) =>
+          dispatchQueue = queue
+          dispatch(nextAction)
+        }
       } else {
-        handleFatal(action, new IllegalStateException(s"Cannot dispatch action $action while another dispatch is running!"))
+        // add to the queue
+        dispatchQueue = dispatchQueue.enqueue(action)
       }
     }
   }

@@ -27,6 +27,8 @@ object CircuitTests extends TestSuite {
 
   case class Delay(action: AnyRef)
 
+  case class ThrowAction(ex: Throwable)
+
   class AppCircuit(implicit ec: ExecutionContext) extends Circuit[Model] {
     import diode.ActionResult._
     override def initialModel = Model("Testing", Data(42, true))
@@ -42,6 +44,8 @@ object CircuitTests extends TestSuite {
       case SetEffect(s, effect) =>
         // run effect twice!
         ModelUpdateEffect(model.copy(s = s), Effect(effect()) + effect)
+      case ThrowAction(ex) =>
+        throw ex
     }: PartialFunction[AnyRef, ActionResult[Model]]).lift.apply(action)
 
     var lastFatal: (AnyRef, Throwable) = ("", null)
@@ -83,6 +87,11 @@ object CircuitTests extends TestSuite {
         case class TestMissing(i: Int)
 
         c.dispatch(TestMissing)
+        assert(c.lastFatal._2.isInstanceOf[IllegalArgumentException])
+      }
+      'ErrorInHandler - {
+        val c = circuit
+        c.dispatch(ThrowAction(new IllegalArgumentException("Oh noes!")))
         assert(c.lastFatal._2.isInstanceOf[IllegalArgumentException])
       }
     }
@@ -386,7 +395,15 @@ object CircuitTests extends TestSuite {
       val fh = circuit.foldHandlers(h1, h2)
 
       val res = fh(c.model, SetS("test"))
-      assert(res.contains(ModelUpdate(origModel.copy(s = "TestingTESTTEST", data = Data(42, true)))))
+      assert(res.contains(ModelUpdate(origModel.copy(s = "TestingTESTTEST", data = Data(43, true)))))
+    }
+    'NestedDispatch - {
+      val c = circuit
+      // dispatch in a listener
+      c.subscribe(c.zoom(_.s))( r => c.dispatch(SetD(Data(3, false))))
+      c.dispatch(SetS("Nested"))
+      assert(c.model.s == "Nested")
+      assert(c.model.data == Data(3, false))
     }
   }
 }
