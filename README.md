@@ -45,9 +45,9 @@ Since having a static counter is not very interesting, we'll want to have some w
 the application model happen through _actions_. Let's define a couple of useful actions:
 
 ```scala
-case class Increase(amount: Int)
-case class Decrease(amount: Int)
-case object Reset
+case class Increase(amount: Int) extends Action
+case class Decrease(amount: Int) extends Action
+case object Reset extends Action
 ```
 
 Actions in Diode can be anything (that extends `AnyRef`), but typically case classes work best due to their pattern

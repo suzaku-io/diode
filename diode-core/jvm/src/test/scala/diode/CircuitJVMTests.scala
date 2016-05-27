@@ -11,13 +11,13 @@ object CircuitJVMTests extends TestSuite {
   case class Model(list: Vector[Int])
 
   // actions
-  case class Append(i: Int)
+  case class Append(i: Int) extends Action
 
-  case class Prepend(i: Int)
+  case class Prepend(i: Int) extends Action
 
-  case class Filter(f: Int => Boolean)
+  case class Filter(f: Int => Boolean) extends Action
 
-  case class RunEffects[A <: AnyRef](effects: Seq[Effect], parallel: Boolean = false)
+  case class RunEffects[A <: AnyRef](effects: Seq[Effect], parallel: Boolean = false) extends Action
 
   class TestCircuit(implicit ec: ExecutionContext) extends Circuit[Model] {
     import diode.ActionResult._
@@ -93,14 +93,14 @@ object CircuitJVMTests extends TestSuite {
     'SequenceActions - {
       val c = circuit
       val actions = for (i <- 0 until 1000) yield Append(i)
-      c.dispatch(actions)
+      c.dispatch(ActionSeq(actions))
       assert(c.model.list.size == 1000)
       assert(c.model.list == Vector.range(0, 1000))
     }
     'SequenceActionEffects - {
       val c = circuit
       val actions = for (i <- 0 until 1000) yield RunEffects(Seq(() => Future(Append(i))))
-      c.dispatch(actions)
+      c.dispatch(ActionSeq(actions))
       // wait for futures to complete
       Thread.sleep(300)
       assert(c.model.list.size == 1000)

@@ -6,11 +6,11 @@ import diode._
 case class RootModel(counter: Int)
 
 // Define actions
-case class Increase(amount: Int)
+case class Increase(amount: Int) extends Action
 
-case class Decrease(amount: Int)
+case class Decrease(amount: Int) extends Action
 
-case object Reset
+case object Reset extends Action
 
 /**
   * AppCircuit provides the actual instance of the `RootModel` and all the action
