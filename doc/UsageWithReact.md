@@ -31,11 +31,11 @@ object AppCircuit extends Circuit[RootModel] with ReactConnector[RootModel] { ..
 ```
 
 Now your `AppCircuit` is equipped with two new methods: `wrap` and `connect`. Both methods have almost the same signature, taking a zoom function (or
-alternatively a model reader) and a function to build a React component.
+alternatively a model reader). Wrap also takes a function to build a React component immediately whereas connect returns a component taking a similar function as props.
 
 ```scala
 def wrap[S, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)
-def connect[S, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)
+def connect[S](zoomFunc: M => S)
 ```
 
 The difference between these two is that `wrap` just creates a `ModelProxy` and passes it to your component builder function, while `connect` actually creates
@@ -51,7 +51,7 @@ your component.
 // connect with ModelProxy
 val smartComponent = ReactComponentB[ModelProxy[Seq[String]]("SmartComponent").build
 ...
-val sc = AppCircuit.connect(_.data)(p => smartComponent(p))
+val sc = AppCircuit.connect(_.data)
 
 // wrap with specific props
 case class Props(data: Seq[String], onClick: Callback)
@@ -59,23 +59,30 @@ val dummyComponent = ReactComponentB[Props]("DummyComponent").build
 ...
 val dc = AppCircuit.wrap(_.data)(p => dummyComponent(Props(p(), p.dispatch(DummyClicked)))
 
-def render = <.div(sc, dc)
+def render = <.div(sc(p => smartComponent(p)), dc)
 ```
 
 The `ModelProxy` provides a `dispatch` function that wraps the dispatch call in a React `Callback`, making it easy to integrate with event
 handlers etc. It also provides `wrap` and `connect`, allowing your component to connect sub-components to the Diode circuit.
 
+Note that connect is being called once for the lifecycle of this component. Having a single reference to this component during your components
+lifecycle ensures that React will update your component rather than unmounting and remounting it. This applies to calling connect in
+other contexts too. Try to create and store your component once and reuse it.
+
 ```scala
-val Dashboard = ReactComponentB[ModelProxy[RootModel]("Dashboard")
-  .render_P { proxy =>
-    <.div(
-      h3("Data"),
-      proxy.connect(_.asyncData)(p => AsyncDataView(p)), // pass ModelProxy
-      proxy.wrap(_.data)(p => DataView(p()), // just pass the value
-      <.button(^.onClick --> proxy.dispatch(RefreshData), "Refresh") 
-    )
-  }
-  .build
+case class State(component: ReactComponentC.ReqProps[(ModelProxy[Pot[String]]) => ReactElement, Pot[String], _, TopNode])
+
+val Dashboard = ReactComponentB[ModelProxy[RootModel]]("Dashboard")
+.initialState_P(proxy => State(proxy.connect(_.asyncData)))
+.renderPS { (_, proxy, state) =>
+  <.div(
+    <.h3("Data"),
+    state.component(p => AsyncDataView(p)), // pass ModelProxy
+    proxy.wrap(_.data)(p => DataView(p())), // just pass the value
+    <.button(^.onClick --> proxy.dispatch(RefreshData), "Refresh")
+  )
+}
+.build
 ```  
 
 ## Rendering `Pot`

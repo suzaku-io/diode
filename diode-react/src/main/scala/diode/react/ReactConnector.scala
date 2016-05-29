@@ -21,9 +21,9 @@ case class ModelProxy[S](modelReader: ModelR[_, S], dispatch: AnyRef => Callback
   def wrap[T <: AnyRef, C](f: S => T)(compB: ModelProxy[T] => C)
     (implicit ev: C => ReactElement, feq: FastEq[_ >: T]): C = compB(zoom(f))
 
-  def connect[T <: AnyRef, C](f: S => T)(compB: ModelProxy[T] => C)
-    (implicit ev: C => ReactElement, feq: FastEq[_ >: T]): ReactComponentU[Unit, T, _, TopNode] = {
-    connector.connect(modelReader.zoom(f))(compB)
+  def connect[T <: AnyRef](f: S => T)
+    (implicit feq: FastEq[_ >: T]): ReactComponentC.ReqProps[ModelProxy[T] => ReactElement, T, _, TopNode] = {
+    connector.connect(modelReader.zoom(f))
   }
 }
 
@@ -60,17 +60,16 @@ trait ReactConnector[M <: AnyRef] {
     *
     * @param zoomFunc Function to retrieve relevant piece from the model
     * @param key      Optional parameter specifying a unique React key for this component.
-    * @param compB    Function that creates the wrapped component
-    * @return A React component
+    * @return A React component accepting a prop that is a function to creates the wrapped component
     */
-  def connect[S <: AnyRef, C](zoomFunc: M => S, key: js.Any)(compB: ModelProxy[S] => C)
-    (implicit ev: C => ReactElement, feq: FastEq[_ >: S]): ReactComponentU[Unit, S, _, TopNode] = {
-    connect(circuit.zoom(zoomFunc), key)(compB)
+  def connect[S <: AnyRef](zoomFunc: M => S, key: js.Any)
+    (implicit feq: FastEq[_ >: S]): ReactComponentC.ReqProps[ModelProxy[S] => ReactElement, S, _, TopNode] = {
+    connect(circuit.zoom(zoomFunc), key)
   }
 
-  def connect[S <: AnyRef, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)
-    (implicit ev: C => ReactElement, feq: FastEq[_ >: S]): ReactComponentU[Unit, S, _, TopNode] = {
-    connect(circuit.zoom(zoomFunc))(compB)
+  def connect[S <: AnyRef](zoomFunc: M => S)
+    (implicit feq: FastEq[_ >: S]): ReactComponentC.ReqProps[ModelProxy[S] => ReactElement, S, _, TopNode] = {
+    connect(circuit.zoom(zoomFunc))
   }
 
   /**
@@ -79,19 +78,19 @@ trait ReactConnector[M <: AnyRef] {
     *
     * @param modelReader A reader that returns the piece of model we are interested in
     * @param key         Optional parameter specifying a unique React key for this component.
-    * @param compB       Function that creates the wrapped component
-    * @return A React component
+    * @return A React component accepting a prop that is a function to create the wrapped component
     */
-  def connect[S <: AnyRef, C](modelReader: ModelR[_, S], key: js.UndefOr[js.Any] = js.undefined)
-    (compB: ModelProxy[S] => C)
-    (implicit ev: C => ReactElement, feq: FastEq[_ >: S]): ReactComponentU[Unit, S, _, TopNode] = {
+  def connect[S <: AnyRef](modelReader: ModelR[_, S], key: js.UndefOr[js.Any] = js.undefined)
+    (implicit feq: FastEq[_ >: S]): ReactComponentC.ReqProps[ModelProxy[S] => ReactElement, S, _, TopNode] = {
 
-    class Backend(t: BackendScope[Unit, S]) {
+    class Backend(t: BackendScope[ModelProxy[S] => ReactElement, S]) {
       private var unsubscribe = Option.empty[() => Unit]
 
-      def willMount = Callback {
+      def willMount = {
         // subscribe to model changes
-        unsubscribe = Some(circuit.subscribe(modelReader.asInstanceOf[ModelR[M, S]])(changeHandler))
+        Callback {
+          unsubscribe = Some(circuit.subscribe(modelReader.asInstanceOf[ModelR[M, S]])(changeHandler))
+        } >> t.setState(modelReader())
       }
 
       def willUnmount = Callback {
@@ -106,16 +105,16 @@ trait ReactConnector[M <: AnyRef] {
         }
       }
 
-      def render(s: S) = wrap(modelReader)(compB)
+      def render(s: S, compB: ModelProxy[S] => ReactElement) = wrap(modelReader)(compB)
     }
 
-    ReactComponentB[Unit]("DiodeWrapper")
+    ReactComponentB[ModelProxy[S] => ReactElement]("DiodeWrapper")
       .initialState(modelReader())
       .renderBackend[Backend]
       .componentWillMount(scope => scope.backend.willMount)
       .componentWillUnmount(scope => scope.backend.willUnmount)
-      .shouldComponentUpdate(scope => scope.currentState ne scope.nextState)
-      .buildU
-      .set(key).apply()
+      .shouldComponentUpdate(scope => (scope.currentState ne scope.nextState) || (scope.currentProps ne scope.nextProps))
+      .build
+      .set(key)
   }
 }
