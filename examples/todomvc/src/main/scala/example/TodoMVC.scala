@@ -20,8 +20,10 @@ object TodoMVC extends JSApp {
   val routerConfig: RouterConfig[TodoFilter] = RouterConfigDsl[TodoFilter].buildConfig { dsl =>
     import dsl._
 
+    val todoConnection = AppCircuit.connect(_.todos)
+
     /* how the application renders the list given a filter */
-    def filterRoute(s: TodoFilter): Rule = staticRoute("#/" + s.link, s) ~> renderR(router => AppCircuit.connect(_.todos)(p => TodoList(p, s, router)))
+    def filterRoute(s: TodoFilter): Rule = staticRoute("#/" + s.link, s) ~> renderR(router => todoConnection(p => TodoList(p, s, router)))
 
     val filterRoutes: Rule = TodoFilter.values.map(filterRoute).reduce(_ | _)
 
