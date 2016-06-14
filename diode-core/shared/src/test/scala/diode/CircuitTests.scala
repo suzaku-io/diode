@@ -9,6 +9,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object CircuitTests extends TestSuite {
 
+  implicit object AnyRefAction extends ActionType[AnyRef]
+
   // model
   case class Model(s: String, data: Data)
 
@@ -364,7 +366,7 @@ object CircuitTests extends TestSuite {
             }
           }
 
-          def run = {
+          def run(): Unit = {
             pending.foreach { case (action, dispatcher) => dispatcher(action) }
             pending.clear()
           }
@@ -373,7 +375,7 @@ object CircuitTests extends TestSuite {
         c.addProcessor(p)
         c.dispatch(Delay(SetS("Test")))
         assert(c.model.s == "Testing")
-        p.run
+        p.run()
         assert(c.model.s == "Test")
       }
     }

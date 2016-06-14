@@ -1,7 +1,7 @@
 package diode.data
 
 import diode.util.RetryPolicy
-import diode.{ActionHandler, ActionResult, Effect}
+import diode.{ActionHandler, ActionResult, ActionType, Effect}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
@@ -154,6 +154,8 @@ trait AsyncActionRetriable[A, P <: AsyncActionRetriable[A, P]] extends AsyncActi
 }
 
 object AsyncAction {
+
+  implicit object AsyncActionType extends ActionType[AsyncAction[_,_]]
 
   class PendingException extends Exception
 

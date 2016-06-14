@@ -50,10 +50,10 @@ object PotActionTests extends TestSuite {
   class TestFailHandler[M](modelRW: ModelRW[M, Pot[String]]) extends ActionHandler(modelRW) {
     override def handle = {
       case action: TestActionRP =>
-        val updateF = action.effectWithRetry(Future(throw new TimeoutException))(_.toString)
+        val updateF = action.effectWithRetry(Future[Int](throw new TimeoutException))(_.toString)
         action.handleWith(this, updateF)(PotActionRetriable.handler())
       case action: TestAction =>
-        val updateF = action.effect(Future(throw new TimeoutException))(_.toString)
+        val updateF = action.effect(Future[Int](throw new TimeoutException))(_.toString)
         action.handleWith(this, updateF)(PotAction.handler())
     }
   }

@@ -178,7 +178,7 @@ object Effect {
     * Converts a lazy action value into an effect. Typically used in combination with other effects or
     * with `after` to delay execution.
     */
-  def action[A <: AnyRef](action: => A)(implicit ec: ExecutionContext): EffectSingle[A] =
+  def action[A <: AnyRef : ActionType](action: => A)(implicit ec: ExecutionContext): EffectSingle[A] =
     new EffectSingle(() => Future.successful(action), ec)
 
   implicit def f2effect[A <: AnyRef](f: EffectF[A])(implicit ec: ExecutionContext): EffectSingle[A] = new EffectSingle(f, ec)

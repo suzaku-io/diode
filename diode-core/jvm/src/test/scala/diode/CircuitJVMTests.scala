@@ -8,6 +8,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object CircuitJVMTests extends TestSuite {
 
+  implicit object AnyRefAction extends ActionType[AnyRef]
+
   case class Model(list: Vector[Int])
 
   // actions

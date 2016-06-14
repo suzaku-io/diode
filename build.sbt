@@ -2,16 +2,30 @@ import sbt._
 import Keys._
 import com.typesafe.sbt.pgp.PgpKeys._
 
-crossScalaVersions := Seq("2.11.7")
+crossScalaVersions := Seq("2.11.8")
 
 val commonSettings = Seq(
   organization := "me.chrons",
   version := Version.library,
-  scalaVersion := "2.11.7",
-  scalacOptions ++= Seq("-unchecked", "-feature", "-deprecation", "-encoding", "utf8"),
+  scalaVersion := "2.11.8",
+  scalacOptions := Seq(
+    "-deprecation",
+    "-encoding", "UTF-8",
+    "-feature",
+    "-unchecked",
+    "-Xfatal-warnings",
+    "-Xlint",
+    "-Yinline-warnings",
+    "-Yno-adapted-args",
+    "-Ywarn-dead-code",
+    "-Ywarn-numeric-widen",
+    "-Ywarn-value-discard",
+    "-Xfuture"),
+  scalacOptions in Compile ~= (_ filterNot (_ == "-Ywarn-value-discard")),
+  scalacOptions in (Compile, doc) ~= (_ filterNot (_ == "-Xfatal-warnings")),
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %%% "utest" % "0.3.1" % "test"
+    "com.lihaoyi" %%% "utest" % "0.4.3" % "test"
   )
 )
 

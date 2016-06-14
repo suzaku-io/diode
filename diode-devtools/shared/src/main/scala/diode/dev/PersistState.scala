@@ -48,9 +48,12 @@ abstract class PersistState[M <: AnyRef, P] extends ActionProcessor[M] {
 
 object PersistState {
 
+  sealed trait PersistAction
+
   // define external actions
-  final case class Save(id: String)
+  final case class Save(id: String) extends PersistAction
 
-  final case class Load(id: String)
+  final case class Load(id: String) extends PersistAction
 
+  implicit object PersistActionType extends ActionType[PersistAction]
 }

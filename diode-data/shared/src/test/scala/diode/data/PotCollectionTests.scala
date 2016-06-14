@@ -71,9 +71,9 @@ object PotCollectionTests extends TestSuite {
         val v1 = v.updated(5, Ready("0")).updated(8, Ready("1"))
         val it = v1.iterator
         assert(it.hasNext)
-        assert(it.next() ==(5, Ready("0")))
+        assert(it.next() == ((5, Ready("0"))))
         assert(it.hasNext)
-        assert(it.next() ==(8, Ready("1")))
+        assert(it.next() == ((8, Ready("1"))))
         assert(!it.hasNext)
       }
     }

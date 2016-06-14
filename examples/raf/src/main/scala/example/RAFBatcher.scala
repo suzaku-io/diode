@@ -14,6 +14,10 @@ class RAFBatcher[M <: AnyRef] extends ActionProcessor[M] {
   private var batch = List.empty[RAFWrapper]
   private var frameRequested = false
 
+  implicit object RAFWrapperType extends ActionType[RAFWrapper]
+
+  implicit object RAFTimeStampType extends ActionType[RAFTimeStamp]
+
   /**
     * Callback for RAF.
     *
@@ -29,7 +33,7 @@ class RAFBatcher[M <: AnyRef] extends ActionProcessor[M] {
         // Precede actions with a time stamp action to get correct time in animations.
         // When dispatching a sequence, Circuit optimizes processing internally and only calls
         // listeners after all the actions are processed
-        dispatch(RAFTimeStamp(time) :: actions)
+        dispatch(RAFTimeStamp(time) +: ActionBatch(actions:_*))
       }
       // request next frame
       requestAnimationFrame

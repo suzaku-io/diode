@@ -13,7 +13,7 @@ trait RunAfter {
   def runAfter[A](delay: FiniteDuration)(f: => A): Future[A]
 
   def runAfter[A](delay: Int)(f: => A): Future[A] =
-    runAfter(FiniteDuration(delay, TimeUnit.MILLISECONDS))(f)
+    runAfter(FiniteDuration(delay.toLong, TimeUnit.MILLISECONDS))(f)
 }
 
 object RunAfter {

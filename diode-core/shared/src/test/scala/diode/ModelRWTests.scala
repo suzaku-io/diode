@@ -71,9 +71,9 @@ object ModelRWTests extends TestSuite {
       val z2 = r2.zip(r3)
 
       val v1 = z1.value
-      assert(z1.value ==(m.a, m.b.fs))
+      assert(z1.value ==((m.a, m.b.fs)))
       val v2 = z2.value
-      assert(z2.value ==(m.a.i, m.b.max))
+      assert(z2.value ==((m.a.i, m.b.max)))
 
       m = m.copy(m.a.copy(s = "diode"))
       assert(v1 ne z1.value)

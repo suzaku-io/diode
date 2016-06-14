@@ -1,16 +1,54 @@
 package diode
 
+import scala.annotation.implicitNotFound
 import scala.collection.immutable.Queue
 import scala.language.higherKinds
 
-trait Dispatcher {
-  def dispatch(action: AnyRef): Unit
+/**
+  * The `ActionType` type class is used to verify that only valid actions are dispatched. An implicit instance of
+  * `ActionType[A]` must be in scope when calling dispatch methods or creating effects that return actions.
+  *
+  * @tparam A Action type
+  */
+@implicitNotFound(msg = "Cannot find an ActionType type class for action of type ${A}. Make sure to provide an implicit ActionType for dispatched actions.")
+trait ActionType[-A]
 
-  def apply(action: AnyRef) = dispatch(action)
+trait Dispatcher {
+  def dispatch[A <: AnyRef : ActionType](action: A): Unit
+
+  def apply[A <: AnyRef : ActionType](action: A) = dispatch(action)
+}
+
+/**
+  * A batch of actions. These actions are dispatched in a batch, without calling listeners in-between the dispatches.
+  * @param actions Sequence of actions to dispatch
+  */
+class ActionBatch private (val actions: Seq[AnyRef]) {
+  def :+[A <: AnyRef : ActionType](action: A): ActionBatch =
+    new ActionBatch(actions :+ action)
+
+  def +:[A <: AnyRef : ActionType](action: A) =
+    new ActionBatch(action +: actions)
+
+  def ++(batch: ActionBatch) =
+    new ActionBatch(actions ++ batch.actions)
+}
+
+object ActionBatch {
+  def apply[A <: AnyRef : ActionType](actions: A*): ActionBatch = new ActionBatch(actions)
+
+  implicit object ActionBatchType extends ActionType[ActionBatch]
+}
+
+/**
+  * Use `NoAction` when you need to dispatch an action that does nothing
+  */
+case object NoAction {
+  implicit object NoActionType extends ActionType[NoAction.type]
 }
 
 trait ActionProcessor[M <: AnyRef] {
-  def process(dispatch: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M], currentModel: M): ActionResult[M]
+  def process(dispatch: Dispatcher, action: AnyRef, next: AnyRef => ActionResult[M], currentModel: M): ActionResult[M]
 }
 
 sealed trait ActionResult[+M] {
@@ -98,12 +136,20 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   }
 
   private def baseHandler(action: AnyRef) = action match {
-    case seq: Seq[_] =>
+    case seq: Seq[AnyRef]@unchecked =>
       // dispatch all actions in the sequence using internal dispatchBase to prevent
       // additional calls to subscribed listeners
-      seq.asInstanceOf[Seq[AnyRef]].foreach(dispatchBase)
+      seq.foreach(a => dispatchBase(a))
+      ActionResult.NoChange
+    case batch: ActionBatch =>
+      // dispatch all actions in the sequence using internal dispatchBase to prevent
+      // additional calls to subscribed listeners
+      batch.actions.foreach(a => dispatchBase(a))
       ActionResult.NoChange
     case None =>
+      // ignore
+      ActionResult.NoChange
+    case NoAction =>
       // ignore
       ActionResult.NoChange
     case a if a.getClass.getName.endsWith("$") =>
@@ -277,7 +323,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     *
     * @param action Action to dispatch
     */
-  def dispatch(action: AnyRef): Unit = {
+  def dispatch[A <: AnyRef : ActionType](action: A): Unit = {
     this.synchronized {
       if (!isDispatching) {
         try {
@@ -330,7 +376,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
         // if there is an item in the queue, dispatch it
         dispatchQueue.dequeueOption foreach { case (nextAction, queue) =>
           dispatchQueue = queue
-          dispatch(nextAction)
+          dispatch(nextAction)(null)
         }
       } else {
         // add to the queue
@@ -342,7 +388,8 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   /**
     * Perform actual dispatching, without calling change listeners
     */
-  protected def dispatchBase(action: AnyRef): Boolean = {
+  protected def dispatchBase[A <: AnyRef](action: A): Boolean = {
+    import AnyRefAction._
     try {
       processChain(action) match {
         case ActionResult.NoChange =>
@@ -356,7 +403,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
           true
         case ActionResult.EffectOnly(effects) =>
           // run effects
-          effects.run(dispatch).recover {
+          effects.run(a => dispatch(a)).recover {
             case e: Throwable =>
               handleError(s"Error in processing effects for action $action: $e")
           }(effects.ec)
@@ -364,7 +411,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
         case ActionResult.ModelUpdateEffect(newModel, effects) =>
           update(newModel)
           // run effects
-          effects.run(dispatch).recover {
+          effects.run(a => dispatch(a)).recover {
             case e: Throwable =>
               handleError(s"Error in processing effects for action $action: $e")
           }(effects.ec)
@@ -372,7 +419,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
         case ActionResult.ModelUpdateSilentEffect(newModel, effects) =>
           update(newModel)
           // run effects
-          effects.run(dispatch).recover {
+          effects.run(a => dispatch(a)).recover {
             case e: Throwable =>
               handleError(s"Error in processing effects for action $action: $e")
           }(effects.ec)

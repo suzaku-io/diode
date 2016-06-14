@@ -47,19 +47,25 @@ case class Flower(rpm: Double, position: Point = Point(1, 0), override val scale
 }
 
 // Define actions
-case object Reset
+sealed trait Action
 
-case class AddAnimation(animation: Animation)
+object Action {
+  implicit object AType extends ActionType[Action]
+}
 
-case class UpdateAnimation(id: Int) extends RAFAction
+case object Reset extends Action
 
-case class StartAnimation(id: Int, animation: Animation) extends RAFAction
+case class AddAnimation(animation: Animation) extends Action
 
-case class PauseAnimation(id: Int) extends RAFAction
+case class UpdateAnimation(id: Int) extends RAFAction with Action
 
-case class ContinueAnimation(id: Int) extends RAFAction
+case class StartAnimation(id: Int, animation: Animation) extends RAFAction with Action
 
-case class DeleteAnimation(id: Int) extends RAFAction
+case class PauseAnimation(id: Int) extends RAFAction with Action
+
+case class ContinueAnimation(id: Int) extends RAFAction with Action
+
+case class DeleteAnimation(id: Int) extends RAFAction with Action
 
 /**
   * AppCircuit provides the actual instance of the `RootModel` and all the action
