@@ -49,7 +49,7 @@ your component.
 
 ```scala
 // connect with ModelProxy
-val smartComponent = ReactComponentB[ModelProxy[Seq[String]]("SmartComponent").build
+val smartComponent = ReactComponentB[ModelProxy[Seq[String]]]("SmartComponent").build
 ...
 val sc = AppCircuit.connect(_.data)
 
