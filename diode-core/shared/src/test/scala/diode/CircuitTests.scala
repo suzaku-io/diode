@@ -15,19 +15,19 @@ object CircuitTests extends TestSuite {
   case class Data(i: Int, b: Boolean)
 
   // actions
-  case class SetS(s: String)
+  case class SetS(s: String) extends Action
 
-  case class SetSSilent(s: String)
+  case class SetSSilent(s: String) extends Action
 
-  case class SetD(d: Data)
+  case class SetD(d: Data) extends Action
 
-  case class SetEffect(s: String, effect: () => Future[AnyRef])
+  case class SetEffect(s: String, effect: () => Future[Action]) extends Action
 
-  case class SetEffectOnly(effect: () => Future[AnyRef])
+  case class SetEffectOnly(effect: () => Future[Action]) extends Action
 
-  case class Delay(action: AnyRef)
+  case class Delay(action: Action) extends Action
 
-  case class ThrowAction(ex: Throwable)
+  case class ThrowAction(ex: Throwable) extends Action
 
   class AppCircuit(implicit ec: ExecutionContext) extends Circuit[Model] {
     import diode.ActionResult._
@@ -46,15 +46,16 @@ object CircuitTests extends TestSuite {
         ModelUpdateEffect(model.copy(s = s), Effect(effect()) + effect)
       case ThrowAction(ex) =>
         throw ex
-    }: PartialFunction[AnyRef, ActionResult[Model]]).lift.apply(action)
+    }: PartialFunction[Action, ActionResult[Model]]).lift.apply(action)
 
     var lastFatal: (AnyRef, Throwable) = ("", null)
     var lastError = ""
 
-    override def handleFatal(action: AnyRef, e: Throwable): Unit = lastFatal = (action, e)
+    override def handleFatal(action: Action, e: Throwable): Unit = lastFatal = (action, e)
     override def handleError(msg: String): Unit = lastError = msg
   }
 
+  case object Unknown extends Action
   def tests = TestSuite {
     def circuit = new AppCircuit
 
@@ -64,30 +65,24 @@ object CircuitTests extends TestSuite {
         c.dispatch(SetS("New"))
         assert(c.model.s == "New")
       }
-      'None - {
+      'Noop - {
         val c = circuit
-        c.dispatch(None)
+        c.dispatch(Noop)
         assert(c.model.s == "Testing")
       }
       'Unknown - {
         val c = circuit
-        c.dispatch("Unknown")
+        c.dispatch(Unknown)
         assert(c.model.s == "Testing")
-        assert(c.lastError.contains("not handled"))
+        val le = c.lastError
+        assert(le.contains("not handled"))
       }
       'ActionSeq - {
         val c = circuit
-        c.dispatch(Seq(SetS("First"), SetD(Data(43, false))))
+        c.dispatch(ActionSeq(List[Action](SetS("First"), SetD(Data(43, false)))))
         assert(c.model.s == "First")
         assert(c.model.data.i == 43)
         assert(c.model.data.b == false)
-      }
-      'NoHandler - {
-        val c = circuit
-        case class TestMissing(i: Int)
-
-        c.dispatch(TestMissing)
-        assert(c.lastFatal._2.isInstanceOf[IllegalArgumentException])
       }
       'ErrorInHandler - {
         val c = circuit
@@ -125,7 +120,7 @@ object CircuitTests extends TestSuite {
         assert(state.s == "Listen")
         assert(callbackCount == 1)
         // sequence of actions causes only a single callback
-        c.dispatch(Seq(SetS("Listen1"), SetS("Listen2"), SetS("Listen3"), SetS("Listen4")))
+        c.dispatch(ActionSeq(List[Action](SetS("Listen1"), SetS("Listen2"), SetS("Listen3"), SetS("Listen4"))))
         assert(state.s == "Listen4")
         assert(callbackCount == 2)
         unsubscribe()
@@ -282,7 +277,7 @@ object CircuitTests extends TestSuite {
       'Run - {
         val c = circuit
         var effectRun = 0
-        val effect = SetEffect("Effect", () => {effectRun += 1; Future.successful(None)})
+        val effect = SetEffect("Effect", () => {effectRun += 1; Future.successful(Noop)})
         c.dispatch(effect)
         assert(c.model.s == "Effect")
         assert(effectRun == 2)
@@ -290,35 +285,38 @@ object CircuitTests extends TestSuite {
       'EffectOnly - {
         val c = circuit
         var effectRun = 0
-        val effect = SetEffectOnly(() => {effectRun += 1; Future.successful(None)})
+        val effect = SetEffectOnly(() => {effectRun += 1; Future.successful(Noop)})
         c.dispatch(effect)
         assert(effectRun == 1)
       }
     }
     'Processor - {
+      trait TestAction extends Action
+      case object Test extends TestAction
+      case object Test2 extends TestAction
       'ModAction - {
         val c = circuit
         val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model],
+          override def process(dispatcher: Dispatcher, action: Action, next: Action => ActionResult[Model],
             currentModel: Model) = {
             next(action match {
-              case s: String =>
-                SetS(s)
+              case s: TestAction =>
+                SetS(s.toString)
               case _ => action
             })
           }
         }
         c.addProcessor(p)
-        c.dispatch("Test")
+        c.dispatch(Test)
         assert(c.model.s == "Test")
         c.removeProcessor(p)
-        c.dispatch("Test2")
+        c.dispatch(Test2)
         assert(c.model.s == "Test")
       }
       'Filter - {
         val c = circuit
         val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model],
+          override def process(dispatcher: Dispatcher, action: Action, next: Action => ActionResult[Model],
             currentModel: Model) = {
             action match {
               case SetS(_) =>
@@ -335,7 +333,7 @@ object CircuitTests extends TestSuite {
         val c = circuit
         var log = "log"
         val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model],
+          override def process(dispatcher: Dispatcher, action: Action, next: Action => ActionResult[Model],
             currentModel: Model) = {
             next(action) match {
               case m: ModelUpdated[Model@unchecked] =>
@@ -352,9 +350,9 @@ object CircuitTests extends TestSuite {
       'Delay - {
         val c = circuit
         class AP extends ActionProcessor[Model] {
-          val pending = mutable.Queue.empty[(AnyRef, Dispatcher)]
+          val pending = mutable.Queue.empty[(Action, Dispatcher)]
 
-          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model],
+          override def process(dispatcher: Dispatcher, action: Action, next: Action => ActionResult[Model],
             currentModel: Model) = {
             action match {
               case Delay(a) =>

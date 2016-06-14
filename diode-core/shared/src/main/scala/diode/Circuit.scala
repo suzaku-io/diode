@@ -4,13 +4,13 @@ import scala.collection.immutable.Queue
 import scala.language.higherKinds
 
 trait Dispatcher {
-  def dispatch(action: AnyRef): Unit
+  def dispatch(action: Action): Unit
 
-  def apply(action: AnyRef) = dispatch(action)
+  def apply(action: Action) = dispatch(action)
 }
 
 trait ActionProcessor[M <: AnyRef] {
-  def process(dispatch: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M], currentModel: M): ActionResult[M]
+  def process(dispatch: Dispatcher, action: Action, next: Action => ActionResult[M], currentModel: M): ActionResult[M]
 }
 
 sealed trait ActionResult[+M] {
@@ -53,9 +53,17 @@ object ActionResult {
   }
 }
 
+trait Action
+/**
+  * dispatch all actions in the sequence using internal dispatchBase to prevent
+  * additional calls to subscribed listeners
+  */
+case class ActionSeq(actions: Seq[Action]) extends Action
+case object Noop extends Action
+
 trait Circuit[M <: AnyRef] extends Dispatcher {
 
-  type HandlerFunction = (M, AnyRef) => Option[ActionResult[M]]
+  type HandlerFunction = (M, Action) => Option[ActionResult[M]]
 
   private case class Subscription[T](listener: ModelR[M, T] => Unit, cursor: ModelR[M, T], lastValue: T) {
     def changed: Option[Subscription[T]] = {
@@ -84,7 +92,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
 
   private val modelRW = new RootModelRW[M](model)
   private var isDispatching = false
-  private var dispatchQueue = Queue.empty[AnyRef]
+  private var dispatchQueue = Queue.empty[Action]
   private var listenerId = 0
   private var listeners = Map.empty[Int, Subscription[_]]
   private var processors = List.empty[ActionProcessor[M]]
@@ -93,21 +101,17 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   private def buildProcessChain = {
     // chain processing functions
     processors.reverse.foldLeft(process _)((next, processor) =>
-      (action: AnyRef) => processor.process(this, action, next, model)
+      (action: Action) => processor.process(this, action, next, model)
     )
   }
 
-  private def baseHandler(action: AnyRef) = action match {
-    case seq: Seq[_] =>
-      // dispatch all actions in the sequence using internal dispatchBase to prevent
-      // additional calls to subscribed listeners
-      seq.asInstanceOf[Seq[AnyRef]].foreach(dispatchBase)
+  private def baseHandler(action: Action) =
+    action match {
+    case ActionSeq(seq) =>
+      seq.foreach(dispatchBase)
       ActionResult.NoChange
-    case None =>
+    case Noop =>
       // ignore
-      ActionResult.NoChange
-    case a if a.getClass.getName.endsWith("$") =>
-      handleFatal(action, new IllegalArgumentException(s"Action $action was not handled by any action handler. It seems to be a singleton object, so please check that you have not accidentally dispatched a companion object instead of a case class."))
       ActionResult.NoChange
     case unknown =>
       handleError(s"Action $unknown was not handled by any action handler")
@@ -199,7 +203,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * @param action Action that caused the exception
     * @param e      Exception that was thrown
     */
-  def handleFatal(action: AnyRef, e: Throwable): Unit = throw e
+  def handleFatal(action: Action, e: Throwable): Unit = throw e
 
   /**
     * Handle a non-fatal error, such as dispatching an action with no action handler.
@@ -223,7 +227,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * @param action Action to be handled
     * @return
     */
-  private def process(action: AnyRef): ActionResult[M] = {
+  private def process(action: Action): ActionResult[M] = {
     actionHandler(model, action).getOrElse(baseHandler(action))
   }
 
@@ -277,7 +281,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     *
     * @param action Action to dispatch
     */
-  def dispatch(action: AnyRef): Unit = {
+  def dispatch(action: Action): Unit = {
     this.synchronized {
       if (!isDispatching) {
         try {
@@ -342,7 +346,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   /**
     * Perform actual dispatching, without calling change listeners
     */
-  protected def dispatchBase(action: AnyRef): Boolean = {
+  protected def dispatchBase(action: Action): Boolean = {
     try {
       processChain(action) match {
         case ActionResult.NoChange =>

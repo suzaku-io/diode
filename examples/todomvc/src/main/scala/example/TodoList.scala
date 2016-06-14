@@ -15,7 +15,7 @@ object TodoList {
   class Backend($: BackendScope[Props, State]) {
     def mounted(props: Props) = Callback {}
 
-    def handleNewTodoKeyDown(dispatch: AnyRef => Callback)(e: ReactKeyboardEventI): Option[Callback] = {
+    def handleNewTodoKeyDown(dispatch: diode.Action => Callback)(e: ReactKeyboardEventI): Option[Callback] = {
       val title = e.target.value.trim
       if (e.nativeEvent.keyCode == KeyCode.Enter && title.nonEmpty) {
         Some(Callback(e.target.value = "") >> dispatch(AddTodo(title)))
@@ -54,7 +54,7 @@ object TodoList {
       )
     }
 
-    def todoList(dispatch: AnyRef => Callback, editing: Option[TodoId], todos: Seq[Todo], activeCount: Int) =
+    def todoList(dispatch: diode.Action => Callback, editing: Option[TodoId], todos: Seq[Todo], activeCount: Int) =
       <.section(
         ^.className := "main",
         <.input.checkbox(
@@ -78,7 +78,7 @@ object TodoList {
         )
       )
 
-    def footer(p: Props, dispatch: AnyRef => Callback, currentFilter: TodoFilter, activeCount: Int, completedCount: Int): ReactElement =
+    def footer(p: Props, dispatch: diode.Action => Callback, currentFilter: TodoFilter, activeCount: Int, completedCount: Int): ReactElement =
       Footer(Footer.Props(
         filterLink = p.ctl.link,
         onSelectFilter = f => dispatch(SelectFilter(f)),

@@ -89,7 +89,7 @@ object PotActionTests extends TestSuite {
         val eff = ta.effect(Future {completed = !completed; 42})(_.toString)
 
         eff.toFuture.map { action =>
-          assert(action.potResult == Ready("42"))
+          assert(action.head.potResult == Ready("42"))
           assert(completed == true)
         }
       }
@@ -98,7 +98,7 @@ object PotActionTests extends TestSuite {
         val eff = ta.effect(Future {if (true) throw new Exception("Oh no!") else 42})(_.toString, ex => new Exception(ex.getMessage * 2))
 
         eff.toFuture.map { action =>
-          assert(action.potResult.exceptionOption.exists(_.getMessage == "Oh no!Oh no!"))
+          assert(action.head.potResult.exceptionOption.exists(_.getMessage == "Oh no!Oh no!"))
         }
       }
     }
@@ -119,7 +119,7 @@ object PotActionTests extends TestSuite {
             ???
         }
         nextAction.map {
-          case TestAction(value) if value.isReady =>
+          case List(TestAction(value)) if value.isReady =>
             assert(value.get == "42")
           case _ => assert(false)
         }
@@ -135,7 +135,7 @@ object PotActionTests extends TestSuite {
             ???
         }
         nextAction.map {
-          case TestAction(value) if value.isFailed =>
+          case List(TestAction(value)) if value.isFailed =>
             assert(value.exceptionOption.get.isInstanceOf[TimeoutException])
           case _ => assert(false)
         }
@@ -161,7 +161,7 @@ object PotActionTests extends TestSuite {
             ???
         }
         nextAction.map {
-          case TestActionRP(value, _) if value.isFailed =>
+          case List(TestActionRP(value, _)) if value.isFailed =>
             assert(value.exceptionOption.get.isInstanceOf[TimeoutException])
           case _ => assert(false)
         }
@@ -182,7 +182,7 @@ object PotActionTests extends TestSuite {
             ???
         }
         nextAction.map {
-          case TestCollAction(state, value) if state == PotState.PotReady =>
+          case List(TestCollAction(state, value)) if state == PotState.PotReady =>
             assert(value.get == Set(("A", Ready("42"))))
           case _ => assert(false)
         }

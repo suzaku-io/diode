@@ -47,9 +47,9 @@ case class Flower(rpm: Double, position: Point = Point(1, 0), override val scale
 }
 
 // Define actions
-case object Reset
+case object Reset extends Action
 
-case class AddAnimation(animation: Animation)
+case class AddAnimation(animation: Animation) extends Action
 
 case class UpdateAnimation(id: Int) extends RAFAction
 

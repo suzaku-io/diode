@@ -4,11 +4,11 @@ import diode._
 import org.scalajs.dom._
 
 // marker trait to identify actions that should be RAF batched
-trait RAFAction
+trait RAFAction extends Action
 
-private[example] final case class RAFWrapper(action: AnyRef, dispatch: Dispatcher)
+private[example] final case class RAFWrapper(action: Action, dispatch: Dispatcher) extends Action
 
-final case class RAFTimeStamp(time: Double)
+final case class RAFTimeStamp(time: Double) extends Action
 
 class RAFBatcher[M <: AnyRef] extends ActionProcessor[M] {
   private var batch = List.empty[RAFWrapper]
@@ -29,7 +29,7 @@ class RAFBatcher[M <: AnyRef] extends ActionProcessor[M] {
         // Precede actions with a time stamp action to get correct time in animations.
         // When dispatching a sequence, Circuit optimizes processing internally and only calls
         // listeners after all the actions are processed
-        dispatch(RAFTimeStamp(time) :: actions)
+        dispatch(ActionSeq((RAFTimeStamp(time) :: actions)))
       }
       // request next frame
       requestAnimationFrame
@@ -48,7 +48,7 @@ class RAFBatcher[M <: AnyRef] extends ActionProcessor[M] {
     }
   }
 
-  override def process(dispatch: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M], currentModel: M) = {
+  override def process(dispatch: Dispatcher, action: Action, next: Action => ActionResult[M], currentModel: M) = {
     action match {
       case rafAction: RAFAction =>
         // save action into the batch using a wrapper

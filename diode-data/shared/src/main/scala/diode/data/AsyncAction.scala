@@ -1,7 +1,7 @@
 package diode.data
 
 import diode.util.RetryPolicy
-import diode.{ActionHandler, ActionResult, Effect}
+import diode.{ActionHandler, ActionResult, Effect, Action}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success, Try}
@@ -22,7 +22,7 @@ import scala.util.{Failure, Success, Try}
   * @tparam A Type of action result
   * @tparam P Type of the actual action class
   */
-trait AsyncAction[A, P <: AsyncAction[A, P]] {
+trait AsyncAction[A, P <: AsyncAction[A, P]] extends Action {
   def state: PotState
 
   def result: Try[A]

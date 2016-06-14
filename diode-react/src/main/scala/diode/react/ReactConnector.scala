@@ -10,9 +10,10 @@ import scala.scalajs.js
   * Wraps a model reader, dispatcher and React connector to be passed to React components
   * in props.
   */
-case class ModelProxy[S](modelReader: ModelR[_, S], dispatch: AnyRef => Callback,
+case class ModelProxy[S](modelReader: ModelR[_, S], dispatch: Action => Callback,
   connector: ReactConnector[_ <: AnyRef]) {
   def value = modelReader()
+
 
   def apply() = modelReader()
 

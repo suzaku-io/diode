@@ -28,16 +28,16 @@ case class Tree(root: Directory, selected: Seq[String])
 case class RootModel(tree: Tree)
 
 // Define actions
-case class ReplaceTree(newTree: Directory)
+case class ReplaceTree(newTree: Directory) extends Action
 
 // path is defined by a sequence of identifiers
-case class AddNode(path: Seq[String], node: FileNode)
+case class AddNode(path: Seq[String], node: FileNode) extends Action
 
-case class RemoveNode(path: Seq[String])
+case class RemoveNode(path: Seq[String]) extends Action
 
-case class ReplaceNode(path: Seq[String], node: FileNode)
+case class ReplaceNode(path: Seq[String], node: FileNode) extends Action
 
-case class Select(selected: Seq[String])
+case class Select(selected: Seq[String]) extends Action
 
 /**
   * AppCircuit provides the actual instance of the `RootModel` and all the action
