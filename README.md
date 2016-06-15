@@ -180,10 +180,12 @@ demonstrating the use of React integration features and async operations.
 # Change history
 
 ### 0.6.0-SNAPSHOT
+- Actions are now type checked using a type class based mechanism (fixes #11)
+- Special `Seq` and `None` actions are replaced with `ActionBatch` and `NoAction` classes
 - Support for silent model changes that do not trigger listeners
-- Dispatcher now reports a special error if an unknown action is potentially a companion object (fixes #11)
 - Dispatcher supports nested dispatching and queues any dispatch requests received while dispatching a previous action
-- React Connector `connect` accepts an optional `key` for the React component it creates (fixes #17) 
+- React Connector `connect` accepts an optional `key` for the React component it creates (fixes #17)
+- React Connector updated to prevent unwanted remounting of components when a model change is triggered
 - Fixed `map`, `flatMap` and `flatten` in `Pot` to return a correct type of `Pot` instead of Empty/Ready
 - Added `ModelRO[S]` trait (for "read-only") to abstract reader functionality that does not need to know about the
   base model type. Can be used to replace types of `ModelR[_, S]`
