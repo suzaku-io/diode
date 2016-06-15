@@ -6,7 +6,7 @@ import org.scalajs.dom._
 // marker trait to identify actions that should be RAF batched
 trait RAFAction extends Action
 
-private[example] final case class RAFWrapper(action: AnyRef, dispatch: Dispatcher) extends Action
+private[example] final case class RAFWrapper(action: Any, dispatch: Dispatcher) extends Action
 
 final case class RAFTimeStamp(time: Double) extends Action
 
@@ -48,7 +48,7 @@ class RAFBatcher[M <: AnyRef] extends ActionProcessor[M] {
     }
   }
 
-  override def process(dispatch: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M], currentModel: M) = {
+  override def process(dispatch: Dispatcher, action: Any, next: Any => ActionResult[M], currentModel: M) = {
     action match {
       case rafAction: RAFAction =>
         // save action into the batch using a wrapper

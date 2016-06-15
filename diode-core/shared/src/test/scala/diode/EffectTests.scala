@@ -9,7 +9,7 @@ import scala.concurrent._
 import scala.concurrent.duration._
 
 object EffectTests extends TestSuite {
-  import AnyRefAction._
+  import AnyAction._
 
   def tests = TestSuite {
     def efA = Effect(Future("A"))

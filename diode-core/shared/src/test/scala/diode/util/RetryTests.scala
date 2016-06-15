@@ -1,6 +1,6 @@
 package diode.util
 
-import diode.{AnyRefAction, Effect}
+import diode.{AnyAction, Effect}
 import utest._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 import diode.Implicits.runAfterImpl
 
 object RetryTests extends TestSuite {
-  import AnyRefAction._
+  import AnyAction._
 
   def tests = TestSuite {
     'Immediate - {

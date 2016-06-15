@@ -2,13 +2,13 @@
 package object diode {
 
   /**
-    * Provides a type class instance of ActionType for AnyRef, allowing you to dispatch anything as an action.
+    * Provides a type class instance of ActionType for Any, allowing you to dispatch anything as an action.
     *
-    * Bring to scope with `import diode.AnyRefAction._`
+    * Bring to scope with `import diode.AnyAction._`
     */
-  object AnyRefAction {
+  object AnyAction {
 
-    implicit object aType extends ActionType[AnyRef]
+    implicit object aType extends ActionType[Any]
 
   }
 }

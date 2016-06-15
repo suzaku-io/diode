@@ -22,7 +22,7 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
   /**
     * Handles the incoming action by updating current model and calling the real `handle` function
     */
-  def handleAction(model: M, action: AnyRef): Option[ActionResult[M]] = {
+  def handleAction(model: M, action: Any): Option[ActionResult[M]] = {
     currentModel = model
     liftedHandler(action)
   }
@@ -30,7 +30,7 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
   /**
     * Override this function to handle dispatched actions.
     */
-  protected def handle: PartialFunction[AnyRef, ActionResult[M]]
+  protected def handle: PartialFunction[Any, ActionResult[M]]
 
   /**
     * Helper function that returns the current value from the model.
@@ -100,11 +100,11 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
     * @param delay How much to delay the effect.
     * @param f     Result of the effect
     */
-  def runAfter[A <: AnyRef : ActionType](delay: FiniteDuration)(f: => A)(implicit runner: RunAfter, ec: ExecutionContext): Effect =
+  def runAfter[A : ActionType](delay: FiniteDuration)(f: => A)(implicit runner: RunAfter, ec: ExecutionContext): Effect =
     Effect(runner.runAfter(delay)(f))
 }
 
 object ActionHandler {
-  implicit def extractHandler[M <: AnyRef](actionHandler: ActionHandler[M, _]): (M, AnyRef) => Option[ActionResult[M]] =
+  implicit def extractHandler[M <: AnyRef](actionHandler: ActionHandler[M, _]): (M, Any) => Option[ActionResult[M]] =
     actionHandler.handleAction
 }

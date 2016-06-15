@@ -14,7 +14,7 @@ trait Effect {
     * @param dispatch Function to dispatch the effect result with.
     * @return A future that completes when the effect completes.
     */
-  def run(dispatch: AnyRef => Unit): Future[Unit]
+  def run(dispatch: Any => Unit): Future[Unit]
 
   /**
     * Combines two effects so that will be run in parallel.
@@ -37,9 +37,9 @@ trait Effect {
   def size: Int
 
   /**
-    * Runs the effect function and returns its value (a Future[AnyRef])
+    * Runs the effect function and returns its value (a Future[Any])
     */
-  def toFuture: Future[AnyRef]
+  def toFuture: Future[Any]
 
   /**
     * Delays the execution of this effect by duration `delay`
@@ -51,7 +51,7 @@ trait Effect {
     * this effect. If this effect is completed with an exception then the new
     * effect will also contain this exception.
     */
-  def map[B <: AnyRef : ActionType](g: AnyRef => B): Effect
+  def map[B : ActionType](g: Any => B): Effect
 
   /**
     * Creates a new effect by applying a function to the successful result of
@@ -59,7 +59,7 @@ trait Effect {
     * If this effect is completed with an exception then the new
     * effect will also contain this exception.
     */
-  def flatMap[B <: AnyRef : ActionType](g: AnyRef => Future[B]): Effect
+  def flatMap[B : ActionType](g: Any => Future[B]): Effect
 
   def ec: ExecutionContext
 }
@@ -78,17 +78,17 @@ abstract class EffectBase(val ec: ExecutionContext) extends Effect {
     private def executeWith[A](f: Effect => Future[A]): Future[A] =
       runner.runAfter(delay)(()).flatMap(_ => f(self))(ec)
 
-    override def run(dispatch: (AnyRef) => Unit) =
+    override def run(dispatch: (Any) => Unit) =
       executeWith(_.run(dispatch))
 
     override def toFuture =
       executeWith(_.toFuture)
   }
 
-  override def map[B <: AnyRef : ActionType](g: AnyRef => B): Effect =
+  override def map[B : ActionType](g: Any => B): Effect =
     new EffectSingle(() => toFuture.map(g)(ec), ec)
 
-  override def flatMap[B <: AnyRef : ActionType](g: AnyRef => Future[B]): Effect =
+  override def flatMap[B : ActionType](g: Any => Future[B]): Effect =
     new EffectSingle(() => toFuture.flatMap(g)(ec), ec)
 }
 
@@ -98,8 +98,8 @@ abstract class EffectBase(val ec: ExecutionContext) extends Effect {
   *
   * @param f The effect function, returning a `Future[A]`
   */
-class EffectSingle[A <: AnyRef] private[diode] (f: () => Future[A], ec: ExecutionContext) extends EffectBase(ec) {
-  override def run(dispatch: AnyRef => Unit) = f().map(dispatch)(ec)
+class EffectSingle[A] private[diode] (f: () => Future[A], ec: ExecutionContext) extends EffectBase(ec) {
+  override def run(dispatch: Any => Unit) = f().map(dispatch)(ec)
 
   override def toFuture = f()
 }
@@ -115,7 +115,7 @@ class EffectSeq(head: Effect, tail: Seq[Effect], ec: ExecutionContext) extends E
   private def executeWith[A](f: Effect => Future[A]): Future[A] =
     tail.foldLeft(f(head)) { (prev, effect) => prev.flatMap(_ => f(effect))(ec) }
 
-  override def run(dispatch: AnyRef => Unit) =
+  override def run(dispatch: Any => Unit) =
     executeWith(_.run(dispatch))
 
   override def >>(that: Effect) =
@@ -130,10 +130,10 @@ class EffectSeq(head: Effect, tail: Seq[Effect], ec: ExecutionContext) extends E
   override def toFuture =
     executeWith(_.toFuture)
 
-  override def map[B <: AnyRef : ActionType](g: AnyRef => B) =
+  override def map[B : ActionType](g: Any => B) =
     new EffectSeq(head.map(g), tail.map(_.map(g)), ec)
 
-  override def flatMap[B <: AnyRef : ActionType](g: AnyRef => Future[B]) =
+  override def flatMap[B : ActionType](g: Any => Future[B]) =
     new EffectSeq(head.flatMap(g), tail.map(_.flatMap(g)), ec)
 }
 
@@ -147,7 +147,7 @@ class EffectSet(head: Effect, tail: Set[Effect], ec: ExecutionContext) extends E
   private def executeWith[A](f: Effect => Future[A]): Future[Set[A]] =
     Future.traverse(tail + head)(f(_))(implicitly[CanBuildFrom[Set[Effect], A, Set[A]]], ec)
 
-  override def run(dispatch: AnyRef => Unit) =
+  override def run(dispatch: Any => Unit) =
     executeWith(_.run(dispatch)).map(_ => ())(ec)
 
   override def +(that: Effect) =
@@ -159,25 +159,25 @@ class EffectSet(head: Effect, tail: Set[Effect], ec: ExecutionContext) extends E
   override def toFuture =
     executeWith(_.toFuture)
 
-  override def map[B <: AnyRef : ActionType](g: AnyRef => B) =
+  override def map[B : ActionType](g: Any => B) =
     new EffectSet(head.map(g), tail.map(_.map(g)), ec)
 
-  override def flatMap[B <: AnyRef : ActionType](g: AnyRef => Future[B]) =
+  override def flatMap[B : ActionType](g: Any => Future[B]) =
     new EffectSet(head.flatMap(g), tail.map(_.flatMap(g)), ec)
 }
 
 object Effect {
   type EffectF[A] = () => Future[A]
 
-  def apply[A <: AnyRef : ActionType](f: => Future[A])(implicit ec: ExecutionContext): EffectSingle[A] =
+  def apply[A : ActionType](f: => Future[A])(implicit ec: ExecutionContext): EffectSingle[A] =
     new EffectSingle(f _, ec)
 
   /**
     * Converts a lazy action value into an effect. Typically used in combination with other effects or
     * with `after` to delay execution.
     */
-  def action[A <: AnyRef : ActionType](action: => A)(implicit ec: ExecutionContext): EffectSingle[A] =
+  def action[A : ActionType](action: => A)(implicit ec: ExecutionContext): EffectSingle[A] =
     new EffectSingle(() => Future.successful(action), ec)
 
-  implicit def f2effect[A <: AnyRef : ActionType](f: EffectF[A])(implicit ec: ExecutionContext): EffectSingle[A] = new EffectSingle(f, ec)
+  implicit def f2effect[A : ActionType](f: EffectF[A])(implicit ec: ExecutionContext): EffectSingle[A] = new EffectSingle(f, ec)
 }

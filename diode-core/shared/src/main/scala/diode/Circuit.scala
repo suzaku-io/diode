@@ -14,9 +14,9 @@ import scala.language.higherKinds
 trait ActionType[-A]
 
 trait Dispatcher {
-  def dispatch[A <: AnyRef : ActionType](action: A): Unit
+  def dispatch[A : ActionType](action: A): Unit
 
-  def apply[A <: AnyRef : ActionType](action: A) = dispatch(action)
+  def apply[A : ActionType](action: A) = dispatch(action)
 }
 
 /**
@@ -35,11 +35,11 @@ object Action {
   *
   * @param actions Sequence of actions to dispatch
   */
-class ActionBatch private(val actions: Seq[AnyRef]) extends Action {
-  def :+[A <: AnyRef : ActionType](action: A): ActionBatch =
+class ActionBatch private(val actions: Seq[Any]) extends Action {
+  def :+[A : ActionType](action: A): ActionBatch =
     new ActionBatch(actions :+ action)
 
-  def +:[A <: AnyRef : ActionType](action: A) =
+  def +:[A : ActionType](action: A) =
     new ActionBatch(action +: actions)
 
   def ++(batch: ActionBatch) =
@@ -47,7 +47,7 @@ class ActionBatch private(val actions: Seq[AnyRef]) extends Action {
 }
 
 object ActionBatch {
-  def apply[A <: AnyRef : ActionType](actions: A*): ActionBatch = new ActionBatch(actions)
+  def apply[A : ActionType](actions: A*): ActionBatch = new ActionBatch(actions)
 }
 
 /**
@@ -56,7 +56,7 @@ object ActionBatch {
 case object NoAction extends Action
 
 trait ActionProcessor[M <: AnyRef] {
-  def process(dispatch: Dispatcher, action: AnyRef, next: AnyRef => ActionResult[M], currentModel: M): ActionResult[M]
+  def process(dispatch: Dispatcher, action: Any, next: Any => ActionResult[M], currentModel: M): ActionResult[M]
 }
 
 sealed trait ActionResult[+M] {
@@ -101,7 +101,7 @@ object ActionResult {
 
 trait Circuit[M <: AnyRef] extends Dispatcher {
 
-  type HandlerFunction = (M, AnyRef) => Option[ActionResult[M]]
+  type HandlerFunction = (M, Any) => Option[ActionResult[M]]
 
   private case class Subscription[T](listener: ModelR[M, T] => Unit, cursor: ModelR[M, T], lastValue: T) {
     def changed: Option[Subscription[T]] = {
@@ -130,7 +130,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
 
   private val modelRW = new RootModelRW[M](model)
   private var isDispatching = false
-  private var dispatchQueue = Queue.empty[AnyRef]
+  private var dispatchQueue = Queue.empty[Any]
   private var listenerId = 0
   private var listeners = Map.empty[Int, Subscription[_]]
   private var processors = List.empty[ActionProcessor[M]]
@@ -139,11 +139,11 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   private def buildProcessChain = {
     // chain processing functions
     processors.reverse.foldLeft(process _)((next, processor) =>
-      (action: AnyRef) => processor.process(this, action, next, model)
+      (action: Any) => processor.process(this, action, next, model)
     )
   }
 
-  private def baseHandler(action: AnyRef) = action match {
+  private def baseHandler(action: Any) = action match {
     case batch: ActionBatch =>
       // dispatch all actions in the sequence using internal dispatchBase to prevent
       // additional calls to subscribed listeners
@@ -242,7 +242,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * @param action Action that caused the exception
     * @param e      Exception that was thrown
     */
-  def handleFatal(action: AnyRef, e: Throwable): Unit = throw e
+  def handleFatal(action: Any, e: Throwable): Unit = throw e
 
   /**
     * Handle a non-fatal error, such as dispatching an action with no action handler.
@@ -266,7 +266,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * @param action Action to be handled
     * @return
     */
-  private def process(action: AnyRef): ActionResult[M] = {
+  private def process(action: Any): ActionResult[M] = {
     actionHandler(model, action).getOrElse(baseHandler(action))
   }
 
@@ -319,7 +319,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     *
     * @param action Action to dispatch
     */
-  def dispatch[A <: AnyRef : ActionType](action: A): Unit = {
+  def dispatch[A : ActionType](action: A): Unit = {
     this.synchronized {
       if (!isDispatching) {
         try {
@@ -373,8 +373,8 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   /**
     * Perform actual dispatching, without calling change listeners
     */
-  protected def dispatchBase[A <: AnyRef](action: A): Boolean = {
-    import AnyRefAction._
+  protected def dispatchBase[A](action: A): Boolean = {
+    import AnyAction._
     try {
       processChain(action) match {
         case ActionResult.NoChange =>

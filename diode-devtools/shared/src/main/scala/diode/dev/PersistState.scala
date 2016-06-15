@@ -29,7 +29,7 @@ abstract class PersistState[M <: AnyRef, P] extends ActionProcessor[M] {
 
   private implicit object LoadedActionType extends ActionType[Loaded]
 
-  override def process(dispatch: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M], currentModel: M) = {
+  override def process(dispatch: Dispatcher, action: Any, next: Any => ActionResult[M], currentModel: M) = {
     action match {
       case Save(id) =>
         // pickle and save

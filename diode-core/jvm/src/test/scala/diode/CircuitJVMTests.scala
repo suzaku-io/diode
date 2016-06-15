@@ -8,7 +8,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object CircuitJVMTests extends TestSuite {
 
-  implicit object AnyRefAction extends ActionType[AnyRef]
+  implicit object AnyAction extends ActionType[Any]
 
   case class Model(list: Vector[Int])
 
@@ -19,7 +19,7 @@ object CircuitJVMTests extends TestSuite {
 
   case class Filter(f: Int => Boolean)
 
-  case class RunEffects[A <: AnyRef](effects: Seq[Effect], parallel: Boolean = false)
+  case class RunEffects(effects: Seq[Effect], parallel: Boolean = false)
 
   class TestCircuit(implicit ec: ExecutionContext) extends Circuit[Model] {
     import diode.ActionResult._
@@ -36,7 +36,7 @@ object CircuitJVMTests extends TestSuite {
           ModelUpdateEffect(model, effects.reduce(_ + _))
         else
           ModelUpdateEffect(model, effects.reduce(_ >> _))
-    }: PartialFunction[AnyRef, ActionResult[Model]]).lift.apply(action)
+    }: PartialFunction[Any, ActionResult[Model]]).lift.apply(action)
   }
 
   def tests = TestSuite {

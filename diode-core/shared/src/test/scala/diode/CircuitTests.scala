@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object CircuitTests extends TestSuite {
 
-  import AnyRefAction._
+  import AnyAction._
 
   // model
   case class Model(s: String, data: Data)
@@ -27,7 +27,7 @@ object CircuitTests extends TestSuite {
 
   case class SetEffectOnly(effect: () => Future[AnyRef])
 
-  case class Delay(action: AnyRef)
+  case class Delay(action: Any)
 
   case class ThrowAction(ex: Throwable)
 
@@ -48,12 +48,12 @@ object CircuitTests extends TestSuite {
         ModelUpdateEffect(model.copy(s = s), Effect(effect()) + effect)
       case ThrowAction(ex) =>
         throw ex
-    }: PartialFunction[AnyRef, ActionResult[Model]]).lift.apply(action)
+    }: PartialFunction[Any, ActionResult[Model]]).lift.apply(action)
 
-    var lastFatal: (AnyRef, Throwable) = ("", null)
+    var lastFatal: (Any, Throwable) = ("", null)
     var lastError = ""
 
-    override def handleFatal(action: AnyRef, e: Throwable): Unit = lastFatal = (action, e)
+    override def handleFatal(action: Any, e: Throwable): Unit = lastFatal = (action, e)
     override def handleError(msg: String): Unit = lastError = msg
   }
 
@@ -301,7 +301,7 @@ object CircuitTests extends TestSuite {
       'ModAction - {
         val c = circuit
         val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model],
+          override def process(dispatcher: Dispatcher, action: Any, next: Any => ActionResult[Model],
             currentModel: Model) = {
             next(action match {
               case s: String =>
@@ -320,7 +320,7 @@ object CircuitTests extends TestSuite {
       'Filter - {
         val c = circuit
         val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model],
+          override def process(dispatcher: Dispatcher, action: Any, next: Any => ActionResult[Model],
             currentModel: Model) = {
             action match {
               case SetS(_) =>
@@ -337,7 +337,7 @@ object CircuitTests extends TestSuite {
         val c = circuit
         var log = "log"
         val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model],
+          override def process(dispatcher: Dispatcher, action: Any, next: Any => ActionResult[Model],
             currentModel: Model) = {
             next(action) match {
               case m: ModelUpdated[Model@unchecked] =>
@@ -354,9 +354,9 @@ object CircuitTests extends TestSuite {
       'Delay - {
         val c = circuit
         class AP extends ActionProcessor[Model] {
-          val pending = mutable.Queue.empty[(AnyRef, Dispatcher)]
+          val pending = mutable.Queue.empty[(Any, Dispatcher)]
 
-          override def process(dispatcher: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[Model],
+          override def process(dispatcher: Dispatcher, action: Any, next: Any => ActionResult[Model],
             currentModel: Model) = {
             action match {
               case Delay(a) =>
