@@ -13,7 +13,7 @@ To define an action processor, create a class extending the `ActionProcessor[M]`
 ```scala
 class LoggingProcessor[M] extends ActionProcessor[M] {
   var log = Vector.empty[(Long, String)]
-  def process(dispatch: Dispatcher, action: AnyRef, next: (AnyRef) => ActionResult[M]): ActionResult[M] = {
+  def process(dispatch: Dispatcher, action: AnyRef, next: AnyRef => ActionResult[M]): ActionResult[M] = {
     // log the action
     log = log :+ (System.currentTimeMillis(), action.toString)
     // call the next processor

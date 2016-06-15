@@ -9,7 +9,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 object CircuitTests extends TestSuite {
 
-  implicit object AnyRefAction extends ActionType[AnyRef]
+  import AnyRefAction._
 
   // model
   case class Model(s: String, data: Data)

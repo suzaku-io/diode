@@ -61,11 +61,13 @@ case class RootModel(tree: Tree)
 And some actions, too!
 
 ```scala
-case class ReplaceTree(newTree: Directory)
-case class AddNode(path: Seq[String], node: FileNode)
-case class RemoveNode(path: Seq[String])
-case class ReplaceNode(path: Seq[String], node: FileNode)
-case class Select(selected: Seq[String])
+trait Action
+
+case class ReplaceTree(newTree: Directory) extends Action
+case class AddNode(path: Seq[String], node: FileNode) extends Action
+case class RemoveNode(path: Seq[String]) extends Action
+case class ReplaceNode(path: Seq[String], node: FileNode) extends Action
+case class Select(selected: Seq[String]) extends Action
 ```
 
 ### Writing an Action Handler
