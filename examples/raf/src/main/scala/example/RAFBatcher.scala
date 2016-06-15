@@ -4,19 +4,15 @@ import diode._
 import org.scalajs.dom._
 
 // marker trait to identify actions that should be RAF batched
-trait RAFAction
+trait RAFAction extends Action
 
-private[example] final case class RAFWrapper(action: AnyRef, dispatch: Dispatcher)
+private[example] final case class RAFWrapper(action: AnyRef, dispatch: Dispatcher) extends Action
 
-final case class RAFTimeStamp(time: Double)
+final case class RAFTimeStamp(time: Double) extends Action
 
 class RAFBatcher[M <: AnyRef] extends ActionProcessor[M] {
   private var batch = List.empty[RAFWrapper]
   private var frameRequested = false
-
-  implicit object RAFWrapperType extends ActionType[RAFWrapper]
-
-  implicit object RAFTimeStampType extends ActionType[RAFTimeStamp]
 
   /**
     * Callback for RAF.

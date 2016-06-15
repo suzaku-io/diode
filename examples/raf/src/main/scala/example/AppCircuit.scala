@@ -47,12 +47,6 @@ case class Flower(rpm: Double, position: Point = Point(1, 0), override val scale
 }
 
 // Define actions
-sealed trait Action
-
-object Action {
-  implicit object AType extends ActionType[Action]
-}
-
 case object Reset extends Action
 
 case class AddAnimation(animation: Animation) extends Action

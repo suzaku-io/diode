@@ -20,11 +20,22 @@ trait Dispatcher {
 }
 
 /**
+  * Base trait for actions. Use this as a basis for your action class hierarchy to get an automatic
+  * type class instance of `ActionType[Action]`. Note that this trait is just a helper, you don't need
+  * to use it for your actions as you can always define your own `ActionType` instances for your action types.
+  */
+trait Action
+
+object Action {
+  implicit object aType extends ActionType[Action]
+}
+
+/**
   * A batch of actions. These actions are dispatched in a batch, without calling listeners in-between the dispatches.
   *
   * @param actions Sequence of actions to dispatch
   */
-class ActionBatch private(val actions: Seq[AnyRef]) {
+class ActionBatch private(val actions: Seq[AnyRef]) extends Action {
   def :+[A <: AnyRef : ActionType](action: A): ActionBatch =
     new ActionBatch(actions :+ action)
 
@@ -37,19 +48,12 @@ class ActionBatch private(val actions: Seq[AnyRef]) {
 
 object ActionBatch {
   def apply[A <: AnyRef : ActionType](actions: A*): ActionBatch = new ActionBatch(actions)
-
-  implicit object ActionBatchType extends ActionType[ActionBatch]
-
 }
 
 /**
   * Use `NoAction` when you need to dispatch an action that does nothing
   */
-case object NoAction {
-
-  implicit object NoActionType extends ActionType[NoAction.type]
-
-}
+case object NoAction extends Action
 
 trait ActionProcessor[M <: AnyRef] {
   def process(dispatch: Dispatcher, action: AnyRef, next: AnyRef => ActionResult[M], currentModel: M): ActionResult[M]

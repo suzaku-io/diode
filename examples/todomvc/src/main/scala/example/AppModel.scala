@@ -2,7 +2,7 @@ package example
 
 import java.util.UUID
 
-import diode.ActionType
+import diode.Action
 
 // Define our application model
 case class AppModel(todos: Todos)
@@ -31,12 +31,6 @@ object TodoFilter {
 }
 
 // define actions
-sealed trait Action
-
-object Action {
-  implicit object AType extends ActionType[Action]
-}
-
 case object InitTodos extends Action
 
 case class AddTodo(title: String) extends Action

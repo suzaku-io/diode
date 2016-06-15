@@ -10,8 +10,6 @@ Actions are very much application specific but can generally be classified into 
 below, always changing the same part of the model.
 
 ```scala
-trait Action
-
 case class Increase(amount: Int) extends Action
 case class Decrease(amount: Int) extends Action
 case object Reset extends Action
@@ -50,7 +48,10 @@ object Action {
 }
 ```
 
-If you want to forgo type safety, you can import the provided `AnyRefAction` implicit, which allows `AnyRef` to be used as action.
+To make your life easier, Diode provides such a base trait by default so you can start using it right away!
+
+If you want to forgo type safety altogether, you can import the provided `AnyRefAction` implicit, which allows `AnyRef` to be used as action. This can be used
+for adapting legacy Diode code to a new version.
 
 ```scala
 import diode.AnyRefAction._

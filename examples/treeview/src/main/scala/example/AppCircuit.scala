@@ -28,12 +28,6 @@ case class Tree(root: Directory, selected: Seq[String])
 case class RootModel(tree: Tree)
 
 // Define actions
-sealed trait Action
-
-object Action {
-  implicit object AType extends ActionType[Action]
-}
-
 case class ReplaceTree(newTree: Directory) extends Action
 
 // path is defined by a sequence of identifiers

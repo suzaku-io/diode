@@ -1,6 +1,7 @@
 package example
 
 import diode.react.ModelProxy
+import diode.Action
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router._
 import japgolly.scalajs.react.vdom.prefix_<^._

@@ -6,12 +6,6 @@ import diode._
 case class RootModel(counter: Int)
 
 // Define actions
-sealed trait Action
-
-object Action {
-  implicit object AType extends ActionType[Action]
-}
-
 case class Increase(amount: Int) extends Action
 
 case class Decrease(amount: Int) extends Action
