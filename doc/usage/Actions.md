@@ -55,3 +55,12 @@ If you want to forgo type safety, you can import the provided `AnyRefAction` imp
 ```scala
 import diode.AnyRefAction._
 ```
+
+## Special actions
+
+Diode defines two special actions: `ActionBatch` and `NoAction`.
+
+Use `ActionBatch` to create a batch of actions that are dispatched in sequence without calling any model update listeners in between. This can be used as an
+optimization.
+
+`NoAction`, as its name implies, performs no action and can be used as a result in purely side-effecting Effects.

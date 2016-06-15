@@ -16,7 +16,8 @@ In an Effect we _describe_ a computation instead of directly _executing_ it. It'
 Scalaz/Haskell, containing a function that returns a `Future[AnyRef]`.
 
 The action returned by the `Future` is automatically dispatched by the Circuit. If your effect doesn't need anything
-dispatched, return a `None`.
+dispatched, return a `NoAction`. The same type checking rules apply to Effects as to normal action dispatching, so the type returned by your effect must have
+a valid `ActionType` type class implicitly available.
 
 ### Using Effects
 
@@ -25,7 +26,7 @@ To create an effect you need a function that runs something asynchronously, for 
 ```scala
 import org.scalajs.dom.ext.Ajax
 
-case class NewMessages(msgs: String)
+case class NewMessages(msgs: String) extends Action
 
 def loadMessagesEffect(user: String) = 
   Effect(Ajax.get(s"/user/messages?id=$user").map(r => NewMessages(r.responseText)))
