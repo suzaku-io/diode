@@ -21,8 +21,8 @@ val commonSettings = Seq(
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard",
     "-Xfuture"),
-  scalacOptions in Compile ~= (_ filterNot (_ == "-Ywarn-value-discard")),
-  scalacOptions in (Compile, doc) ~= (_ filterNot (_ == "-Xfatal-warnings")),
+  scalacOptions in Compile -= "-Ywarn-value-discard",
+  scalacOptions in (Compile, doc) -= "-Xfatal-warnings",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
     "com.lihaoyi" %%% "utest" % "0.4.3" % "test"
@@ -89,7 +89,8 @@ lazy val diodeCore = crossProject.in(file("diode-core"))
   )
   .jsSettings(
     scalacOptions ++= sourceMapSetting.value,
-    scalaJSStage in Global := FastOptStage)
+    scalaJSUseRhino in Global := false
+  )
   .jvmSettings()
 
 lazy val diodeCoreJS = diodeCore.js
@@ -104,7 +105,8 @@ lazy val diodeData = crossProject.in(file("diode-data"))
   )
   .jsSettings(
     scalacOptions ++= sourceMapSetting.value,
-    scalaJSStage in Global := FastOptStage)
+    scalaJSUseRhino in Global := false
+  )
   .jvmSettings()
   .dependsOn(diodeCore)
 
@@ -134,7 +136,8 @@ lazy val diodeDevtools = crossProject.in(file("diode-devtools"))
     libraryDependencies ++= Seq(
       "org.scala-js" %%% "scalajs-dom" % "0.9.0"
     ),
-    scalacOptions ++= sourceMapSetting.value
+    scalacOptions ++= sourceMapSetting.value,
+    scalaJSUseRhino in Global := false
   )
   .jvmSettings()
   .dependsOn(diodeCore)
@@ -149,11 +152,9 @@ lazy val diodeReact = project.in(file("diode-react"))
   .settings(
     name := "diode-react",
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "core" % "0.10.4"
+      "com.github.japgolly.scalajs-react" %%% "core" % "0.11.1"
     ),
-    // use PhantomJS for testing, because we need real browser JS stuff
-    scalaJSStage in Global := FastOptStage,
-    jsDependencies += RuntimeDOM,
+    scalaJSUseRhino in Global := false,
     scalacOptions ++= sourceMapSetting.value
   )
   .dependsOn(diodeJS)

@@ -66,9 +66,9 @@ object CircuitTests extends TestSuite {
         c.dispatch(SetS("New"))
         assert(c.model.s == "New")
       }
-      'None - {
+      'NoAction - {
         val c = circuit
-        c.dispatch(None)
+        c.dispatch(NoAction)
         assert(c.model.s == "Testing")
       }
       'Unknown - {
@@ -77,9 +77,9 @@ object CircuitTests extends TestSuite {
         assert(c.model.s == "Testing")
         assert(c.lastError.contains("not handled"))
       }
-      'ActionSeq - {
+      'ActionBatch - {
         val c = circuit
-        c.dispatch(Seq(SetS("First"), SetD(Data(43, false))))
+        c.dispatch(ActionBatch(SetS("First"), SetD(Data(43, false))))
         assert(c.model.s == "First")
         assert(c.model.data.i == 43)
         assert(c.model.data.b == false)
@@ -89,7 +89,7 @@ object CircuitTests extends TestSuite {
         case class TestMissing(i: Int)
 
         c.dispatch(TestMissing)
-        assert(c.lastFatal._2.isInstanceOf[IllegalArgumentException])
+        assert(c.lastError.isEmpty == false)
       }
       'ErrorInHandler - {
         val c = circuit
@@ -127,7 +127,7 @@ object CircuitTests extends TestSuite {
         assert(state.s == "Listen")
         assert(callbackCount == 1)
         // sequence of actions causes only a single callback
-        c.dispatch(Seq(SetS("Listen1"), SetS("Listen2"), SetS("Listen3"), SetS("Listen4")))
+        c.dispatch(ActionBatch(SetS("Listen1"), SetS("Listen2"), SetS("Listen3"), SetS("Listen4")))
         assert(state.s == "Listen4")
         assert(callbackCount == 2)
         unsubscribe()

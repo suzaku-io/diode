@@ -19,8 +19,8 @@ val diodeVersion = "0.6.0-SNAPSHOT"
 
 libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "0.9.0",
-  "com.github.japgolly.scalajs-react" %%% "core" % "0.10.4",
-  "com.github.japgolly.scalajs-react" %%% "extra" % "0.10.4",
+  "com.github.japgolly.scalajs-react" %%% "core" % "0.11.1",
+  "com.github.japgolly.scalajs-react" %%% "extra" % "0.11.1",
   "me.chrons" %%% "diode" % diodeVersion,
   "me.chrons" %%% "diode-devtools" % diodeVersion,
   "me.chrons" %%% "diode-react" % diodeVersion,
@@ -28,6 +28,6 @@ libraryDependencies ++= Seq(
 )
 
 jsDependencies ++= Seq(
-  "org.webjars.bower" % "react" % "0.14.7" / "react-with-addons.js" commonJSName "React" minified "react-with-addons.min.js",
-  "org.webjars.bower" % "react" % "0.14.7" / "react-dom.js" commonJSName "ReactDOM" minified "react-dom.min.js" dependsOn "react-with-addons.js"
+  "org.webjars.bower" % "react" % "15.1.0" / "react-with-addons.js" commonJSName "React" minified "react-with-addons.min.js",
+  "org.webjars.bower" % "react" % "15.1.0" / "react-dom.js" commonJSName "ReactDOM" minified "react-dom.min.js" dependsOn "react-with-addons.js"
 )

@@ -21,9 +21,10 @@ trait Dispatcher {
 
 /**
   * A batch of actions. These actions are dispatched in a batch, without calling listeners in-between the dispatches.
+  *
   * @param actions Sequence of actions to dispatch
   */
-class ActionBatch private (val actions: Seq[AnyRef]) {
+class ActionBatch private(val actions: Seq[AnyRef]) {
   def :+[A <: AnyRef : ActionType](action: A): ActionBatch =
     new ActionBatch(actions :+ action)
 
@@ -38,13 +39,16 @@ object ActionBatch {
   def apply[A <: AnyRef : ActionType](actions: A*): ActionBatch = new ActionBatch(actions)
 
   implicit object ActionBatchType extends ActionType[ActionBatch]
+
 }
 
 /**
   * Use `NoAction` when you need to dispatch an action that does nothing
   */
 case object NoAction {
+
   implicit object NoActionType extends ActionType[NoAction.type]
+
 }
 
 trait ActionProcessor[M <: AnyRef] {
@@ -136,24 +140,13 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   }
 
   private def baseHandler(action: AnyRef) = action match {
-    case seq: Seq[AnyRef]@unchecked =>
-      // dispatch all actions in the sequence using internal dispatchBase to prevent
-      // additional calls to subscribed listeners
-      seq.foreach(a => dispatchBase(a))
-      ActionResult.NoChange
     case batch: ActionBatch =>
       // dispatch all actions in the sequence using internal dispatchBase to prevent
       // additional calls to subscribed listeners
       batch.actions.foreach(a => dispatchBase(a))
       ActionResult.NoChange
-    case None =>
-      // ignore
-      ActionResult.NoChange
     case NoAction =>
       // ignore
-      ActionResult.NoChange
-    case a if a.getClass.getName.endsWith("$") =>
-      handleFatal(action, new IllegalArgumentException(s"Action $action was not handled by any action handler. It seems to be a singleton object, so please check that you have not accidentally dispatched a companion object instead of a case class."))
       ActionResult.NoChange
     case unknown =>
       handleError(s"Action $unknown was not handled by any action handler")
@@ -317,7 +310,6 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
       }._2
     }
 
-
   /**
     * Dispatch the action, call change listeners when completed
     *
@@ -336,35 +328,24 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
               if (listeners.isDefinedAt(key)) {
                 // Listener still exists
                 sub.changed match {
-                  case Some(newSub) => {
+                  case Some(newSub) =>
                     // value at the cursor has changed, call listener and update subscription
                     if (!silent) sub.call()
                     l.updated(key, newSub)
-                  }
-
-                  case None => {
-                    // nothing interesting happened
-                    l
-                  }
+                  case None => l // nothing interesting happened
                 }
-              }
-              else {
-                // Listener was removed since we started
-                l
+              } else {
+                l // Listener was removed since we started
               }
             }
 
             // Listeners may have changed during processing (subscribe or unsubscribe)
             // so only update the listeners that are still there, and leave any new listeners that may be there now.
             listeners = updated.foldLeft(listeners) { case (l, (key, sub)) =>
-              if (l.isDefinedAt(key)) {
-                // Listener still exists for this key
-                l.updated(key, sub)
-              }
-              else {
-                // Listener was removed for this key, skip it
-                l
-              }
+              if (l.isDefinedAt(key))
+                l.updated(key, sub) // Listener still exists for this key
+              else
+                l // Listener was removed for this key, skip it
             }
           }
         } catch {
