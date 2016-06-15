@@ -23,6 +23,8 @@ import scala.util.{Failure, Success, Try}
   * @tparam P Type of the actual action class
   */
 trait AsyncAction[A, P <: AsyncAction[A, P]] {
+  implicit object PActionType extends ActionType[P]
+
   def state: PotState
 
   def result: Try[A]

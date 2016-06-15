@@ -189,7 +189,8 @@ demonstrating the use of React integration features and async operations.
 - Fixed `map`, `flatMap` and `flatten` in `Pot` to return a correct type of `Pot` instead of Empty/Ready
 - Added `ModelRO[S]` trait (for "read-only") to abstract reader functionality that does not need to know about the
   base model type. Can be used to replace types of `ModelR[_, S]`
-  
+- Updated to Scala.js 0.6.9
+
 ### 0.5.2
 - Fixed a bug in `foldHandlers` where model changes in earlier handles were not always taken into account
 - Fixed a bug in `Circuit` where subscribing to a listener while other listeners were being called resulted in that new
@@ -237,11 +238,11 @@ demonstrating the use of React integration features and async operations.
 Diode was created and is maintained by [Otto Chrons](https://github.com/ochrons) - otto@chrons.me - Twitter:
 [@ochrons](https://twitter.com/ochrons).
 
-Contributors: [PerWiklander](https://github.com/PerWiklander), [[ your name here ]]
+Contributors: @PerWiklander, @DylanArnold
 
 ## MIT License
 
-Copyright (c) 2015, Otto Chrons (otto@chrons.me)
+Copyright (c) 2015-2016, Otto Chrons (otto@chrons.me)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
 documentation files (the "Software"), to deal in the Software without restriction, including without limitation the

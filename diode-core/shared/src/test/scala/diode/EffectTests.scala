@@ -3,11 +3,14 @@ package diode
 import java.util.concurrent.atomic.AtomicInteger
 
 import utest._
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
 import scala.concurrent.duration._
 
 object EffectTests extends TestSuite {
+  import AnyRefAction._
+
   def tests = TestSuite {
     def efA = Effect(Future("A"))
     def efB = Effect(Future("B"))
