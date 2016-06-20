@@ -179,7 +179,7 @@ demonstrating the use of React integration features and async operations.
 
 # Change history
 
-See separate (changes document)(CHANGES.md)
+See separate [changes document](CHANGES.md)
 
 # Contributors
 
