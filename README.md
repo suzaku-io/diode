@@ -6,7 +6,7 @@
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ochrons/diode)
 [![Build Status](https://travis-ci.org/ochrons/diode.svg?branch=master)](https://travis-ci.org/ochrons/diode)
-[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.6.svg)](https://www.scala-js.org)
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.8.svg)](https://www.scala-js.org)
 
 Diode is a Scala/Scala.js library for managing immutable application state with unidirectional data flow. It is heavily
 influenced and inspired by [Flux](https://facebook.github.io/flux/) and
@@ -23,11 +23,11 @@ Full documentation [available here](http://ochrons.github.io/diode/index.html).
 
 Add following dependency declaration to your Scala project.
 
-<pre><code class="lang-scala">"me.chrons" %% "diode" % "0.5.2"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %% "diode" % "1.0.0"</code></pre>
 
 In a Scala.js project the dependency looks like this.
 
-<pre><code class="lang-scala">"me.chrons" %%% "diode" % "0.5.2"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %%% "diode" % "1.0.0"</code></pre>
 
 <img align="right" src="doc/images/architecture.png">
 
@@ -45,13 +45,13 @@ Since having a static counter is not very interesting, we'll want to have some w
 the application model happen through _actions_. Let's define a couple of useful actions:
 
 ```scala
-case class Increase(amount: Int)
-case class Decrease(amount: Int)
-case object Reset
+case class Increase(amount: Int) extends Action
+case class Decrease(amount: Int) extends Action
+case object Reset extends Action
 ```
 
-Actions in Diode can be anything (that extends `AnyRef`), but typically case classes work best due to their pattern
-matching capability.
+Actions in Diode can be anything (that extends `diode.Action` trait or provides an `ActionType[A]` type class instance), but typically
+case classes work best due to their pattern matching capability.
 
 ### The Circuit
 
@@ -73,7 +73,7 @@ object AppCircuit extends Circuit[RootModel] {
 ```
 
 The `actionHandler` is a function receiving the current model and action and returning a result of type
-`Option[ActionResult[RootModel]]`. Each action must return a new copy of the (root)model so we use the convenient case
+`Option[ActionResult[M]]`. Each action must return a new copy of the (root)model so we use the convenient case
 class `copy` function. Note that we are _not updating_ the `model` variable here, just returning a copy. The actual
 update is performed by the Circuit.
 
@@ -91,7 +91,7 @@ val counterHandler = new ActionHandler(zoomRW(_.counter)((m, v) => m.copy(counte
 val actionHandler = composeHandlers(counterHandler)
 ```
 
-Note how in the `ActionHandler`'s constructor call we _zoom_ into the model, defining a reader/writer pair to access the
+Note how in the `ActionHandler`'s constructor we _zoom_ into the model, defining a reader/writer pair to access the
 part of the model these actions are interested in. This defines a _scope_ for our handler, both preventing it from
 inadvertently accessing other parts of our application model and also simplifying access to the part we _are_ interested
 in (provided through the `value` function). The class also provides helper functions like `updated`, making it trivial
@@ -179,59 +179,7 @@ demonstrating the use of React integration features and async operations.
 
 # Change history
 
-### 0.6.0-SNAPSHOT
-- Actions are now type checked using a type class based mechanism (fixes #11)
-- Special `Seq` and `None` actions are replaced with `ActionBatch` and `NoAction` classes
-- Support for silent model changes that do not trigger listeners
-- Dispatcher supports nested dispatching and queues any dispatch requests received while dispatching a previous action
-- React Connector `connect` accepts an optional `key` for the React component it creates (fixes #17)
-- React Connector updated to prevent unwanted remounting of components when a model change is triggered
-- Fixed `map`, `flatMap` and `flatten` in `Pot` to return a correct type of `Pot` instead of Empty/Ready
-- Added `ModelRO[S]` trait (for "read-only") to abstract reader functionality that does not need to know about the
-  base model type. Can be used to replace types of `ModelR[_, S]`
-- Updated to Scala.js 0.6.9
-
-### 0.5.2
-- Fixed a bug in `foldHandlers` where model changes in earlier handles were not always taken into account
-- Fixed a bug in `Circuit` where subscribing to a listener while other listeners were being called resulted in that new
-  subscription being ignored.
-
-### 0.5.1
-- Changed Circuit `actionHandler` type to take current model as parameter to enable chaining of handlers
-- Added `composeHandlers` and `foldHandlers` to help building action handler hierarchies
-- `combineHandlers` is deprecated and replaced with `composeHandlers`
-- Exposed `root` model reader in the `ModelR` trait
-
-### 0.5.0
-- Introduced `FastEq` typeclass to provide suitable equality checking in various cases using `===` and `=!=` operators.
-- `PotCollection` fetching is always asynchronous to prevent nasty corner cases
-- Circuit subscription requires a `ModelR` instead of a simple function
-- The `model` in Circuit is now private, override `initialModel` method to set the initial value 
-- Updated to Scala.js 0.6.7
-- DevTools updated to scalajs-dom 0.9.0 (backwards incompatible change in accessing `indexedDB`)
-
-### 0.4.0
-- Split Diode into `diode-core` and `diode-data` modules as the core functionality is quite stable but `diode-data`
-  (`Pot` stuff) is still changing quite rapidly.
-- Added `AsyncAction` which is a more general base for `PotAction`.
-- Simplified `Pot` by moving everything RetryPolicy related into specific `AsyncActionRetriable`.
-
-### 0.3.0
-- Added virtual collections (`PotCollection`) to support lazy loading of data.
-- Added `RefTo` for referencing data elsewhere in the model. 
-- Added `map` and `flatMap` to access model values inside containers (such as `Option`) while maintaining reference
-  equality.
-- Added `zip` to combine two readers while maintaining reference equality.
-- Added an action processor for persisting application state.
-- Moved `Pot` and related classes from `diode.util` to `diode.data` package.
-
-### 0.2.0
-- Upgraded `Effect`s to be real class(es) instead of just type alias for easier composition etc.
-- Added animation example using `requestAnimationFrame`.
-- Added TodoMVC example using React.
-
-### 0.1.0
-- Initial version.
+See separate (changes document)(CHANGES.md)
 
 # Contributors
 

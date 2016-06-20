@@ -24,7 +24,7 @@ case class ModelProxy[S](modelReader: ModelR[_, S], theDispatch: Any => Callback
     (implicit ev: C => ReactElement, feq: FastEq[_ >: T]): C = compB(zoom(f))
 
   def connect[T <: AnyRef](f: S => T)
-    (implicit feq: FastEq[_ >: T]): ReactComponentC.ReqProps[ModelProxy[T] => ReactElement, T, _, TopNode] = {
+    (implicit feq: FastEq[_ >: T]): ReactConnectProxy[T] = {
     connector.connect(modelReader.zoom(f))
   }
 }
@@ -66,12 +66,12 @@ trait ReactConnector[M <: AnyRef] {
     * @return A React component accepting a prop that is a function to creates the wrapped component
     */
   def connect[S <: AnyRef](zoomFunc: M => S, key: js.Any)
-    (implicit feq: FastEq[_ >: S]): ReactComponentC.ReqProps[ModelProxy[S] => ReactElement, S, _, TopNode] = {
+    (implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
     connect(circuit.zoom(zoomFunc), key)
   }
 
   def connect[S <: AnyRef](zoomFunc: M => S)
-    (implicit feq: FastEq[_ >: S]): ReactComponentC.ReqProps[ModelProxy[S] => ReactElement, S, _, TopNode] = {
+    (implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
     connect(circuit.zoom(zoomFunc))
   }
 
@@ -84,7 +84,7 @@ trait ReactConnector[M <: AnyRef] {
     * @return A React component accepting a prop that is a function to create the wrapped component
     */
   def connect[S <: AnyRef](modelReader: ModelR[_, S], key: js.UndefOr[js.Any] = js.undefined)
-    (implicit feq: FastEq[_ >: S]): ReactComponentC.ReqProps[ModelProxy[S] => ReactElement, S, _, TopNode] = {
+    (implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
 
     class Backend(t: BackendScope[ModelProxy[S] => ReactElement, S]) {
       private var unsubscribe = Option.empty[() => Unit]
