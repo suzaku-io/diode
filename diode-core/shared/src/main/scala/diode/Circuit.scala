@@ -8,6 +8,10 @@ import scala.language.higherKinds
   * The `ActionType` type class is used to verify that only valid actions are dispatched. An implicit instance of
   * `ActionType[A]` must be in scope when calling dispatch methods or creating effects that return actions.
   *
+  * `ActionType` is contravariant, which means it's enough to have an instance of `ActionType` for a common supertype
+  * to be able to dispatch actions of its subtypes. For example providing an instance of `ActionType[Action]` allows
+  * dispatching any class that is a subtype of `Action`.
+  *
   * @tparam A Action type
   */
 @implicitNotFound(msg = "Cannot find an ActionType type class for action of type ${A}. Make sure to provide an implicit ActionType for dispatched actions.")

@@ -59,7 +59,7 @@ import diode.AnyAction._
 
 ## Special actions
 
-Diode defines two special actions: `ActionBatch` and `NoAction`.
+Diode defines two special actions: `ActionBatch` and `NoAction`, both extending the `Action` trait.
 
 Use `ActionBatch` to create a batch of actions that are dispatched in sequence without calling any model update listeners in between. This can be used as an
 optimization.

@@ -70,7 +70,7 @@ lifecycle ensures that React will update your component rather than unmounting a
 other contexts too. Try to create and store your component once and reuse it.
 
 ```scala
-case class State(component: ReactComponentC.ReqProps[(ModelProxy[Pot[String]]) => ReactElement, Pot[String], _, TopNode])
+case class State(component: ReactConnectProxy[Pot[String])
 
 val Dashboard = ReactComponentB[ModelProxy[RootModel]]("Dashboard")
 .initialState_P(proxy => State(proxy.connect(_.asyncData)))

@@ -4,10 +4,10 @@ After you start using `Pot` (for medicinal purposes!) in your application, you w
 loading process.
 
 ```scala
-case class LoadTodos
-case class UpdateTodos
-case class LoadTodosFailed
-case class LoadTodosPending
+case class LoadTodos extends Action
+case class UpdateTodos extends Action
+case class LoadTodosFailed extends Action
+case class LoadTodosPending extends Action
 ```
 
 Because this is such a common pattern, wouldn't it be nice to abstract this functionality into a trait and reuse it for all your `Pot` actions?
@@ -15,7 +15,8 @@ Because this is such a common pattern, wouldn't it be nice to abstract this func
 ## `PotAction`
 
 The `PotAction` trait simplifies creation of stateful actions for `Pot` data. To use it, simply define a case class extending `PotAction` and define the `next`
-function to build a new instance of your action.
+function to build a new instance of your action. The `PotAction` trait extends Diode's `Action` trait, so all your classes using it will automatically be
+valid for dispatching.
 
 ```scala
 case class UpdateTodos(result: Pot[Todos] = Empty) extends PotAction[Todos, UpdateTodos] {
