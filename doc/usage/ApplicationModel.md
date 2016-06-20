@@ -202,7 +202,7 @@ var model = RootModel(...)
 val rootReader = new RootModelR(model)
 
 // create a reference to a Product
-def productRef(id: String) = RefTo(rootReader.zoom(_.products(id), UpdateProduct(id, _))
+def productRef(id: String) = RefTo(rootReader.zoom(_.products(id)), UpdateProduct(id, _))
 ```
 
 The `RefTo` paradigm is especially useful with Diode's [async collections](../advanced/PotCollection.md) as you can
