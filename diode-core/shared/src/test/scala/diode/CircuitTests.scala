@@ -279,6 +279,24 @@ object CircuitTests extends TestSuite {
         assert(state2.s == state2Snapshot.s)
         assert(callback2Count == callback2CountSnapshot)
       }
+      'WithCallbackReference - {
+        val c = circuit
+        var state: Model = null
+        var callbackCount = 0
+        def listener(cursor: ModelR[Model, String]): (() ⇒ Unit) ⇒ Unit = unsubscribe ⇒ {
+          state = c.model
+          callbackCount += 1
+          unsubscribe()
+        }
+        c.subscribeC(c.zoom(_.s))(listener)
+        c.dispatch(SetS("Listen"))
+        assert(state.s == "Listen")
+        assert(callbackCount == 1)
+        c.dispatch(SetS("Listen1"))
+        // unsubscribe should already be called, so no changes
+        assert(state.s == "Listen")
+        assert(callbackCount == 1)
+      }
     }
     'Effects - {
       'Run - {
