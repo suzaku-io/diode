@@ -19,7 +19,7 @@ function to build a new instance of your action. The `PotAction` trait extends D
 valid for dispatching.
 
 ```scala
-case class UpdateTodos(result: Pot[Todos] = Empty) extends PotAction[Todos, UpdateTodos] {
+case class UpdateTodos(potResult: Pot[Todos] = Empty) extends PotAction[Todos, UpdateTodos] {
   def next(newResult: Pot[Todos]) = UpdateTodos(newResult)
 }
 ```
