@@ -27,6 +27,11 @@ object PotTests extends TestSuite {
         val ps = p.ready("test").pending(50).flatMap(s => Ready(s.length))
         assert(ps.contains(4) && ps.isPending)
       }
+      'fromOption - {
+        assert(Pot.fromOption(Some("a")) == Ready("a"))
+        val none: Option[String] = None
+        assert(Pot.fromOption(none) == Empty)
+      }
     }
   }
 }
