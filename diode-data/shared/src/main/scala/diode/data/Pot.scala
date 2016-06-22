@@ -311,6 +311,11 @@ object Pot {
     */
   def empty[A]: Pot[A] = Empty
 
+  def fromOption[A](a: Option[A]) = a match {
+    case Some(x) => Ready(x)
+    case None => Empty
+  }
+
   /**
     * Monad type class for `Pot`
     */
