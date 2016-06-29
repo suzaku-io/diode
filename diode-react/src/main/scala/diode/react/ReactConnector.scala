@@ -10,11 +10,21 @@ import scala.scalajs.js
   * Wraps a model reader, dispatcher and React connector to be passed to React components
   * in props.
   */
-case class ModelProxy[S](modelReader: ModelR[_, S], theDispatch: Any => Callback,
+case class ModelProxy[S](modelReader: ModelR[_, S], theDispatch: Any => Unit,
   connector: ReactConnector[_ <: AnyRef]) {
   def value = modelReader()
 
-  def dispatch[A : ActionType](action: A): Callback = theDispatch(action)
+  def dispatch[A : ActionType](action: A): Callback = dispatchCB(action)
+
+  /**
+    * Perform a dispatch action in a `Callback`
+    */
+  def dispatchCB[A : ActionType](action: A): Callback = Callback(theDispatch(action))
+
+  /**
+    * Dispatch an action right now
+    */
+  def dispatchNow[A : ActionType](action: A): Unit = theDispatch(action)
 
   def apply() = modelReader()
 
@@ -54,7 +64,7 @@ trait ReactConnector[M <: AnyRef] {
   def wrap[S <: AnyRef, C](modelReader: ModelR[_, S])(compB: ModelProxy[S] => C)
     (implicit ev: C => ReactElement, feq: FastEq[_ >: S]): C = {
     implicit object aType extends ActionType[Any]
-    compB(ModelProxy(modelReader, action => Callback(circuit.dispatch(action)), ReactConnector.this))
+    compB(ModelProxy(modelReader, action => circuit.dispatch(action), ReactConnector.this))
   }
 
   /**

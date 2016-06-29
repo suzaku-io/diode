@@ -15,7 +15,7 @@ emitSourceMaps := true
 /* create javascript launcher. Searches for an object extends JSApp */
 persistLauncher := true
 
-val diodeVersion = "1.0.0"
+val diodeVersion = "1.0.1-SNAPSHOT"
 
 libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "0.9.1",

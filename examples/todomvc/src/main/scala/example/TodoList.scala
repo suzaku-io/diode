@@ -33,7 +33,7 @@ object TodoList {
 
     def render(p: Props, s: State) = {
       val proxy = p.proxy()
-      val dispatch = (action: Action) => p.proxy.dispatch(action)
+      val dispatch: Action => Callback = p.proxy.dispatchCB
       val todos = proxy.todoList
       val filteredTodos = todos filter p.currentFilter.accepts
       val activeCount = todos count TodoFilter.Active.accepts

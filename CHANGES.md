@@ -1,5 +1,10 @@
 # Changes
 
+## 1.0.1-SNAPSHOT
+
+- Added `dispatchCB` and `dispatchNow` to `ModelProxy` to provide a more explicit way of dispatching in a `Callback` or directly
+- Added a Pot.fromOption convenience method (by @vpavkin)
+
 ## 1.0.0
 
 ### Action type safety

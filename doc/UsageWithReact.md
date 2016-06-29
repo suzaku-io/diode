@@ -34,12 +34,12 @@ Now your `AppCircuit` is equipped with two new methods: `wrap` and `connect`. Bo
 alternatively a model reader). Wrap also takes a function to build a React component immediately whereas connect returns a component taking a similar function as props.
 
 ```scala
-def wrap[S, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)
-def connect[S](zoomFunc: M => S)
+def wrap[S, C](zoomFunc: M => S)(compB: ModelProxy[S] => C): C
+def connect[S](zoomFunc: M => S): ReactConnectProxy[S]
 ```
 
 The difference between these two is that `wrap` just creates a `ModelProxy` and passes it to your component builder function, while `connect` actually creates
-another React component that surrounds your own component.
+another React component that proxies your own component.
 
 > Use `wrap` when your component doesn't need model updates from Diode, and `connect` when it does. Even if you use `wrap` on a top component, you can still
 `connect` components underneath it.
@@ -62,12 +62,13 @@ val dc = AppCircuit.wrap(_.data)(p => dummyComponent(Props(p(), p.dispatch(Dummy
 def render = <.div(sc(p => smartComponent(p)), dc)
 ```
 
-The `ModelProxy` provides a `dispatch` function that wraps the dispatch call in a React `Callback`, making it easy to integrate with event
-handlers etc. It also provides `wrap` and `connect`, allowing your component to connect sub-components to the Diode circuit.
+The `ModelProxy` provides a `dispatchCB` method that wraps the dispatch call in a React `Callback`, making it easy to integrate with event
+handlers etc. If you want to dispatch immediately, you can use `dispatchNow` instead. It also provides `wrap` and `connect` methods, allowing your component to
+connect sub-components to the Diode circuit.
 
-Note that connect is being called once for the lifecycle of this component. Having a single reference to this component during your components
-lifecycle ensures that React will update your component rather than unmounting and remounting it. This applies to calling connect in
-other contexts too. Try to create and store your component once and reuse it.
+Note that `connect` is being called once for the lifecycle of this component. Having a single reference to this component during your components lifecycle
+ensures that React will update your component rather than unmounting and remounting it. This applies to calling `connect` in other contexts too. Try to connect
+and store your component once and reuse it.
 
 ```scala
 case class State(component: ReactConnectProxy[Pot[String])
@@ -79,7 +80,7 @@ val Dashboard = ReactComponentB[ModelProxy[RootModel]]("Dashboard")
     <.h3("Data"),
     state.component(p => AsyncDataView(p)), // pass ModelProxy
     proxy.wrap(_.data)(p => DataView(p())), // just pass the value
-    <.button(^.onClick --> proxy.dispatch(RefreshData), "Refresh")
+    <.button(^.onClick --> proxy.dispatchCB(RefreshData), "Refresh")
   )
 }
 .build
@@ -105,7 +106,7 @@ val Motd = ReactComponentB[ModelProxy[Pot[String]]]("Motd")
       proxy().renderPending(_ > 500, _ => <.p("Loading...")),
       proxy().renderFailed(ex => <.p("Failed to load")),
       proxy().render(m => <.p(m)),
-      Button(Button.Props(proxy.dispatch(UpdateMotd()), CommonStyle.danger), Icon.refresh, " Update")
+      Button(Button.Props(proxy.dispatchCB(UpdateMotd()), CommonStyle.danger), Icon.refresh, " Update")
     )
   }
 ```
