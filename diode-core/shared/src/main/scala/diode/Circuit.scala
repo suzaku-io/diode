@@ -107,7 +107,9 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
 
   type HandlerFunction = (M, Any) => Option[ActionResult[M]]
 
-  private case class Subscription[T](listener: ModelR[M, T] => Unit, cursor: ModelR[M, T], lastValue: T) {
+  type UnsubscribeFunction = () => Unit
+
+  private case class Subscription[T](listener: ModelR[M, T] => (UnsubscribeFunction => Unit), cursor: ModelR[M, T], lastValue: T, unsubscribe: UnsubscribeFunction) {
     def changed: Option[Subscription[T]] = {
       if (cursor === lastValue)
         None
@@ -115,7 +117,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
         Some(copy(lastValue = cursor.eval(model)))
     }
 
-    def call(): Unit = listener(cursor)
+    def call(): Unit = listener(cursor)(unsubscribe)
   }
 
   private[diode] var model: M = initialModel
@@ -200,17 +202,34 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * what part of the model must change for your listener to be called. If omitted, all changes
     * result in a call.
     *
+    * This is a simplified version of subscribeC where the listener doesn't need unsubscribe callback
+    * reference
+    *
     * @param cursor   Model reader returning the part of the model you are interested in.
     * @param listener Function to be called when model is updated. The listener function gets
     *                 the model reader as a parameter.
     * @return A function to unsubscribe your listener
     */
-  def subscribe[T](cursor: ModelR[M, T])(listener: ModelR[M, T] => Unit): () => Unit = {
+  def subscribe[T](cursor: ModelR[M, T])(listener: ModelR[M, T] => Unit): UnsubscribeFunction =
+    subscribeC(cursor)(m => (_ => listener(m)))
+
+  /**
+    * Subscribes to listen to changes in the model. By providing a `cursor` you can limit
+    * what part of the model must change for your listener to be called. If omitted, all changes
+    * result in a call.
+    *
+    * @param cursor   Model reader returning the part of the model you are interested in.
+    * @param listener Function to be called when model is updated. The listener function gets
+    *                 the model reader and unsubscribe callback as parameters.
+    * @return A function to unsubscribe your listener
+    */
+  def subscribeC[T](cursor: ModelR[M, T])(listener: ModelR[M, T] => (UnsubscribeFunction => Unit)): UnsubscribeFunction = {
     this.synchronized {
       listenerId += 1
       val id = listenerId
-      listeners += id -> Subscription(listener, cursor, cursor.eval(model))
-      () => this.synchronized(listeners -= id)
+      val unsubscribe = () => this.synchronized(listeners -= id)
+      listeners += id -> Subscription(listener, cursor, cursor.eval(model), unsubscribe)
+      unsubscribe
     }
   }
 
