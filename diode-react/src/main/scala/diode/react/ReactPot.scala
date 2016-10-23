@@ -2,7 +2,7 @@ package diode.react
 
 import diode.data.{PendingBase, Pot}
 import diode.util._
-import japgolly.scalajs.react.ReactNode
+import japgolly.scalajs.react.vdom.ReactNode
 
 object ReactPot {
 

@@ -1,7 +1,12 @@
 package diode.react
 
 import diode._
+import japgolly.scalajs.react.CtorType.{ArgKey, Props}
+import japgolly.scalajs.react.ScalaComponent.Unmounted
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.vdom.ReactElement
+import japgolly.scalajs.react.vdom.all.svg
+import org.scalajs.dom
 
 import scala.language.existentials
 import scala.scalajs.js
@@ -75,7 +80,7 @@ trait ReactConnector[M <: AnyRef] {
     * @param key      Optional parameter specifying a unique React key for this component.
     * @return A React component accepting a prop that is a function to creates the wrapped component
     */
-  def connect[S <: AnyRef](zoomFunc: M => S, key: js.Any)
+  def connect[S <: AnyRef](zoomFunc: M => S, key: ArgKey)
     (implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
     connect(circuit.zoom(zoomFunc), key)
   }
@@ -93,7 +98,7 @@ trait ReactConnector[M <: AnyRef] {
     * @param key         Optional parameter specifying a unique React key for this component.
     * @return A React component accepting a prop that is a function to create the wrapped component
     */
-  def connect[S <: AnyRef](modelReader: ModelR[_, S], key: js.UndefOr[js.Any] = js.undefined)
+  def connect[S <: AnyRef](modelReader: ModelR[_, S], key: ArgKey = js.undefined)
     (implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
 
     class Backend(t: BackendScope[ModelProxy[S] => ReactElement, S]) {
@@ -113,21 +118,24 @@ trait ReactConnector[M <: AnyRef] {
 
       private def changeHandler(cursor: ModelR[M, S]): Unit = {
         // modify state if we are mounted and state has actually changed
-        if (t.isMounted() && modelReader =!= t.accessDirect.state) {
-          t.accessDirect.setState(modelReader())
-        }
+
+        (t.isMounted && t.state.map(modelReader =!= _))
+          .flatMap(mustUpdate => t.setState(modelReader()) when mustUpdate).runNow()
       }
 
-      def render(s: S, compB: ModelProxy[S] => ReactElement) = wrap(modelReader)(compB)
+      def render(s: S, compB: ModelProxy[S] => ReactElement) = {
+        wrap(modelReader)(compB)
+      }
     }
 
-    ReactComponentB[ModelProxy[S] => ReactElement]("DiodeWrapper")
+    ScalaComponent.build[ModelProxy[S] => ReactElement]("DiodeWrapper")
       .initialState(modelReader())
       .renderBackend[Backend]
       .componentWillMount(scope => scope.backend.willMount)
-      .componentWillUnmount(scope => scope.backend.willUnmount)
+      .componentWillUnmount(scope => scope.backend.willUnmount )
       .shouldComponentUpdate(scope => (scope.currentState ne scope.nextState) || (scope.currentProps ne scope.nextProps))
       .build
-      .set(key)
+      .ctor
+      .set(key) _
   }
 }
