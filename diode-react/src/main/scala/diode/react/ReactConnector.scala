@@ -14,6 +14,9 @@ case class ModelProxy[S](modelReader: ModelR[_, S], theDispatch: Any => Unit,
   connector: ReactConnector[_ <: AnyRef]) {
   def value = modelReader()
 
+  /**
+    * Perform a dispatch action in a `Callback`. Use `dispatchCB` instead to make meaning explicit.
+    */
   def dispatch[A : ActionType](action: A): Callback = dispatchCB(action)
 
   /**
@@ -72,14 +75,21 @@ trait ReactConnector[M <: AnyRef] {
     * relevant state changes and updates the wrapped component as needed.
     *
     * @param zoomFunc Function to retrieve relevant piece from the model
-    * @param key      Optional parameter specifying a unique React key for this component.
-    * @return A React component accepting a prop that is a function to creates the wrapped component
+    * @param key      Specifies a unique React key for this component.
+    * @return A ReactConnectProxy
     */
   def connect[S <: AnyRef](zoomFunc: M => S, key: js.Any)
     (implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
     connect(circuit.zoom(zoomFunc), key)
   }
 
+  /**
+    * Connects a React component into the Circuit by wrapping it in another component that listens to
+    * relevant state changes and updates the wrapped component as needed.
+    *
+    * @param zoomFunc Function to retrieve relevant piece from the model
+    * @return A ReactConnectProxy
+    */
   def connect[S <: AnyRef](zoomFunc: M => S)
     (implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
     connect(circuit.zoom(zoomFunc))
@@ -91,7 +101,7 @@ trait ReactConnector[M <: AnyRef] {
     *
     * @param modelReader A reader that returns the piece of model we are interested in
     * @param key         Optional parameter specifying a unique React key for this component.
-    * @return A React component accepting a prop that is a function to create the wrapped component
+    * @return A ReactConnectProxy
     */
   def connect[S <: AnyRef](modelReader: ModelR[_, S], key: js.UndefOr[js.Any] = js.undefined)
     (implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
@@ -111,7 +121,7 @@ trait ReactConnector[M <: AnyRef] {
         unsubscribe = None
       }
 
-      private def changeHandler(cursor: ModelR[M, S]): Unit = {
+      private def changeHandler(cursor: ModelRO[S]): Unit = {
         // modify state if we are mounted and state has actually changed
         if (t.isMounted() && modelReader =!= t.accessDirect.state) {
           t.accessDirect.setState(modelReader())

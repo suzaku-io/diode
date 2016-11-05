@@ -2,6 +2,8 @@ enablePlugins(ScalaJSPlugin)
 
 name := "Diode React TodoMVC"
 
+crossScalaVersions := Seq("2.11.8", "2.12.0")
+
 scalaVersion := "2.11.8"
 
 workbenchSettings
@@ -15,16 +17,16 @@ emitSourceMaps := true
 /* create javascript launcher. Searches for an object extends JSApp */
 persistLauncher := true
 
-val diodeVersion = "1.0.1-SNAPSHOT"
+val diodeVersion = "1.1.0-SNAPSHOT"
 
 libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "0.9.1",
-  "com.github.japgolly.scalajs-react" %%% "core" % "0.11.1",
-  "com.github.japgolly.scalajs-react" %%% "extra" % "0.11.1",
+  "com.github.japgolly.scalajs-react" %%% "core" % "0.11.3",
+  "com.github.japgolly.scalajs-react" %%% "extra" % "0.11.3",
   "me.chrons" %%% "diode" % diodeVersion,
   "me.chrons" %%% "diode-devtools" % diodeVersion,
   "me.chrons" %%% "diode-react" % diodeVersion,
-  "me.chrons" %%% "boopickle" % "1.2.1"
+  "me.chrons" %%% "boopickle" % "1.2.5-SNAPSHOT"
 )
 
 jsDependencies ++= Seq(

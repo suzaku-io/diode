@@ -84,7 +84,7 @@ notifications.
 ```scala
 val root = dom.document.getElementById("root")
 val unsubscribe = AppCircuit.subscribe(AppCircuit.zoom(_.tree))(tree => render(root, tree))
-def render(root: dom.Element, tree: ModelR[_, Tree]) = { ... }
+def render(root: dom.Element, tree: ModelRO[Tree]) = { ... }
 ```
 
 Listeners are called when the model pointed by the cursor changes, even if it would have no effect in the part of the

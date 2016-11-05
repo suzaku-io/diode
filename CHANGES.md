@@ -1,9 +1,12 @@
 # Changes
 
-## 1.0.1-SNAPSHOT
+## 1.1.0
 
 - Added `dispatchCB` and `dispatchNow` to `ModelProxy` to provide a more explicit way of dispatching in a `Callback` or directly
 - Added a Pot.fromOption convenience method (by @vpavkin)
+- Circuit `subscribe` now users `ModelRO[T]` in its listener callback so that the listener does not need to care about the type of the
+model.
+- Support for Scala 2.12
 
 ## 1.0.0
 

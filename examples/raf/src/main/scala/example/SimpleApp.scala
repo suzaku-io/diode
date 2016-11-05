@@ -82,7 +82,7 @@ object SimpleApp extends JSApp {
       h1("RAF example"),
       p(a(href := "https://github.com/ochrons/diode/tree/master/examples/raf", "Source code")),
       div(cls := "dropdown",
-        button(tpe := "button", "data-toggle".attr := "dropdown", "Add animation", span(cls := "caret")),
+        button(tpe := "button", data("toggle") := "dropdown", "Add animation", span(cls := "caret")),
         ul(cls := "dropdown-menu",
           animGenerators.map { case (animName, animGenerator) =>
             li(

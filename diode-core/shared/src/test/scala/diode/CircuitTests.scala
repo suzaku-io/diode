@@ -5,7 +5,6 @@ import utest._
 
 import scala.collection.mutable
 import scala.concurrent._
-import scala.concurrent.ExecutionContext.Implicits.global
 
 object CircuitTests extends TestSuite {
 
@@ -31,7 +30,7 @@ object CircuitTests extends TestSuite {
 
   case class ThrowAction(ex: Throwable)
 
-  class AppCircuit(implicit ec: ExecutionContext) extends Circuit[Model] {
+  class AppCircuit(implicit val ec: ExecutionContext) extends Circuit[Model] {
     import diode.ActionResult._
     override def initialModel = Model("Testing", Data(42, true))
     override protected def actionHandler: HandlerFunction = (model, action) => ({
@@ -58,6 +57,7 @@ object CircuitTests extends TestSuite {
   }
 
   def tests = TestSuite {
+    import scala.concurrent.ExecutionContext.Implicits.global
     def circuit = new AppCircuit
 
     'Dispatch - {
@@ -118,7 +118,7 @@ object CircuitTests extends TestSuite {
         val c = circuit
         var state: Model = null
         var callbackCount = 0
-        def listener(cursor: ModelR[Model, String]): Unit = {
+        def listener(cursor: ModelRO[String]): Unit = {
           state = c.model
           callbackCount += 1
         }
@@ -139,11 +139,11 @@ object CircuitTests extends TestSuite {
         var state: Model = null
         var state2: Model = null
         var callbackCount = 0
-        def listener1(cursor: ModelR[Model, Data]): Unit = {
+        def listener1(cursor: ModelRO[Data]): Unit = {
           state = c.model
           callbackCount += 1
         }
-        def listener2(cursor: ModelR[Model, String]): Unit = {
+        def listener2(cursor: ModelRO[String]): Unit = {
           state2 = c.model
           callbackCount += 1
         }
@@ -164,7 +164,7 @@ object CircuitTests extends TestSuite {
         val c = circuit
         var state: Model = null
         var callbackCount = 0
-        def listener(cursor: ModelR[Model, String]): Unit = {
+        def listener(cursor: ModelRO[String]): Unit = {
           state = c.model
           callbackCount += 1
         }
@@ -183,7 +183,7 @@ object CircuitTests extends TestSuite {
         var callback2Count = 0
         var unsubscribe2: () => Unit = null
 
-        def listener1(cursor: ModelR[Model, String]): Unit = {
+        def listener1(cursor: ModelRO[String]): Unit = {
           state1 = c.model
           callback1Count += 1
 
@@ -192,7 +192,7 @@ object CircuitTests extends TestSuite {
           }
         }
 
-        def listener2(cursor: ModelR[Model, String]): Unit = {
+        def listener2(cursor: ModelRO[String]): Unit = {
           state2 = c.model
           callback2Count += 1
         }
@@ -235,7 +235,7 @@ object CircuitTests extends TestSuite {
         var unsubscribe2: () => Unit = null
         var executeUnsubscribe2 = false
 
-        def listener1(cursor: ModelR[Model, String]): Unit = {
+        def listener1(cursor: ModelRO[String]): Unit = {
           state1 = c.model
           callback1Count += 1
 
@@ -245,7 +245,7 @@ object CircuitTests extends TestSuite {
           }
         }
 
-        def listener2(cursor: ModelR[Model, String]): Unit = {
+        def listener2(cursor: ModelRO[String]): Unit = {
           state2 = c.model
           callback2Count += 1
         }

@@ -107,7 +107,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
 
   type HandlerFunction = (M, Any) => Option[ActionResult[M]]
 
-  private case class Subscription[T](listener: ModelR[M, T] => Unit, cursor: ModelR[M, T], lastValue: T) {
+  private case class Subscription[T](listener: ModelRO[T] => Unit, cursor: ModelR[M, T], lastValue: T) {
     def changed: Option[Subscription[T]] = {
       if (cursor === lastValue)
         None
@@ -205,7 +205,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     *                 the model reader as a parameter.
     * @return A function to unsubscribe your listener
     */
-  def subscribe[T](cursor: ModelR[M, T])(listener: ModelR[M, T] => Unit): () => Unit = {
+  def subscribe[T](cursor: ModelR[M, T])(listener: ModelRO[T] => Unit): () => Unit = {
     this.synchronized {
       listenerId += 1
       val id = listenerId

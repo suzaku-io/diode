@@ -112,7 +112,7 @@ object CircuitJVMTests extends TestSuite {
       val c = circuit
       class Listen {
         var called = false
-        def listener(cursor: ModelR[Model, Vector[Int]]): Unit = called = !called
+        def listener(cursor: ModelRO[Vector[Int]]): Unit = called = !called
       }
       val listeners = for (i <- 0 until 1000) yield new Listen
       // add in parallel
