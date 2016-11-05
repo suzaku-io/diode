@@ -25,7 +25,7 @@ val commonSettings = Seq(
   scalacOptions in (Compile, doc) -= "-Xfatal-warnings",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %%% "utest" % "0.4.3" % "test"
+    "com.lihaoyi" %%% "utest" % "0.4.4" % "test"
   )
 )
 
@@ -88,8 +88,7 @@ lazy val diodeCore = crossProject.in(file("diode-core"))
     name := "diode-core"
   )
   .jsSettings(
-    scalacOptions ++= sourceMapSetting.value,
-    scalaJSUseRhino in Global := false
+    scalacOptions ++= sourceMapSetting.value
   )
   .jvmSettings()
 
@@ -104,8 +103,7 @@ lazy val diodeData = crossProject.in(file("diode-data"))
     name := "diode-data"
   )
   .jsSettings(
-    scalacOptions ++= sourceMapSetting.value,
-    scalaJSUseRhino in Global := false
+    scalacOptions ++= sourceMapSetting.value
   )
   .jvmSettings()
   .dependsOn(diodeCore)
@@ -134,10 +132,9 @@ lazy val diodeDevtools = crossProject.in(file("diode-devtools"))
   )
   .jsSettings(
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.0"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.1"
     ),
-    scalacOptions ++= sourceMapSetting.value,
-    scalaJSUseRhino in Global := false
+    scalacOptions ++= sourceMapSetting.value
   )
   .jvmSettings()
   .dependsOn(diodeCore)
@@ -152,9 +149,8 @@ lazy val diodeReact = project.in(file("diode-react"))
   .settings(
     name := "diode-react",
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "core" % "0.11.1"
+      "com.github.japgolly.scalajs-react" %%% "core" % "0.11.3"
     ),
-    scalaJSUseRhino in Global := false,
     scalacOptions ++= sourceMapSetting.value
   )
   .dependsOn(diodeJS)
