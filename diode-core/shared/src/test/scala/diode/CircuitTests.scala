@@ -57,7 +57,7 @@ object CircuitTests extends TestSuite {
   }
 
   def tests = TestSuite {
-    import scala.concurrent.ExecutionContext.Implicits.global
+    implicit val ec = ExecutionContext.global
     def circuit = new AppCircuit
 
     'Dispatch - {
@@ -250,8 +250,9 @@ object CircuitTests extends TestSuite {
           callback2Count += 1
         }
 
-        val unsubscribe1 = c.subscribe(c.zoom(_.s))(listener1)
-        unsubscribe2 = c.subscribe(c.zoom(_.s))(listener2)
+        val sub: Subscriber[String] = c.subscribe(c.zoom(_.s))
+        val unsubscribe1 = sub(listener1)
+        unsubscribe2 = sub(listener2)
 
         c.dispatch(SetS("Listen"))
         assert(state1.s == "Listen")

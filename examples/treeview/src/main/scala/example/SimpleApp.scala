@@ -2,7 +2,7 @@ package example
 
 import java.util.UUID
 
-import diode.ModelR
+import diode._
 
 import scala.scalajs.js.JSApp
 import scala.scalajs.js.annotation.JSExport
@@ -32,21 +32,22 @@ object SimpleApp extends JSApp {
   @JSExport
   override def main(): Unit = {
     val root = dom.document.getElementById("root")
+    val tree = AppCircuit.zoom(_.tree)
     // subscribe to changes in the application model and call render when anything changes
-    AppCircuit.subscribe(AppCircuit.zoom(_.tree))(tree => render(root, tree))
+    AppCircuit.subscribe(tree)(_ => render(root, tree))
     // start the application by dispatching a ReplaceTree action
     AppCircuit.dispatch(ReplaceTree(data))
   }
 
-  def render(root: dom.Element, tree: ModelR[_, Tree]) = {
+  def render(root: dom.Element, tree: ModelRO[Tree]) = {
     // rebuild the tree view if the model has changed
-    val dirRoot: ModelR[_, FileNode] = tree.zoom(_.root)
+    val dirRoot: ModelRO[FileNode] = tree.zoom(_.root)
     if (dirRoot =!= currentModel) {
       currentModel = dirRoot.value
       treeView = new TreeView(dirRoot, Seq.empty, tree.zoom(_.selected), AppCircuit)
     }
 
-    val selectionLoc = tree.zoom(_.selected).value
+    val selectionLoc = tree().selected
     def renderButtons(selected: Boolean) = {
       div(
         button(if (!selected) disabled else "", cls := "btn",

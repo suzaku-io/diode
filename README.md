@@ -6,7 +6,7 @@
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ochrons/diode)
 [![Build Status](https://travis-ci.org/ochrons/diode.svg?branch=master)](https://travis-ci.org/ochrons/diode)
-[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.8.svg)](https://www.scala-js.org)
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.13.svg)](https://www.scala-js.org)
 
 Diode is a Scala/Scala.js library for managing immutable application state with unidirectional data flow. It is heavily
 influenced and inspired by [Flux](https://facebook.github.io/flux/) and
@@ -23,11 +23,11 @@ Full documentation [available here](http://ochrons.github.io/diode/index.html).
 
 Add following dependency declaration to your Scala project.
 
-<pre><code class="lang-scala">"me.chrons" %% "diode" % "1.0.0"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %% "diode" % "1.1.0"</code></pre>
 
 In a Scala.js project the dependency looks like this.
 
-<pre><code class="lang-scala">"me.chrons" %%% "diode" % "1.0.0"</code></pre>
+<pre><code class="lang-scala">"me.chrons" %%% "diode" % "1.1.0"</code></pre>
 
 <img align="right" src="doc/images/architecture.png">
 

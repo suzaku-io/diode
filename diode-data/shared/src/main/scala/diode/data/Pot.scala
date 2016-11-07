@@ -65,7 +65,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     * @see flatMap
     * @see foreach
     */
-  final def map[B](f: A => B): Pot[B] = this match {
+  @noinline final def map[B](f: A => B): Pot[B] = this match {
     case Empty => Empty
     case Ready(x) => Ready(f(x))
     case Pending(t) => Pending(t)
@@ -96,9 +96,9 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     * @see map
     * @see foreach
     */
-  def flatMap[B](f: A => Pot[B]): Pot[B] = map(f).flatten
+  @noinline def flatMap[B](f: A => Pot[B]): Pot[B] = map(f).flatten
 
-  def flatten[B](implicit ev: A <:< Pot[B]): Pot[B] = this match {
+  @noinline def flatten[B](implicit ev: A <:< Pot[B]): Pot[B] = this match {
     case Empty => Empty
     case Ready(x) => x
     case Pending(t) => Pending(t)

@@ -4,9 +4,11 @@
 
 - Added `dispatchCB` and `dispatchNow` to `ModelProxy` to provide a more explicit way of dispatching in a `Callback` or directly
 - Added a Pot.fromOption convenience method (by @vpavkin)
-- Circuit `subscribe` now users `ModelRO[T]` in its listener callback so that the listener does not need to care about the type of the
+- Circuit `subscribe` now uses `ModelRO[T]` in its listener callback so that the listener does not need to care about the type of the
 model.
+- Moved many methods from ModelR into its super trait ModelRO
 - Support for Scala 2.12
+- Updated to Scala.js 0.6.13 (for Scala 2.12 support)
 
 ## 1.0.0
 

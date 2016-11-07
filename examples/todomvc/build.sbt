@@ -4,7 +4,7 @@ name := "Diode React TodoMVC"
 
 crossScalaVersions := Seq("2.11.8", "2.12.0")
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.0"
 
 workbenchSettings
 
@@ -17,7 +17,7 @@ emitSourceMaps := true
 /* create javascript launcher. Searches for an object extends JSApp */
 persistLauncher := true
 
-val diodeVersion = "1.1.0-SNAPSHOT"
+val diodeVersion = "1.1.0"
 
 libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "0.9.1",
@@ -26,10 +26,10 @@ libraryDependencies ++= Seq(
   "me.chrons" %%% "diode" % diodeVersion,
   "me.chrons" %%% "diode-devtools" % diodeVersion,
   "me.chrons" %%% "diode-react" % diodeVersion,
-  "me.chrons" %%% "boopickle" % "1.2.5-SNAPSHOT"
+  "me.chrons" %%% "boopickle" % "1.2.5"
 )
 
 jsDependencies ++= Seq(
-  "org.webjars.bower" % "react" % "15.1.0" / "react-with-addons.js" commonJSName "React" minified "react-with-addons.min.js",
-  "org.webjars.bower" % "react" % "15.1.0" / "react-dom.js" commonJSName "ReactDOM" minified "react-dom.min.js" dependsOn "react-with-addons.js"
+  "org.webjars.bower" % "react" % "15.3.2" / "react-with-addons.js" commonJSName "React" minified "react-with-addons.min.js",
+  "org.webjars.bower" % "react" % "15.3.2" / "react-dom.js" commonJSName "ReactDOM" minified "react-dom.min.js" dependsOn "react-with-addons.js"
 )

@@ -10,7 +10,7 @@ import scalatags.JsDom.all._
   * @param counter  Model reader for the counter value
   * @param dispatch Dispatcher
   */
-class CounterView(counter: ModelR[_, Int], dispatch: Dispatcher) {
+class CounterView(counter: ModelRO[Int], dispatch: Dispatcher) {
   def render = {
     div(
       h3("Counter"),

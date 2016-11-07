@@ -10,13 +10,14 @@ import scala.scalajs.js
   * Wraps a model reader, dispatcher and React connector to be passed to React components
   * in props.
   */
-case class ModelProxy[S](modelReader: ModelR[_, S], theDispatch: Any => Unit,
+case class ModelProxy[S](modelReader: ModelRO[S], theDispatch: Any => Unit,
   connector: ReactConnector[_ <: AnyRef]) {
   def value = modelReader()
 
   /**
     * Perform a dispatch action in a `Callback`. Use `dispatchCB` instead to make meaning explicit.
     */
+  @deprecated("Use dispatchCB instead", "1.1.0")
   def dispatch[A : ActionType](action: A): Callback = dispatchCB(action)
 
   /**
@@ -64,7 +65,7 @@ trait ReactConnector[M <: AnyRef] {
     * @param compB       Function that creates the wrapped component
     * @return The component returned by `compB`
     */
-  def wrap[S <: AnyRef, C](modelReader: ModelR[_, S])(compB: ModelProxy[S] => C)
+  def wrap[S <: AnyRef, C](modelReader: ModelRO[S])(compB: ModelProxy[S] => C)
     (implicit ev: C => ReactElement, feq: FastEq[_ >: S]): C = {
     implicit object aType extends ActionType[Any]
     compB(ModelProxy(modelReader, action => circuit.dispatch(action), ReactConnector.this))
@@ -103,7 +104,7 @@ trait ReactConnector[M <: AnyRef] {
     * @param key         Optional parameter specifying a unique React key for this component.
     * @return A ReactConnectProxy
     */
-  def connect[S <: AnyRef](modelReader: ModelR[_, S], key: js.UndefOr[js.Any] = js.undefined)
+  def connect[S <: AnyRef](modelReader: ModelRO[S], key: js.UndefOr[js.Any] = js.undefined)
     (implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
 
     class Backend(t: BackendScope[ModelProxy[S] => ReactElement, S]) {

@@ -82,7 +82,7 @@ object AppCircuit extends Circuit[RootModel] {
   val actionHandler = composeHandlers(animationHandler, timestampHandler)
 }
 
-class AnimationHandler[M](modelRW: ModelRW[M, Map[Int, Animated]], now: ModelR[_, Double]) extends ActionHandler(modelRW) {
+class AnimationHandler[M](modelRW: ModelRW[M, Map[Int, Animated]], now: ModelRO[Double]) extends ActionHandler(modelRW) {
   def updateOne(id: Int, f: Animated => Animated) = {
     value.get(id).fold(value)(a => value.updated(id, f(a)))
   }
