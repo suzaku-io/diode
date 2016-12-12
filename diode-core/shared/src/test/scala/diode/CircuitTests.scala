@@ -112,6 +112,13 @@ object CircuitTests extends TestSuite {
         assert(m.data.i == 43)
         assert(m.data.b == false)
       }
+      'lens - {
+        val c = circuit
+        val dataWriter = c.zoomLens(_.data.i)
+        val m = dataWriter.updated(43)
+        assert(m.s == "Testing")
+        assert(m.data.i == 43)
+      }
     }
     'Listener - {
       'Normal - {
