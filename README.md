@@ -81,7 +81,7 @@ Because we want to keep the code clean and DRY, let's use the `ActionHandler` he
 instead.
 
 ```scala
-val counterHandler = new ActionHandler(zoomRW(_.counter)((m, v) => m.copy(counter = v))) {
+val counterHandler = new ActionHandler(zoomTo(_.counter)) {
   override def handle = {
     case Increase(a) => updated(value + a)
     case Decrease(a) => updated(value - a)
