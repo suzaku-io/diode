@@ -17,7 +17,7 @@ class PersistStateIDB[M <: AnyRef, P <: js.Any](pickleF: M => P, unpickleF: P =>
       Future.failed(new Exception("IndexedDB is not supported"))
     } else {
       val req = dom.window.indexedDB.open("DiodePersistence")
-      val p = Promise[IDBDatabase]
+      val p   = Promise[IDBDatabase]
       req.onsuccess = (_: Event) => {
         println("Open onsuccess")
         p.success(req.result.asInstanceOf[IDBDatabase])
@@ -37,7 +37,7 @@ class PersistStateIDB[M <: AnyRef, P <: js.Any](pickleF: M => P, unpickleF: P =>
 
   private def withStore[A](f: IDBObjectStore => Future[A]) = {
     dbF.flatMap { db =>
-      val tx = db.transaction(storeName, "readwrite")
+      val tx    = db.transaction(storeName, "readwrite")
       val store = tx.objectStore(storeName)
       f(store)
     }
@@ -49,7 +49,7 @@ class PersistStateIDB[M <: AnyRef, P <: js.Any](pickleF: M => P, unpickleF: P =>
 
   override def save(id: String, pickled: P): Unit = {
     withStore { store =>
-      val p = Promise[String]
+      val p   = Promise[String]
       val req = store.put(pickled, id)
       req.onsuccess = (_: Event) => {
         println("Save onsuccess")
@@ -65,7 +65,7 @@ class PersistStateIDB[M <: AnyRef, P <: js.Any](pickleF: M => P, unpickleF: P =>
 
   override def load(id: String): Future[P] = {
     withStore { store =>
-      val p = Promise[P]
+      val p   = Promise[P]
       val req = store.get(id)
       req.onsuccess = (_: Event) => {
         println("Load onsuccess")

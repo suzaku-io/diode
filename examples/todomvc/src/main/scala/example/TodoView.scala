@@ -6,35 +6,34 @@ import org.scalajs.dom.ext.KeyCode
 
 object TodoView {
 
-  case class Props(
-    onToggle: Callback,
-    onDelete: Callback,
-    onStartEditing: Callback,
-    onUpdateTitle: String => Callback,
-    onCancelEditing: Callback,
-    todo: Todo,
-    isEditing: Boolean)
+  case class Props(onToggle: Callback,
+                   onDelete: Callback,
+                   onStartEditing: Callback,
+                   onUpdateTitle: String => Callback,
+                   onCancelEditing: Callback,
+                   todo: Todo,
+                   isEditing: Boolean)
 
   case class State(editText: String)
 
-  class Backend($: BackendScope[Props, State]) {
+  class Backend($ : BackendScope[Props, State]) {
     val x = $.props.map(_.isEditing)
     def editFieldSubmit(p: Props): Callback =
-      $.state.flatMap(s =>
-        if (s.editText.trim == "")
-          p.onDelete
-        else p.onUpdateTitle(s.editText.trim)
-      )
-
+      $.state.flatMap(
+        s =>
+          if (s.editText.trim == "")
+            p.onDelete
+          else p.onUpdateTitle(s.editText.trim))
 
     def resetText(p: Props): Callback =
       $.modState(_.copy(editText = p.todo.title))
 
     def editFieldKeyDown(p: Props): ReactKeyboardEvent => Option[Callback] =
-      e => e.nativeEvent.keyCode match {
-        case KeyCode.Escape => Some(resetText(p) >> p.onCancelEditing)
-        case KeyCode.Enter => Some(editFieldSubmit(p))
-        case _ => None
+      e =>
+        e.nativeEvent.keyCode match {
+          case KeyCode.Escape => Some(resetText(p) >> p.onCancelEditing)
+          case KeyCode.Enter  => Some(editFieldSubmit(p))
+          case _              => None
       }
 
     val editFieldChanged: ReactEventI => Callback =
@@ -44,7 +43,7 @@ object TodoView {
       <.li(
         ^.classSet(
           "completed" -> p.todo.isCompleted,
-          "editing" -> p.isEditing
+          "editing"   -> p.isEditing
         ),
         <.div(
           ^.className := "view",
@@ -75,7 +74,8 @@ object TodoView {
 
   val component = ReactComponentB[Props]("CTodoItem")
     .initialState_P(p => State(p.todo.title))
-    .renderBackend[Backend].build
+    .renderBackend[Backend]
+    .build
 
   def apply(P: Props) =
     component.withKey(P.todo.id.id.toString)(P)

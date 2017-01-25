@@ -11,7 +11,7 @@ private[example] final case class RAFWrapper(action: Any, dispatch: Dispatcher) 
 final case class RAFTimeStamp(time: Double) extends Action
 
 class RAFBatcher[M <: AnyRef] extends ActionProcessor[M] {
-  private var batch = List.empty[RAFWrapper]
+  private var batch          = List.empty[RAFWrapper]
   private var frameRequested = false
 
   /**
@@ -25,11 +25,12 @@ class RAFBatcher[M <: AnyRef] extends ActionProcessor[M] {
       val curBatch = batch
       batch = Nil
       // dispatch all actions in the batch, supports multiple different dispatchers
-      curBatch.reverse.groupBy(_.dispatch).foreach { case (dispatch, actions) =>
-        // Precede actions with a time stamp action to get correct time in animations.
-        // When dispatching a sequence, Circuit optimizes processing internally and only calls
-        // listeners after all the actions are processed
-        dispatch(RAFTimeStamp(time) +: ActionBatch(actions:_*))
+      curBatch.reverse.groupBy(_.dispatch).foreach {
+        case (dispatch, actions) =>
+          // Precede actions with a time stamp action to get correct time in animations.
+          // When dispatching a sequence, Circuit optimizes processing internally and only calls
+          // listeners after all the actions are processed
+          dispatch(RAFTimeStamp(time) +: ActionBatch(actions: _*))
       }
       // request next frame
       requestAnimationFrame

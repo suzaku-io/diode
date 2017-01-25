@@ -1,6 +1,5 @@
 package example
 
-
 import scala.scalajs.js.JSApp
 import scala.scalajs.js.annotation.JSExport
 import scalatags.JsDom.all._
@@ -21,10 +20,11 @@ object SimpleApp extends JSApp {
   }
 
   def render(root: Element) = {
-    val e = div(cls := "container",
+    val e = div(
+      cls := "container",
       div(img(src := "diode-logo-small.png")),
       h1("Simple counter example"),
-      p(a(href := "https://github.com/ochrons/diode/tree/master/examples/simple", "Source code")),
+      p(a(href := "https://github.com/suzaku-io/diode/tree/master/examples/simple", "Source code")),
       counter.render // renders the counter view
     ).render
     // clear and update contents

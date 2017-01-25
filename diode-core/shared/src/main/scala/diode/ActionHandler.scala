@@ -100,7 +100,7 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
     * @param delay How much to delay the effect.
     * @param f     Result of the effect
     */
-  def runAfter[A : ActionType](delay: FiniteDuration)(f: => A)(implicit runner: RunAfter, ec: ExecutionContext): Effect =
+  def runAfter[A: ActionType](delay: FiniteDuration)(f: => A)(implicit runner: RunAfter, ec: ExecutionContext): Effect =
     Effect(runner.runAfter(delay)(f))
 }
 

@@ -193,7 +193,7 @@ In Diode context a reference to a value of type `V` would be `ModelRO[V]` but th
 facilitate easy referencing of other data within the model, Diode provides a `RefTo` class.
 
 ```scala
-class RefTo[V](val target: ModelRO[V], val updated: V => AnyRef) {
+class RefTo[V](val target: ModelRO[V], val updated: V => Action) {
   def apply() = target()
 }
 ```
@@ -233,8 +233,17 @@ val rwForA: ModelRW[Root, A] = AppCircuit.zoomRW(_.a)((m, v) => m.copy(a = v))
 val rwForA_e: ModelRW[Root, String] = rwForA.zoomRW(_.e)((a, v) => a.copy(e = v))
 ```
 
-This time we are defining the writer in two steps to take advantage of the provided function composition. To make the
-update, just call `updated`.
+This time we are defining the writer in two steps to take advantage of the provided function composition. For the common case of 
+accessing a value using `_.a.b.c` syntax, there is a macro based helper function `zoomTo`. The above example could be simplified to
+
+```scala
+val rwForA_e: ModelRW[Root, String] = AppCircuit.zoomTo(_.a.e)
+```
+
+Most of the documentation will use the `zoomTo` version, but if you need to update something more complicated, like inside a collection,
+ you would need to provide the reader and writer functions separately using `zoomRW`.
+ 
+To update the model (and creating a new model), just call `updated`.
 
 ```scala
 val newRoot: Root = rwForA_e.updated("New value!")

@@ -1,5 +1,18 @@
 # Changes
 
+## 1.1.1
+
+- New `zoomTo` macro to simplify common `zoomRW` use-cases. For example what used to be
+```scala
+circuit.zoomRW(_.a)((m, v) ⇒ m.copy(a = v)).zoomRW(_.i)((m, v) ⇒ m.copy(i = v))
+```
+can now be expressed with
+```scala
+circuit.zoomTo(_.a.i)
+```
+- Fixed `RefTo` to always use `Action`
+- Moved Diode under `io.suzaku` organization
+
 ## 1.1.0
 
 - Added `dispatchCB` and `dispatchNow` to `ModelProxy` to provide a more explicit way of dispatching in a `Callback` or directly

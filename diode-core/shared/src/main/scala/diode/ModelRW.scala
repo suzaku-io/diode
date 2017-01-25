@@ -1,7 +1,8 @@
 package diode
 
-import scala.language.higherKinds
+import diode.macros.GenLens
 
+import scala.language.higherKinds
 
 /**
   * A read-only version of ModelR that doesn't know about the root model.
@@ -9,6 +10,7 @@ import scala.language.higherKinds
   * @tparam S Type of the reader value
   */
 trait ModelRO[S] {
+
   /**
     * Type of a new reader returned by functions such as `zoom`
     * @tparam T
@@ -48,8 +50,7 @@ trait ModelRO[S] {
     *
     * @param f The function to apply
     */
-  def map[F[_], A, B](f: A => B)
-    (implicit ev: S =:= F[A], monad: Monad[F], feq: FastEq[_ >: B]): NewR[F[B]] =
+  def map[F[_], A, B](f: A => B)(implicit ev: S =:= F[A], monad: Monad[F], feq: FastEq[_ >: B]): NewR[F[B]] =
     zoomMap((_: S) => ev(value))(f)
 
   /**
@@ -58,8 +59,7 @@ trait ModelRO[S] {
     *
     * @param f The function to apply, must return a value of type `F[B]`
     */
-  def flatMap[F[_], A, B](f: A => F[B])
-    (implicit ev: S =:= F[A], monad: Monad[F], feq: FastEq[_ >: B]): NewR[F[B]] =
+  def flatMap[F[_], A, B](f: A => F[B])(implicit ev: S =:= F[A], monad: Monad[F], feq: FastEq[_ >: B]): NewR[F[B]] =
     zoomFlatMap((_: S) => ev(value))(f)
 
   /**
@@ -68,8 +68,7 @@ trait ModelRO[S] {
     * @param fa Zooming function
     * @param f  The function to apply
     */
-  def zoomMap[F[_], A, B](fa: S => F[A])(f: A => B)
-    (implicit monad: Monad[F], feq: FastEq[_ >: B]): NewR[F[B]]
+  def zoomMap[F[_], A, B](fa: S => F[A])(f: A => B)(implicit monad: Monad[F], feq: FastEq[_ >: B]): NewR[F[B]]
 
   /**
     * Zooms into the model and flatMaps over the zoomed value, which must be of type `F[A]`
@@ -77,8 +76,7 @@ trait ModelRO[S] {
     * @param fa Zooming function
     * @param f  The function to apply, must return a value of type `F[B]`
     */
-  def zoomFlatMap[F[_], A, B](fa: S => F[A])(f: A => F[B])
-    (implicit monad: Monad[F], feq: FastEq[_ >: B]): NewR[F[B]]
+  def zoomFlatMap[F[_], A, B](fa: S => F[A])(f: A => F[B])(implicit monad: Monad[F], feq: FastEq[_ >: B]): NewR[F[B]]
 }
 
 /**
@@ -116,6 +114,7 @@ trait ModelR[M, S] extends ModelRO[S] {
   * @tparam S Type of the reader/writer value
   */
 trait ModelRW[M, S] extends ModelR[M, S] {
+
   /**
     * Updates the model using the value provided and returns the updated model.
     */
@@ -143,8 +142,7 @@ trait ModelRW[M, S] extends ModelR[M, S] {
     * @param f   The function to apply
     * @param set Function to update the model with a new value
     */
-  def zoomMapRW[F[_], A, B](fa: S => F[A])(f: A => B)(set: (S, F[B]) => S)
-    (implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelRW[M, F[B]]
+  def zoomMapRW[F[_], A, B](fa: S => F[A])(f: A => B)(set: (S, F[B]) => S)(implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelRW[M, F[B]]
 
   /**
     * Zooms into the model and flatMaps over the zoomed value, which must be of type `F[A]`. The `set` function is used to
@@ -154,8 +152,16 @@ trait ModelRW[M, S] extends ModelR[M, S] {
     * @param f   The function to apply
     * @param set Function to update the model with a new value
     */
-  def zoomFlatMapRW[F[_], A, B](fa: S => F[A])(f: A => F[B])(set: (S, F[B]) => S)
-    (implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelRW[M, F[B]]
+  def zoomFlatMapRW[F[_], A, B](fa: S => F[A])(f: A => F[B])(set: (S, F[B]) => S)(implicit monad: Monad[F],
+                                                                                  feq: FastEq[_ >: B]): ModelRW[M, F[B]]
+
+  /**
+    * An easier way to zoom into a RW model by just specifying a single chained accessor for the field. This works for cases like
+    * `zoomTo(_.a.b.c)` but not for more complex cases such as `zoomTo(_.a.b(0))`. Uses a macro to generate appropriate update function.
+    *
+    * @param field Field to access in the model
+    */
+  def zoomTo[T](field: S => T): ModelRW[M, T] = macro GenLens.generate[M, S, T]
 }
 
 /**
@@ -175,12 +181,10 @@ trait BaseModelR[M, S] extends ModelR[M, S] {
   override def zip[SS](that: ModelR[M, SS])(implicit feqS: FastEq[_ >: S], feqSS: FastEq[_ >: SS]) =
     new ZipModelR[M, S, SS](root, eval, that.eval)
 
-  override def zoomMap[F[_], A, B](fa: S => F[A])(f: A => B)
-    (implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelR[M, F[B]] =
+  override def zoomMap[F[_], A, B](fa: S => F[A])(f: A => B)(implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelR[M, F[B]] =
     new MapModelR(root, fa compose eval, f)
 
-  override def zoomFlatMap[F[_], A, B](fa: S => F[A])(f: A => F[B])
-    (implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelR[M, F[B]] =
+  override def zoomFlatMap[F[_], A, B](fa: S => F[A])(f: A => F[B])(implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelR[M, F[B]] =
     new FlatMapModelR(root, fa compose eval, f)
 }
 
@@ -200,15 +204,13 @@ class RootModelR[M <: AnyRef](get: => M) extends BaseModelR[M, M] {
 /**
   * Model reader for a zoomed value
   */
-class ZoomModelR[M, S](val root: ModelR[M, M], get: M => S)
-  (implicit feq: FastEq[_ >: S]) extends BaseModelR[M, S] {
+class ZoomModelR[M, S](val root: ModelR[M, M], get: M => S)(implicit feq: FastEq[_ >: S]) extends BaseModelR[M, S] {
   override def eval(model: M) = get(model)
 
   override def ===(that: S): Boolean = feq.eqv(value, that)
 }
 
-trait MappedModelR[F[_], M, B] {
-  self: ModelR[M, F[B]] =>
+trait MappedModelR[F[_], M, B] { self: ModelR[M, F[B]] =>
   protected def monad: Monad[F]
   protected def feq: FastEq[_ >: B]
   protected def mapValue: F[B]
@@ -230,9 +232,9 @@ trait MappedModelR[F[_], M, B] {
 /**
   * Model reader for a mapped value
   */
-class MapModelR[F[_], M, A, B](val root: ModelR[M, M], get: M => F[A], f: A => B)
-  (implicit val monad: Monad[F], val feq: FastEq[_ >: B])
-  extends BaseModelR[M, F[B]] with MappedModelR[F, M, B] {
+class MapModelR[F[_], M, A, B](val root: ModelR[M, M], get: M => F[A], f: A => B)(implicit val monad: Monad[F], val feq: FastEq[_ >: B])
+    extends BaseModelR[M, F[B]]
+    with MappedModelR[F, M, B] {
 
   override protected def mapValue = monad.map(get(root.value))(f)
 }
@@ -240,9 +242,10 @@ class MapModelR[F[_], M, A, B](val root: ModelR[M, M], get: M => F[A], f: A => B
 /**
   * Model reader for a flatMapped value
   */
-class FlatMapModelR[F[_], M, A, B](val root: ModelR[M, M], get: M => F[A], f: A => F[B])
-  (implicit val monad: Monad[F], val feq: FastEq[_ >: B])
-  extends BaseModelR[M, F[B]] with MappedModelR[F, M, B] {
+class FlatMapModelR[F[_], M, A, B](val root: ModelR[M, M], get: M => F[A], f: A => F[B])(implicit val monad: Monad[F],
+                                                                                         val feq: FastEq[_ >: B])
+    extends BaseModelR[M, F[B]]
+    with MappedModelR[F, M, B] {
 
   override protected def mapValue = monad.flatMap(get(root.value))(f)
 }
@@ -250,9 +253,8 @@ class FlatMapModelR[F[_], M, A, B](val root: ModelR[M, M], get: M => F[A], f: A 
 /**
   * Model reader for two zipped readers
   */
-class ZipModelR[M, S, SS](val root: ModelR[M, M], get1: M => S, get2: M => SS)
-  (implicit feqS: FastEq[_ >: S], feqSS: FastEq[_ >: SS])
-  extends BaseModelR[M, (S, SS)] {
+class ZipModelR[M, S, SS](val root: ModelR[M, M], get1: M => S, get2: M => SS)(implicit feqS: FastEq[_ >: S], feqSS: FastEq[_ >: SS])
+    extends BaseModelR[M, (S, SS)] {
   // initial value for zipped
   private var zipped = (get1(root.value), get2(root.value))
 
@@ -281,12 +283,10 @@ trait BaseModelRW[M, S] extends ModelRW[M, S] with BaseModelR[M, S] {
   override def zoomRW[U](get: S => U)(set: (S, U) => S)(implicit feq: FastEq[_ >: U]) =
     new ZoomModelRW[M, U](root, get compose eval, (s, u) => updatedWith(s, set(eval(s), u)))
 
-  override def zoomMapRW[F[_], A, B](fa: S => F[A])(f: A => B)(set: (S, F[B]) => S)
-    (implicit monad: Monad[F], feq: FastEq[_ >: B]) =
+  override def zoomMapRW[F[_], A, B](fa: S => F[A])(f: A => B)(set: (S, F[B]) => S)(implicit monad: Monad[F], feq: FastEq[_ >: B]) =
     new MapModelRW(root, fa compose eval, f)((s, u) => updatedWith(s, set(eval(s), u)))
 
-  override def zoomFlatMapRW[F[_], A, B](fa: S => F[A])(f: A => F[B])(set: (S, F[B]) => S)
-    (implicit monad: Monad[F], feq: FastEq[_ >: B]) =
+  override def zoomFlatMapRW[F[_], A, B](fa: S => F[A])(f: A => F[B])(set: (S, F[B]) => S)(implicit monad: Monad[F], feq: FastEq[_ >: B]) =
     new FlatMapModelRW(root, fa compose eval, f)((s, u) => updatedWith(s, set(eval(s), u)))
 
   override def updated(newValue: S) = updatedWith(root.value, newValue)
@@ -306,26 +306,28 @@ class RootModelRW[M <: AnyRef](get: => M) extends RootModelR(get) with BaseModel
 /**
   * Model reader/writer for a zoomed value
   */
-class ZoomModelRW[M, S](root: ModelR[M, M], get: M => S, set: (M, S) => M)
-  (implicit feq: FastEq[_ >: S]) extends ZoomModelR(root, get) with BaseModelRW[M, S] {
+class ZoomModelRW[M, S](root: ModelR[M, M], get: M => S, set: (M, S) => M)(implicit feq: FastEq[_ >: S])
+    extends ZoomModelR(root, get)
+    with BaseModelRW[M, S] {
   override def updatedWith(model: M, value: S) = set(model, value)
 }
 
 /**
   * Model reader/writer for a mapped value
   */
-class MapModelRW[F[_], M, A, B](root: ModelR[M, M], get: M => F[A], f: A => B)(set: (M, F[B]) => M)
-  (implicit monad: Monad[F], feq: FastEq[_ >: B])
-  extends MapModelR(root, get, f) with BaseModelRW[M, F[B]] {
+class MapModelRW[F[_], M, A, B](root: ModelR[M, M], get: M => F[A], f: A => B)(set: (M, F[B]) => M)(implicit monad: Monad[F],
+                                                                                                    feq: FastEq[_ >: B])
+    extends MapModelR(root, get, f)
+    with BaseModelRW[M, F[B]] {
   override def updatedWith(model: M, value: F[B]) = set(model, value)
 }
 
 /**
   * Model reader/writer for a flatMapped value
   */
-class FlatMapModelRW[F[_], M, A, B](root: ModelR[M, M], get: M => F[A], f: A => F[B])(set: (M, F[B]) => M)
-  (implicit monad: Monad[F], feq: FastEq[_ >: B])
-  extends FlatMapModelR(root, get, f) with BaseModelRW[M, F[B]] {
+class FlatMapModelRW[F[_], M, A, B](root: ModelR[M, M], get: M => F[A], f: A => F[B])(set: (M, F[B]) => M)(implicit monad: Monad[F],
+                                                                                                           feq: FastEq[_ >: B])
+    extends FlatMapModelR(root, get, f)
+    with BaseModelRW[M, F[B]] {
   override def updatedWith(model: M, value: F[B]) = set(model, value)
 }
-

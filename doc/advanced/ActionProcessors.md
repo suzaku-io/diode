@@ -54,7 +54,7 @@ already done, a RAF callback is requested. When the callback is executed, all ba
 should handle this action and update the model with the current timestamp.
 
 ```scala
-val timestampHandler = new ActionHandler(zoomRW(_.now)((m, v) => m.copy(now = v))) {
+val timestampHandler = new ActionHandler(zoomTo(_.now)) {
   override def handle = {
     case RAFTimeStamp(time) =>
       updated(time)
@@ -68,7 +68,7 @@ make sense to use a batching strategy even when no animations are involved.
 
 ### Persisting Application State
 
-Diode [devtools](https://github.com/ochrons/diode/tree/master/diode-devtools) project contains a convenient action processor for saving and restoring
+Diode [devtools](https://github.com/suzaku-io/diode/tree/master/diode-devtools) project contains a convenient action processor for saving and restoring
 application state. This can be useful when encountering a bug in development and wanting to replicate the same application state later, after the code has been
 fixed and application reloaded.
 

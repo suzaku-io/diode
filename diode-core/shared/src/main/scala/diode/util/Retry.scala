@@ -11,6 +11,7 @@ import scala.concurrent.duration._
   * Define a policy for retrying
   */
 trait RetryPolicy {
+
   /**
     * Checks if retry should be attempted.
     *
@@ -72,18 +73,19 @@ object Retry {
     * @param filter A filter to check if the cause of failure should prevent retrying.
     */
   case class Backoff(
-    retriesLeft: Int,
-    delay: FiniteDuration,
-    exp: Double = 2.0,
-    filter: Throwable => Boolean = always
-  )(implicit runner: RunAfter, ec: ExecutionContext) extends RetryPolicy {
+      retriesLeft: Int,
+      delay: FiniteDuration,
+      exp: Double = 2.0,
+      filter: Throwable => Boolean = always
+  )(implicit runner: RunAfter, ec: ExecutionContext)
+      extends RetryPolicy {
     override def canRetry(reason: Throwable) =
       retriesLeft > 0 && filter(reason)
 
     override def retry[T <: AnyRef](reason: Throwable, effectProvider: RetryPolicy => Effect) = {
       if (canRetry(reason)) {
         // calculate next delay time
-        val nextDelay = (delay.toUnit(TimeUnit.MILLISECONDS) * exp).millis
+        val nextDelay  = (delay.toUnit(TimeUnit.MILLISECONDS) * exp).millis
         val nextPolicy = Backoff(retriesLeft - 1, nextDelay, exp, filter)
         // wrap effect into a delayed effect
         Right((nextPolicy, effectProvider(nextPolicy).after(delay)))

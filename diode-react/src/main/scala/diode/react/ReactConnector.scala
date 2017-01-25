@@ -10,41 +10,37 @@ import scala.scalajs.js
   * Wraps a model reader, dispatcher and React connector to be passed to React components
   * in props.
   */
-case class ModelProxy[S](modelReader: ModelRO[S], theDispatch: Any => Unit,
-  connector: ReactConnector[_ <: AnyRef]) {
+case class ModelProxy[S](modelReader: ModelRO[S], theDispatch: Any => Unit, connector: ReactConnector[_ <: AnyRef]) {
   def value = modelReader()
 
   /**
     * Perform a dispatch action in a `Callback`. Use `dispatchCB` instead to make meaning explicit.
     */
   @deprecated("Use dispatchCB instead", "1.1.0")
-  def dispatch[A : ActionType](action: A): Callback = dispatchCB(action)
+  def dispatch[A: ActionType](action: A): Callback = dispatchCB(action)
 
   /**
     * Perform a dispatch action in a `Callback`
     */
-  def dispatchCB[A : ActionType](action: A): Callback = Callback(theDispatch(action))
+  def dispatchCB[A: ActionType](action: A): Callback = Callback(theDispatch(action))
 
   /**
     * Dispatch an action right now
     */
-  def dispatchNow[A : ActionType](action: A): Unit = theDispatch(action)
+  def dispatchNow[A: ActionType](action: A): Unit = theDispatch(action)
 
   def apply() = modelReader()
 
   def zoom[T](f: S => T)(implicit feq: FastEq[_ >: T]) = ModelProxy(modelReader.zoom(f), theDispatch, connector)
 
-  def wrap[T <: AnyRef, C](f: S => T)(compB: ModelProxy[T] => C)
-    (implicit ev: C => ReactElement, feq: FastEq[_ >: T]): C = compB(zoom(f))
+  def wrap[T <: AnyRef, C](f: S => T)(compB: ModelProxy[T] => C)(implicit ev: C => ReactElement, feq: FastEq[_ >: T]): C = compB(zoom(f))
 
-  def connect[T <: AnyRef](f: S => T)
-    (implicit feq: FastEq[_ >: T]): ReactConnectProxy[T] = {
+  def connect[T <: AnyRef](f: S => T)(implicit feq: FastEq[_ >: T]): ReactConnectProxy[T] = {
     connector.connect(modelReader.zoom(f))
   }
 }
 
-trait ReactConnector[M <: AnyRef] {
-  circuit: Circuit[M] =>
+trait ReactConnector[M <: AnyRef] { circuit: Circuit[M] =>
 
   /**
     * Wraps a React component by providing it an instance of ModelProxy for easy access to the model and dispatcher.
@@ -53,8 +49,7 @@ trait ReactConnector[M <: AnyRef] {
     * @param compB    Function that creates the wrapped component
     * @return The component returned by `compB`
     */
-  def wrap[S <: AnyRef, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)
-    (implicit ev: C => ReactElement, feq: FastEq[_ >: S]): C = {
+  def wrap[S <: AnyRef, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)(implicit ev: C => ReactElement, feq: FastEq[_ >: S]): C = {
     wrap(circuit.zoom(zoomFunc))(compB)
   }
 
@@ -65,8 +60,7 @@ trait ReactConnector[M <: AnyRef] {
     * @param compB       Function that creates the wrapped component
     * @return The component returned by `compB`
     */
-  def wrap[S <: AnyRef, C](modelReader: ModelRO[S])(compB: ModelProxy[S] => C)
-    (implicit ev: C => ReactElement, feq: FastEq[_ >: S]): C = {
+  def wrap[S <: AnyRef, C](modelReader: ModelRO[S])(compB: ModelProxy[S] => C)(implicit ev: C => ReactElement, feq: FastEq[_ >: S]): C = {
     implicit object aType extends ActionType[Any]
     compB(ModelProxy(modelReader, action => circuit.dispatch(action), ReactConnector.this))
   }
@@ -79,8 +73,7 @@ trait ReactConnector[M <: AnyRef] {
     * @param key      Specifies a unique React key for this component.
     * @return A ReactConnectProxy
     */
-  def connect[S <: AnyRef](zoomFunc: M => S, key: js.Any)
-    (implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
+  def connect[S <: AnyRef](zoomFunc: M => S, key: js.Any)(implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
     connect(circuit.zoom(zoomFunc), key)
   }
 
@@ -91,8 +84,7 @@ trait ReactConnector[M <: AnyRef] {
     * @param zoomFunc Function to retrieve relevant piece from the model
     * @return A ReactConnectProxy
     */
-  def connect[S <: AnyRef](zoomFunc: M => S)
-    (implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
+  def connect[S <: AnyRef](zoomFunc: M => S)(implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
     connect(circuit.zoom(zoomFunc))
   }
 
@@ -104,8 +96,8 @@ trait ReactConnector[M <: AnyRef] {
     * @param key         Optional parameter specifying a unique React key for this component.
     * @return A ReactConnectProxy
     */
-  def connect[S <: AnyRef](modelReader: ModelRO[S], key: js.UndefOr[js.Any] = js.undefined)
-    (implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
+  def connect[S <: AnyRef](modelReader: ModelRO[S], key: js.UndefOr[js.Any] = js.undefined)(
+      implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
 
     class Backend(t: BackendScope[ModelProxy[S] => ReactElement, S]) {
       private var unsubscribe = Option.empty[() => Unit]

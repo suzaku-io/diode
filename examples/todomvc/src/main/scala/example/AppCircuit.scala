@@ -12,7 +12,7 @@ object AppCircuit extends Circuit[AppModel] with ReactConnector[AppModel] {
   def initialModel = AppModel(Todos(Seq()))
 
   override val actionHandler = composeHandlers(
-    new TodoHandler(zoomRW(_.todos)((m, v) => m.copy(todos = v)).zoomRW(_.todoList)((m, v) => m.copy(todoList = v)))
+    new TodoHandler(zoomTo(_.todos.todoList))
   )
 }
 
@@ -20,8 +20,8 @@ class TodoHandler[M](modelRW: ModelRW[M, Seq[Todo]]) extends ActionHandler(model
 
   def updateOne(Id: TodoId)(f: Todo => Todo): Seq[Todo] =
     value.map {
-      case found@Todo(Id, _, _) => f(found)
-      case other => other
+      case found @ Todo(Id, _, _) => f(found)
+      case other                  => other
     }
 
   override def handle = {

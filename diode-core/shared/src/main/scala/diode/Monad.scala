@@ -6,6 +6,7 @@ import scala.language.higherKinds
   * Defines a Diode specific Monad for traversing models with `Option`s etc.
   */
 trait Monad[F[_]] {
+
   /**
     * Maps a monad value to another value using function `f`
     */
@@ -37,8 +38,8 @@ object Monad {
     override def isEqual[A](fa1: Option[A], fa2: Option[A])(eqF: (A, A) => Boolean): Boolean = {
       (fa1, fa2) match {
         case (Some(a1), Some(a2)) => eqF(a1, a2)
-        case (None, None) => true
-        case _ => false
+        case (None, None)         => true
+        case _                    => false
       }
     }
   }

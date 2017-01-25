@@ -12,13 +12,20 @@ import org.scalajs.dom
 @JSExport("SimpleApp")
 object SimpleApp extends JSApp {
   // initial data
-  val data = Directory("/", "/", Vector(
-    Directory("2", "My files", Vector(
-      Directory("3", "Documents", Vector(
-        File("F3", "HaukiOnKala.doc")
-      ))
-    )), File("F1", "boot.sys")
-  ))
+  val data = Directory("/",
+                       "/",
+                       Vector(
+                         Directory("2",
+                                   "My files",
+                                   Vector(
+                                     Directory("3",
+                                               "Documents",
+                                               Vector(
+                                                 File("F3", "HaukiOnKala.doc")
+                                               ))
+                                   )),
+                         File("F1", "boot.sys")
+                       ))
 
   var id = 0
   def nextId = {
@@ -27,7 +34,7 @@ object SimpleApp extends JSApp {
   }
 
   var currentModel: FileNode = AppCircuit.zoom(_.tree.root).value
-  var treeView = new TreeView(AppCircuit.zoom(_.tree.root), Seq.empty, AppCircuit.zoom(_.tree.selected), AppCircuit)
+  var treeView               = new TreeView(AppCircuit.zoom(_.tree.root), Seq.empty, AppCircuit.zoom(_.tree.selected), AppCircuit)
 
   @JSExport
   override def main(): Unit = {
@@ -50,22 +57,33 @@ object SimpleApp extends JSApp {
     val selectionLoc = tree().selected
     def renderButtons(selected: Boolean) = {
       div(
-        button(if (!selected) disabled else "", cls := "btn",
-          onclick := { () => AppCircuit(AddNode(selectionLoc, Directory(UUID.randomUUID().toString, s"New directory $nextId"))) },
-          "Create dir"),
-        button(if (!selected) disabled else "", cls := "btn",
-          onclick := { () => AppCircuit(AddNode(selectionLoc, File(UUID.randomUUID().toString, s"New file $nextId"))) },
-          "Create file"),
-        button(if (!selected) disabled else "", cls := "btn",
-          onclick := { () => AppCircuit(RemoveNode(selectionLoc)) },
-          "Remove")
+        button(
+          if (!selected) disabled else "",
+          cls := "btn",
+          onclick := { () =>
+            AppCircuit(AddNode(selectionLoc, Directory(UUID.randomUUID().toString, s"New directory $nextId")))
+          },
+          "Create dir"
+        ),
+        button(
+          if (!selected) disabled else "",
+          cls := "btn",
+          onclick := { () =>
+            AppCircuit(AddNode(selectionLoc, File(UUID.randomUUID().toString, s"New file $nextId")))
+          },
+          "Create file"
+        ),
+        button(if (!selected) disabled else "", cls := "btn", onclick := { () =>
+          AppCircuit(RemoveNode(selectionLoc))
+        }, "Remove")
       )
     }
 
-    val e = div(cls := "container",
+    val e = div(
+      cls := "container",
       div(img(src := "diode-logo-small.png")),
       h1("Treeview example"),
-      p(a(href := "https://github.com/ochrons/diode/tree/master/examples/treeview", "Source code")),
+      p(a(href := "https://github.com/suzaku-io/diode/tree/master/examples/treeview", "Source code")),
       renderButtons(selectionLoc.nonEmpty),
       treeView.render
     ).render

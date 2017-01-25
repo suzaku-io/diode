@@ -4,6 +4,7 @@ package diode.data
   * Provides methods to asynchronously fetch value(s) based on key(s)
   */
 trait Fetch[K] {
+
   /**
     * Start fetching a single value for `key`
     */

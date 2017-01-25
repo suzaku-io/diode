@@ -117,7 +117,7 @@ is updating the model at suitable intervals for the model to update.
 
 ## Examples
 
-You may also want to take a look at the [TodoMVC](https://github.com/ochrons/diode/tree/master/examples/todomvc) example for how to build React applications
+You may also want to take a look at the [TodoMVC](https://github.com/suzaku-io/diode/tree/master/examples/todomvc) example for how to build React applications
 using Diode for application state management.
 
 Another more complete application is example is the [Scala.js SPA tutorial](https://github.com/ochrons/scalajs-spa-tutorial), demonstrating the use of
