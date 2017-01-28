@@ -131,7 +131,7 @@ Let's take a look at the full implementation.
 def zoomToChildren[M](path: Seq[String], rw: ModelRW[M, Directory])
   : Option[ModelRW[M, IndexedSeq[FileNode]]] = {
   if (path.isEmpty) {
-    Some(rw.zoomRW(_.children)((m, v) => m.copy(children = v)))
+    Some(rw.zoomTo(_.children))
   } else {
     // find the index for the next directory in the path and make sure it's a directory
     rw.value.children.indexWhere(n => n.id == path.head && n.isDirectory) match {
