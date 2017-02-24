@@ -25,6 +25,7 @@ To create an effect you need a function that runs something asynchronously, for 
  
 ```scala
 import org.scalajs.dom.ext.Ajax
+import scala.scalajs.concurrent.JSExecutionContext.Implicits.queue
 
 case class NewMessages(msgs: String) extends Action
 
