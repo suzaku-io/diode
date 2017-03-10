@@ -8,6 +8,7 @@ import scala.concurrent.duration.FiniteDuration
 import scala.language.implicitConversions
 
 trait Effect {
+
   /**
     * Runs the effect and dispatches the result of the effect.
     *
@@ -51,7 +52,7 @@ trait Effect {
     * this effect. If this effect is completed with an exception then the new
     * effect will also contain this exception.
     */
-  def map[B : ActionType](g: Any => B): Effect
+  def map[B: ActionType](g: Any => B): Effect
 
   /**
     * Creates a new effect by applying a function to the successful result of
@@ -59,13 +60,12 @@ trait Effect {
     * If this effect is completed with an exception then the new
     * effect will also contain this exception.
     */
-  def flatMap[B : ActionType](g: Any => Future[B]): Effect
+  def flatMap[B: ActionType](g: Any => Future[B]): Effect
 
   def ec: ExecutionContext
 }
 
-abstract class EffectBase(val ec: ExecutionContext) extends Effect {
-  self =>
+abstract class EffectBase(val ec: ExecutionContext) extends Effect { self =>
   override def +(that: Effect) = new EffectSet(this, Set(that), ec)
 
   override def >>(that: Effect) = new EffectSeq(this, List(that), ec)
@@ -85,10 +85,10 @@ abstract class EffectBase(val ec: ExecutionContext) extends Effect {
       executeWith(_.toFuture)
   }
 
-  override def map[B : ActionType](g: Any => B): Effect =
+  override def map[B: ActionType](g: Any => B): Effect =
     new EffectSingle(() => toFuture.map(g)(ec), ec)
 
-  override def flatMap[B : ActionType](g: Any => Future[B]): Effect =
+  override def flatMap[B: ActionType](g: Any => Future[B]): Effect =
     new EffectSingle(() => toFuture.flatMap(g)(ec), ec)
 }
 
@@ -113,7 +113,9 @@ class EffectSingle[A] private[diode] (f: () => Future[A], ec: ExecutionContext) 
   */
 class EffectSeq(head: Effect, tail: Seq[Effect], ec: ExecutionContext) extends EffectBase(ec) {
   private def executeWith[A](f: Effect => Future[A]): Future[A] =
-    tail.foldLeft(f(head)) { (prev, effect) => prev.flatMap(_ => f(effect))(ec) }
+    tail.foldLeft(f(head)) { (prev, effect) =>
+      prev.flatMap(_ => f(effect))(ec)
+    }
 
   override def run(dispatch: Any => Unit) =
     executeWith(_.run(dispatch))
@@ -130,10 +132,10 @@ class EffectSeq(head: Effect, tail: Seq[Effect], ec: ExecutionContext) extends E
   override def toFuture =
     executeWith(_.toFuture)
 
-  override def map[B : ActionType](g: Any => B) =
+  override def map[B: ActionType](g: Any => B) =
     new EffectSeq(head.map(g), tail.map(_.map(g)), ec)
 
-  override def flatMap[B : ActionType](g: Any => Future[B]) =
+  override def flatMap[B: ActionType](g: Any => Future[B]) =
     new EffectSeq(head.flatMap(g), tail.map(_.flatMap(g)), ec)
 }
 
@@ -159,25 +161,25 @@ class EffectSet(head: Effect, tail: Set[Effect], ec: ExecutionContext) extends E
   override def toFuture =
     executeWith(_.toFuture)
 
-  override def map[B : ActionType](g: Any => B) =
+  override def map[B: ActionType](g: Any => B) =
     new EffectSet(head.map(g), tail.map(_.map(g)), ec)
 
-  override def flatMap[B : ActionType](g: Any => Future[B]) =
+  override def flatMap[B: ActionType](g: Any => Future[B]) =
     new EffectSet(head.flatMap(g), tail.map(_.flatMap(g)), ec)
 }
 
 object Effect {
   type EffectF[A] = () => Future[A]
 
-  def apply[A : ActionType](f: => Future[A])(implicit ec: ExecutionContext): EffectSingle[A] =
+  def apply[A: ActionType](f: => Future[A])(implicit ec: ExecutionContext): EffectSingle[A] =
     new EffectSingle(f _, ec)
 
   /**
     * Converts a lazy action value into an effect. Typically used in combination with other effects or
     * with `after` to delay execution.
     */
-  def action[A : ActionType](action: => A)(implicit ec: ExecutionContext): EffectSingle[A] =
+  def action[A: ActionType](action: => A)(implicit ec: ExecutionContext): EffectSingle[A] =
     new EffectSingle(() => Future.successful(action), ec)
 
-  implicit def f2effect[A : ActionType](f: EffectF[A])(implicit ec: ExecutionContext): EffectSingle[A] = new EffectSingle(f, ec)
+  implicit def f2effect[A: ActionType](f: EffectF[A])(implicit ec: ExecutionContext): EffectSingle[A] = new EffectSingle(f, ec)
 }

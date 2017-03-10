@@ -6,7 +6,7 @@
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ochrons/diode)
 [![Build Status](https://travis-ci.org/ochrons/diode.svg?branch=master)](https://travis-ci.org/ochrons/diode)
-[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.8.svg)](https://www.scala-js.org)
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.13.svg)](https://www.scala-js.org)
 
 Diode is a Scala/Scala.js library for managing immutable application state with unidirectional data flow. It is heavily
 influenced and inspired by [Flux](https://facebook.github.io/flux/) and
@@ -17,17 +17,17 @@ performing and extensible library with no external dependencies.
 
 ## Documentation
 
-Full documentation [available here](http://ochrons.github.io/diode/index.html).
+Full documentation [available here](https://diode.suzaku.io).
 
 ## Getting Started
 
 Add following dependency declaration to your Scala project.
 
-<pre><code class="lang-scala">"me.chrons" %% "diode" % "1.0.0"</code></pre>
+<pre><code class="lang-scala">"io.suzaku" %% "diode" % "1.1.1"</code></pre>
 
 In a Scala.js project the dependency looks like this.
 
-<pre><code class="lang-scala">"me.chrons" %%% "diode" % "1.0.0"</code></pre>
+<pre><code class="lang-scala">"io.suzaku" %%% "diode" % "1.1.1"</code></pre>
 
 <img align="right" src="doc/images/architecture.png">
 
@@ -81,7 +81,7 @@ Because we want to keep the code clean and DRY, let's use the `ActionHandler` he
 instead.
 
 ```scala
-val counterHandler = new ActionHandler(zoomRW(_.counter)((m, v) => m.copy(counter = v))) {
+val counterHandler = new ActionHandler(zoomTo(_.counter)) {
   override def handle = {
     case Increase(a) => updated(value + a)
     case Decrease(a) => updated(value - a)

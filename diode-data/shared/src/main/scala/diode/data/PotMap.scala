@@ -3,8 +3,8 @@ package diode.data
 import diode.Implicits.runAfterImpl
 
 class PotMap[K, V](
-  private val fetcher: Fetch[K],
-  private val elems: Map[K, Pot[V]]
+    private val fetcher: Fetch[K],
+    private val elems: Map[K, Pot[V]]
 ) extends PotCollection[K, V] {
 
   override def updated(key: K, value: Pot[V]): PotMap[K, V] =
@@ -82,7 +82,7 @@ class PotMap[K, V](
       }
     }(collection.breakOut)
 
-    if(toFetch.nonEmpty) {
+    if (toFetch.nonEmpty) {
       refresh(toFetch)
     }
     values

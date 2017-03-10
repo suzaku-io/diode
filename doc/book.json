@@ -1,16 +1,16 @@
 {
-  "gitbook": "2.5.x",
+  "gitbook": "3.2.x",
   "plugins": ["editlink", "prism", "-highlight", "github"],
   "pluginsConfig": {
     "editlink": {
-      "base": "https://github.com/ochrons/diode/tree/master/doc",
+      "base": "https://github.com/suzaku-io/diode/tree/master/doc",
       "label": "Edit This Page"
     },
     "github": {
-      "url": "https://github.com/ochrons/diode/"
+      "url": "https://github.com/suzaku-io/diode/"
     }
   },
   "variables": {
-    "version": "1.0.0"
+    "version": "1.1.1"
   }
 }

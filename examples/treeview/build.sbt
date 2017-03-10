@@ -2,7 +2,9 @@ enablePlugins(ScalaJSPlugin)
 
 name := "Diode Treeview"
 
-scalaVersion := "2.11.8"
+crossScalaVersions := Seq("2.11.8", "2.12.1")
+
+scalaVersion := "2.12.1"
 
 workbenchSettings
 
@@ -12,7 +14,7 @@ testFrameworks += new TestFramework("utest.runner.Framework")
 
 libraryDependencies ++= Seq(
   "org.scala-js" %%% "scalajs-dom" % "0.9.1",
-  "com.lihaoyi" %%% "scalatags" % "0.5.5",
-  "com.lihaoyi" %%% "utest" % "0.4.3" % "test",
-  "me.chrons" %%% "diode-core" % "1.0.1-SNAPSHOT"
+  "com.lihaoyi"  %%% "scalatags"   % "0.6.2",
+  "com.lihaoyi"  %%% "utest"       % "0.4.4" % "test",
+  "io.suzaku"    %%% "diode-core"  % "1.1.1"
 )

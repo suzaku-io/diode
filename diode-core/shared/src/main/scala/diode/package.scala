@@ -1,4 +1,3 @@
-
 package object diode {
 
   /**
@@ -11,4 +10,6 @@ package object diode {
     implicit object aType extends ActionType[Any]
 
   }
+
+  type Subscriber[A] = (ModelRO[A] => Unit) => () => Unit
 }

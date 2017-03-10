@@ -1,4 +1,4 @@
-# [![Diode](images/diode-logo-big.png)](https://github.com/ochrons/diode)
+# [![Diode](images/diode-logo-big.png)](https://github.com/suzaku-io/diode)
 
 # Introduction
 
@@ -15,11 +15,11 @@ Both give a great overview on the benefits of unidirectional data flow and immut
 
 To use Diode in your application add following dependency declaration to your Scala project.
 
-<pre><code class="lang-scala">"me.chrons" %% "diode" % "{{ book.version }}"</code></pre>
+<pre><code class="lang-scala">"io.suzaku" %% "diode" % "{{ book.version }}"</code></pre>
 
 In a Scala.js project the dependency looks like this.
 
-<pre><code class="lang-scala">"me.chrons" %%% "diode" % "{{ book.version }}"</code></pre>
+<pre><code class="lang-scala">"io.suzaku" %%% "diode" % "{{ book.version }}"</code></pre>
 
 ## Diode Architecture
 

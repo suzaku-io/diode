@@ -11,7 +11,7 @@ into local storage.
 A simple view needs only a _reader_ to access model data, and a _dispatcher_ to dispatch actions.
 
 ```scala
-class CounterView(counter: ModelR[_, Int], dispatch: Dispatcher) {
+class CounterView(counter: ModelRO[Int], dispatch: Dispatcher) {
   def render = {
     div(
       h3("Counter"),
@@ -34,7 +34,7 @@ val counter = new CounterView(AppCircuit.zoom(_.counter), AppCircuit)
 For our directory tree we need a more complex view that supports the recursive nature of the data.
 
 ```scala
-class TreeView(root: ModelR[_, FileNode], parent: Seq[String], 
+class TreeView(root: ModelRO[FileNode], parent: Seq[String], 
                selection: Seq[String], dispatcher: Dispatcher) {
   val id = root.value.id
   val path = parent :+ id
@@ -84,7 +84,7 @@ notifications.
 ```scala
 val root = dom.document.getElementById("root")
 val unsubscribe = AppCircuit.subscribe(AppCircuit.zoom(_.tree))(tree => render(root, tree))
-def render(root: dom.Element, tree: ModelR[_, Tree]) = { ... }
+def render(root: dom.Element, tree: ModelRO[Tree]) = { ... }
 ```
 
 Listeners are called when the model pointed by the cursor changes, even if it would have no effect in the part of the
@@ -93,7 +93,7 @@ expensive re-computations.
 
 ```scala
 // rebuild the tree view if the model has changed
-val dirRoot: ModelR[_, FileNode] = tree.zoom(_.root)
+val dirRoot: ModelRO[FileNode] = tree.zoom(_.root)
 if (dirRoot =!= currentModel) {
   currentModel = dirRoot.value
   treeView = new TreeView(dirRoot, Seq.empty, tree.zoom(_.selected), AppCircuit)
@@ -103,6 +103,15 @@ if (dirRoot =!= currentModel) {
 If only `selected` is changed, we don't need to rebuild the tree as its structure has stayed the same. We do, however,
 need to re-render the tree to reflect this change.
 
-Warning! You must not dispatch actions while your listener function is running. This is because listeners are called
-while the previous dispatch is still being processed. If you have a need to dispatch actions in the listener, use a
-deferred call with, for example, `RunAfter`.
+Quite often you need to listen to changes in a component that doesn't need to know about the application model or its Circuit.
+In these cases you can use currying to pass a function that already contains the cursor to your model. To make this more convenient,
+Diode defines a `Subscriber[A]` type which is an alias for `(ModelRO[A] => Unit) => () => Unit`. For example:
+
+```scala
+class MyComponent(subscriber: Subscriber[Tree]) {
+  val unsubscribe = subscriber(myListener) 
+  def myListener(tree: ModelRO[Tree]) = { ... }
+}
+
+val component = new MyComponent(AppCircuit.subscribe(AppCircuit.zoom(_.tree)))
+```

@@ -37,18 +37,18 @@ In Diode actions can be anything but typically case classes are used for easy pa
 `ActionType[A]` type class in scope. Diode uses this type class to implicitly verify that the dispatched action is actually a valid action. It is up
 to you as the developer to decide what actions are valid by providing appropriate type class instances.
 
-Typically a good way to accomplish this is to create a single base trait (say `Action`) for all your actions and provide an implicit
-`ActionType[Action]` for it in the companion object.
+Typically a good way to accomplish this is to create a single base trait (say `MyAction`) for all your actions and provide an implicit
+`ActionType[MyAction]` for it in the companion object.
 
 ```scala
-trait Action
+trait MyAction
 
-object Action {
-  implicit object actionType extends ActionType[Action]
+object MyAction {
+  implicit object actionType extends ActionType[MyAction]
 }
 ```
 
-To make your life easier, Diode provides such a base trait by default so you can start using it right away!
+To make your life easier, Diode provides such a base trait (named `Action`) by default so you can start using it right away!
 
 If you want to forgo type safety altogether, you can import the provided `AnyAction` implicit, which allows `Any` to be used as action. This can be used
 for adapting legacy Diode code to a new version.

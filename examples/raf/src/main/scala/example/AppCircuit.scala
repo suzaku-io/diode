@@ -10,9 +10,9 @@ case class RootModel(animations: Map[Int, Animated], now: Double)
 case class Point(x: Double, y: Double)
 
 case class Animated(started: Double, animation: Animation, isRunning: Boolean = false, pausedAt: Double = 0) {
-  def pause(time: Double) = copy(isRunning = false, pausedAt = time)
+  def pause(time: Double)    = copy(isRunning = false, pausedAt = time)
   def continue(time: Double) = copy(started = time - pausedAt + started, isRunning = true)
-  def updated(time: Double) = copy(animation = animation.update((time - started) / 1000.0))
+  def updated(time: Double)  = copy(animation = animation.update((time - started) / 1000.0))
 }
 
 trait Animation {
@@ -70,9 +70,9 @@ object AppCircuit extends Circuit[RootModel] {
   def initialModel = RootModel(Map(), System.currentTimeMillis())
 
   // zoom into the model, providing access only to the animations
-  val animationHandler = new AnimationHandler(zoomRW(_.animations)((m, v) => m.copy(animations = v)), zoom(_.now))
+  val animationHandler = new AnimationHandler(zoomTo(_.animations), zoom(_.now))
 
-  val timestampHandler = new ActionHandler(zoomRW(_.now)((m, v) => m.copy(now = v))) {
+  val timestampHandler = new ActionHandler(zoomTo(_.now)) {
     override def handle = {
       case RAFTimeStamp(time) =>
         updated(time)
@@ -82,7 +82,7 @@ object AppCircuit extends Circuit[RootModel] {
   val actionHandler = composeHandlers(animationHandler, timestampHandler)
 }
 
-class AnimationHandler[M](modelRW: ModelRW[M, Map[Int, Animated]], now: ModelR[_, Double]) extends ActionHandler(modelRW) {
+class AnimationHandler[M](modelRW: ModelRW[M, Map[Int, Animated]], now: ModelRO[Double]) extends ActionHandler(modelRW) {
   def updateOne(id: Int, f: Animated => Animated) = {
     value.get(id).fold(value)(a => value.updated(id, f(a)))
   }

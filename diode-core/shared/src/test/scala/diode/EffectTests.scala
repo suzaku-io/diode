@@ -19,7 +19,7 @@ object EffectTests extends TestSuite {
     'Effect - {
       'run - {
         var x = ""
-        efA.run( y => x = y.asInstanceOf[String] ).map { _ =>
+        efA.run(y => x = y.asInstanceOf[String]).map { _ =>
           assert(x == "A")
         }
       }
@@ -47,7 +47,7 @@ object EffectTests extends TestSuite {
         }
       }
       '+ - {
-        val e = efA + efB
+        val e  = efA + efB
         val ai = new AtomicInteger(0)
         e.run(x => ai.incrementAndGet()).map { _ =>
           assert(ai.intValue() == 2)
@@ -56,14 +56,14 @@ object EffectTests extends TestSuite {
       '>> - {
         val e = efA >> efB >> efC
         var r = List.empty[String]
-        e.run(x => r = r :+ x.asInstanceOf[String] ).map { _ =>
+        e.run(x => r = r :+ x.asInstanceOf[String]).map { _ =>
           assert(r == List("A", "B", "C"))
         }
       }
       '<< - {
         val e = efA << efB << efC
         var r = List.empty[String]
-        e.run(x => r = r :+ x.asInstanceOf[String] ).map { _ =>
+        e.run(x => r = r :+ x.asInstanceOf[String]).map { _ =>
           assert(r == List("C", "B", "A"))
         }
       }

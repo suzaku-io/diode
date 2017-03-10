@@ -62,6 +62,18 @@ val reader: ModelR[Root, String] = AppCircuit.zoom(_.a.e)
 Note that you don't need to specify the types for the readers, they are automatically inferred. They are displayed here
 for clarity.
 
+### ModelRO versus ModelR
+
+`ModelR[M, S]` has a super trait `ModelRO[S]` which actually defines most of the methods. The difference is that `ModelRO`
+does not know about the type of the model and can thus be used more freely. The examples in previous chapter could as
+well been written like this:
+
+```scala
+val reader: ModelRO[String] = AppCircuit.zoom(_.a.e)
+```
+
+If you see in your code any instances of `ModelR[_, S]` you probably should replace it with `ModelRO[S]`.
+
 ### Fast Equality Comparison 
 
 An important benefit of an immutable model is the use of _reference equality_ to quickly check if anything has changed.
@@ -117,6 +129,7 @@ Note that the above is only necessary if you want to maintain efficient referenc
 doesn't need this, it's better to just use the naive approach with a plain `zoom` call.
 
 ### Complex Access Patterns
+
 We are not limited to traversing the hierarchy to get a reader for just a single value. Since we get to define the
 access function ourselves, we can freely access anything in the model and return a composite.
 
@@ -176,11 +189,11 @@ occurs only in a single place within the model. For example if your model has `P
 but a product can belong to multiple groups, the group should hold only references to the product data, not the data
 itself.
 
-In Diode context a reference to a value of type `V` would be `ModelR[_, V]` but that provides no update mechanism. To
+In Diode context a reference to a value of type `V` would be `ModelRO[V]` but that provides no update mechanism. To
 facilitate easy referencing of other data within the model, Diode provides a `RefTo` class.
 
 ```scala
-class RefTo[V](val target: ModelR[_, V], val updated: V => AnyRef) {
+class RefTo[V](val target: ModelRO[V], val updated: V => Action) {
   def apply() = target()
 }
 ```
@@ -196,7 +209,7 @@ case class Product(id: String, ...)
 case class ProductGroup(id: String, products: Seq[RefTo[Product]], ...)
 
 // action to update a product
-case class UpdateProduct(id: String, newProduct: Product)
+case class UpdateProduct(id: String, newProduct: Product) extends Action
 
 var model = RootModel(...)
 val rootReader = new RootModelR(model)
@@ -220,8 +233,17 @@ val rwForA: ModelRW[Root, A] = AppCircuit.zoomRW(_.a)((m, v) => m.copy(a = v))
 val rwForA_e: ModelRW[Root, String] = rwForA.zoomRW(_.e)((a, v) => a.copy(e = v))
 ```
 
-This time we are defining the writer in two steps to take advantage of the provided function composition. To make the
-update, just call `updated`.
+This time we are defining the writer in two steps to take advantage of the provided function composition. For the common case of 
+accessing a value using `_.a.b.c` syntax, there is a macro based helper function `zoomTo`. The above example could be simplified to
+
+```scala
+val rwForA_e: ModelRW[Root, String] = AppCircuit.zoomTo(_.a.e)
+```
+
+Most of the documentation will use the `zoomTo` version, but if you need to update something more complicated, like inside a collection,
+ you would need to provide the reader and writer functions separately using `zoomRW`.
+ 
+To update the model (and creating a new model), just call `updated`.
 
 ```scala
 val newRoot: Root = rwForA_e.updated("New value!")

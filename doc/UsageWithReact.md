@@ -5,7 +5,7 @@ with your [scalajs-react](https://github.com/japgolly/scalajs-react) application
 
 To use Diode React in your application add following dependency declaration to your Scala.js project.
 
-<pre><code class="lang-scala">"me.chrons" %%% "diode-react" % "{{ book.version }}"</code></pre>
+<pre><code class="lang-scala">"io.suzaku" %%% "diode-react" % "{{ book.version }}"</code></pre>
 
 ## Overview
 
@@ -117,7 +117,7 @@ is updating the model at suitable intervals for the model to update.
 
 ## Examples
 
-You may also want to take a look at the [TodoMVC](https://github.com/ochrons/diode/tree/master/examples/todomvc) example for how to build React applications
+You may also want to take a look at the [TodoMVC](https://github.com/suzaku-io/diode/tree/master/examples/todomvc) example for how to build React applications
 using Diode for application state management.
 
 Another more complete application is example is the [Scala.js SPA tutorial](https://github.com/ochrons/scalajs-spa-tutorial), demonstrating the use of

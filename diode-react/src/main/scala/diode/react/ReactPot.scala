@@ -8,6 +8,7 @@ object ReactPot {
   import scala.language.implicitConversions
 
   implicit class potWithReact[A](val pot: Pot[A]) extends AnyVal {
+
     /**
       * Render non-empty (ready or stale) content
       *

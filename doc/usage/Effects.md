@@ -40,7 +40,7 @@ To return the effects alongside the new model, use one of the helper functions p
 ```scala
 case class Messages(msgs: String, loadTime: Int)
 
-val messageHandler = new ActionHandler(zoomRW(_.messages)((m, v) => m.copy(messages = v))) {
+val messageHandler = new ActionHandler(zoomTo(_.messages)) {
   override def handle = {
     case LoadMessages(user) =>
       updated(value.copy(loadTime = 0), loadMessagesEffect(user))

@@ -6,15 +6,15 @@ import japgolly.scalajs.react.vdom.prefix_<^._
 object Footer {
 
   case class Props(
-    filterLink: TodoFilter => ReactTag,
-    onSelectFilter: TodoFilter => Callback,
-    onClearCompleted: Callback,
-    currentFilter: TodoFilter,
-    activeCount: Int,
-    completedCount: Int
+      filterLink: TodoFilter => ReactTag,
+      onSelectFilter: TodoFilter => Callback,
+      onClearCompleted: Callback,
+      currentFilter: TodoFilter,
+      activeCount: Int,
+      completedCount: Int
   )
 
-  class Backend($: BackendScope[Props, Unit]) {
+  class Backend($ : BackendScope[Props, Unit]) {
     def clearButton(p: Props) =
       <.button(
         ^.className := "clear-completed",
@@ -42,8 +42,7 @@ object Footer {
       )
   }
 
-  private val component = ReactComponentB[Props]("Footer")
-    .stateless
+  private val component = ReactComponentB[Props]("Footer").stateless
     .renderBackend[Backend]
     .build
 

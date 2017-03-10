@@ -19,5 +19,3 @@ class RunAfterJVM extends RunAfter {
 object RunAfterJVM {
   private val executor = new ScheduledThreadPoolExecutor(1)
 }
-
-

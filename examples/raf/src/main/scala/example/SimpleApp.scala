@@ -29,8 +29,7 @@ object SimpleApp extends JSApp {
   var prevAnimations = Map.empty[Int, Animated]
 
   def clearElement(elem: dom.Element): dom.Element = {
-    while (elem.hasChildNodes)
-      elem.removeChild(elem.firstChild)
+    while (elem.hasChildNodes) elem.removeChild(elem.firstChild)
     elem
   }
 
@@ -39,25 +38,38 @@ object SimpleApp extends JSApp {
     // only render if animation has changed
     if (!prevAnim.exists(_.isRunning == animated.isRunning)) {
       val elem = clearElement(dom.document.querySelector(s"#anim-$animId .anim-buttons"))
-      elem.appendChild(div(cls := "btn-group",
-        if (animated.isRunning)
-          button(cls := "btn btn-warning", "Pause", onclick := { () => AppCircuit.dispatch(PauseAnimation(animId)) })
-        else
-          button(cls := "btn btn-success", "Continue", onclick := { () => AppCircuit.dispatch(ContinueAnimation(animId)) }),
-        button(cls := "btn btn-danger", "Delete", onclick := { () => AppCircuit.dispatch(DeleteAnimation(animId)) })
-      ).render)
+      elem.appendChild(
+        div(
+          cls := "btn-group",
+          if (animated.isRunning)
+            button(cls := "btn btn-warning", "Pause", onclick := { () =>
+              AppCircuit.dispatch(PauseAnimation(animId))
+            })
+          else
+            button(cls := "btn btn-success", "Continue", onclick := { () =>
+              AppCircuit.dispatch(ContinueAnimation(animId))
+            }),
+          button(cls := "btn btn-danger", "Delete", onclick := { () =>
+            AppCircuit.dispatch(DeleteAnimation(animId))
+          })
+        ).render)
     }
     if (!prevAnim.exists(_.animation eq animated.animation)) {
       val animation = animated.animation
-      val elem = clearElement(dom.document.querySelector(s"#anim-$animId .anim-area"))
-      elem.appendChild(svg.svg(svga.width := 300, svga.height := 300,
-        svg.circle(
-          svga.cx := animation.position.x * 130 + 150,
-          svga.cy := animation.position.y * 130 + 150,
-          svga.r := animation.scale * 20,
-          svga.fill := animation.color
-        )
-      ).render)
+      val elem      = clearElement(dom.document.querySelector(s"#anim-$animId .anim-area"))
+      elem.appendChild(
+        svg
+          .svg(
+            svga.width := 300,
+            svga.height := 300,
+            svg.circle(
+              svga.cx := animation.position.x * 130 + 150,
+              svga.cy := animation.position.y * 130 + 150,
+              svga.r := animation.scale * 20,
+              svga.fill := animation.color
+            )
+          )
+          .render)
     }
   }
 
@@ -66,8 +78,9 @@ object SimpleApp extends JSApp {
       // number of animations has changed, render everything
       prevAnimations = Map()
       val elem = div(
-        animations.toSeq.sortBy(_._1).map { case (animId, Animated(_, animation, isRunning, _)) =>
-          div(cls := "row", id := s"anim-$animId", div(cls := "anim-buttons"), div(cls := "anim-area"))
+        animations.toSeq.sortBy(_._1).map {
+          case (animId, Animated(_, animation, isRunning, _)) =>
+            div(cls := "row", id := s"anim-$animId", div(cls := "anim-buttons"), div(cls := "anim-area"))
         }
       ).render
       clearElement(dom.document.getElementById("animations")).appendChild(elem)
@@ -77,19 +90,23 @@ object SimpleApp extends JSApp {
   }
 
   def render(root: dom.Element) = {
-    val e = div(cls := "container",
+    val e = div(
+      cls := "container",
       div(img(src := "diode-logo-small.png")),
       h1("RAF example"),
-      p(a(href := "https://github.com/ochrons/diode/tree/master/examples/raf", "Source code")),
-      div(cls := "dropdown",
-        button(tpe := "button", "data-toggle".attr := "dropdown", "Add animation", span(cls := "caret")),
-        ul(cls := "dropdown-menu",
-          animGenerators.map { case (animName, animGenerator) =>
-            li(
-              a(href := "#",
-                onclick := { () => AppCircuit.dispatch(AddAnimation(animGenerator(math.random))) },
-                animName)
-            )
+      p(a(href := "https://github.com/suzaku-io/diode/tree/master/examples/raf", "Source code")),
+      div(
+        cls := "dropdown",
+        button(tpe := "button", data("toggle") := "dropdown", "Add animation", span(cls := "caret")),
+        ul(
+          cls := "dropdown-menu",
+          animGenerators.map {
+            case (animName, animGenerator) =>
+              li(
+                a(href := "#", onclick := { () =>
+                  AppCircuit.dispatch(AddAnimation(animGenerator(math.random)))
+                }, animName)
+              )
           }
         )
       ),

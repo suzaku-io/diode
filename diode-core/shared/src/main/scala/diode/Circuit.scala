@@ -1,5 +1,7 @@
 package diode
 
+import diode.macros.GenLens
+
 import scala.annotation.implicitNotFound
 import scala.collection.immutable.Queue
 import scala.language.higherKinds
@@ -14,13 +16,14 @@ import scala.language.higherKinds
   *
   * @tparam A Action type
   */
-@implicitNotFound(msg = "Cannot find an ActionType type class for action of type ${A}. Make sure to provide an implicit ActionType for dispatched actions.")
+@implicitNotFound(msg =
+  "Cannot find an ActionType type class for action of type ${A}. Make sure to provide an implicit ActionType for dispatched actions.")
 trait ActionType[-A]
 
 trait Dispatcher {
-  def dispatch[A : ActionType](action: A): Unit
+  def dispatch[A: ActionType](action: A): Unit
 
-  def apply[A : ActionType](action: A) = dispatch(action)
+  def apply[A: ActionType](action: A) = dispatch(action)
 }
 
 /**
@@ -39,11 +42,11 @@ object Action {
   *
   * @param actions Sequence of actions to dispatch
   */
-class ActionBatch private(val actions: Seq[Any]) extends Action {
-  def :+[A : ActionType](action: A): ActionBatch =
+class ActionBatch private (val actions: Seq[Any]) extends Action {
+  def :+[A: ActionType](action: A): ActionBatch =
     new ActionBatch(actions :+ action)
 
-  def +:[A : ActionType](action: A) =
+  def +:[A: ActionType](action: A) =
     new ActionBatch(action +: actions)
 
   def ++(batch: ActionBatch) =
@@ -51,7 +54,7 @@ class ActionBatch private(val actions: Seq[Any]) extends Action {
 }
 
 object ActionBatch {
-  def apply[A : ActionType](actions: A*): ActionBatch = new ActionBatch(actions)
+  def apply[A: ActionType](actions: A*): ActionBatch = new ActionBatch(actions)
 }
 
 /**
@@ -64,7 +67,7 @@ trait ActionProcessor[M <: AnyRef] {
 }
 
 sealed trait ActionResult[+M] {
-  def newModelOpt: Option[M] = None
+  def newModelOpt: Option[M]    = None
   def effectOpt: Option[Effect] = None
 }
 
@@ -92,14 +95,13 @@ object ActionResult {
 
   final case class ModelUpdateEffect[M](newModel: M, effect: Effect) extends ModelUpdated[M] with HasEffect[M]
 
-  final case class ModelUpdateSilentEffect[M](newModel: M, effect: Effect)
-    extends ModelUpdated[M] with HasEffect[M] with UpdateSilent
+  final case class ModelUpdateSilentEffect[M](newModel: M, effect: Effect) extends ModelUpdated[M] with HasEffect[M] with UpdateSilent
 
   def apply[M](model: Option[M], effect: Option[Effect]): ActionResult[M] = (model, effect) match {
     case (Some(m), Some(e)) => ModelUpdateEffect(m, e)
-    case (Some(m), None) => ModelUpdate(m)
-    case (None, Some(e)) => EffectOnly(e)
-    case _ => NoChange
+    case (Some(m), None)    => ModelUpdate(m)
+    case (None, Some(e))    => EffectOnly(e)
+    case _                  => NoChange
   }
 }
 
@@ -107,7 +109,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
 
   type HandlerFunction = (M, Any) => Option[ActionResult[M]]
 
-  private case class Subscription[T](listener: ModelR[M, T] => Unit, cursor: ModelR[M, T], lastValue: T) {
+  private case class Subscription[T](listener: ModelRO[T] => Unit, cursor: ModelR[M, T], lastValue: T) {
     def changed: Option[Subscription[T]] = {
       if (cursor === lastValue)
         None
@@ -132,19 +134,17 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     */
   protected def actionHandler: HandlerFunction
 
-  private val modelRW = new RootModelRW[M](model)
+  private val modelRW       = new RootModelRW[M](model)
   private var isDispatching = false
   private var dispatchQueue = Queue.empty[Any]
-  private var listenerId = 0
-  private var listeners = Map.empty[Int, Subscription[_]]
-  private var processors = List.empty[ActionProcessor[M]]
-  private var processChain = buildProcessChain
+  private var listenerId    = 0
+  private var listeners     = Map.empty[Int, Subscription[_]]
+  private var processors    = List.empty[ActionProcessor[M]]
+  private var processChain  = buildProcessChain
 
   private def buildProcessChain = {
     // chain processing functions
-    processors.reverse.foldLeft(process _)((next, processor) =>
-      (action: Any) => processor.process(this, action, next, model)
-    )
+    processors.reverse.foldLeft(process _)((next, processor) => (action: Any) => processor.process(this, action, next, model))
   }
 
   private def baseHandler(action: Any) = action match {
@@ -170,12 +170,10 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   def zoom[T](get: M => T)(implicit feq: FastEq[_ >: T]): ModelR[M, T] =
     modelRW.zoom[T](get)
 
-  def zoomMap[F[_], A, B](fa: M => F[A])(f: A => B)
-    (implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelR[M, F[B]] =
+  def zoomMap[F[_], A, B](fa: M => F[A])(f: A => B)(implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelR[M, F[B]] =
     modelRW.zoomMap(fa)(f)
 
-  def zoomFlatMap[F[_], A, B](fa: M => F[A])(f: A => F[B])
-    (implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelR[M, F[B]] =
+  def zoomFlatMap[F[_], A, B](fa: M => F[A])(f: A => F[B])(implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelR[M, F[B]] =
     modelRW.zoomFlatMap(fa)(f)
 
   /**
@@ -187,13 +185,15 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     */
   def zoomRW[T](get: M => T)(set: (M, T) => M)(implicit feq: FastEq[_ >: T]): ModelRW[M, T] = modelRW.zoomRW(get)(set)
 
-  def zoomMapRW[F[_], A, B](fa: M => F[A])(f: A => B)(set: (M, F[B]) => M)
-    (implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelRW[M, F[B]] =
+  def zoomMapRW[F[_], A, B](fa: M => F[A])(f: A => B)(set: (M, F[B]) => M)(implicit monad: Monad[F],
+                                                                           feq: FastEq[_ >: B]): ModelRW[M, F[B]] =
     modelRW.zoomMapRW(fa)(f)(set)
 
-  def zoomFlatMapRW[F[_], A, B](fa: M => F[A])(f: A => F[B])(set: (M, F[B]) => M)
-    (implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelRW[M, F[B]] =
+  def zoomFlatMapRW[F[_], A, B](fa: M => F[A])(f: A => F[B])(set: (M, F[B]) => M)(implicit monad: Monad[F],
+                                                                                  feq: FastEq[_ >: B]): ModelRW[M, F[B]] =
     modelRW.zoomFlatMapRW(fa)(f)(set)
+
+  def zoomTo[T](field: M => T): ModelRW[M, T] = macro GenLens.generate[M, M, T]
 
   /**
     * Subscribes to listen to changes in the model. By providing a `cursor` you can limit
@@ -205,12 +205,13 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     *                 the model reader as a parameter.
     * @return A function to unsubscribe your listener
     */
-  def subscribe[T](cursor: ModelR[M, T])(listener: ModelR[M, T] => Unit): () => Unit = {
+  def subscribe[T](cursor: ModelR[M, T])(listener: ModelRO[T] => Unit): () => Unit = {
     this.synchronized {
       listenerId += 1
       val id = listenerId
       listeners += id -> Subscription(listener, cursor, cursor.eval(model))
-      () => this.synchronized(listeners -= id)
+      () =>
+        this.synchronized(listeners -= id)
     }
   }
 
@@ -280,8 +281,8 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     */
   def composeHandlers(handlers: HandlerFunction*): HandlerFunction =
     (model, action) => {
-      handlers.foldLeft(Option.empty[ActionResult[M]]) {
-        (a, b) => a.orElse(b(model, action))
+      handlers.foldLeft(Option.empty[ActionResult[M]]) { (a, b) =>
+        a.orElse(b(model, action))
       }
     }
 
@@ -295,27 +296,30 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     */
   def foldHandlers(handlers: HandlerFunction*): HandlerFunction =
     (initialModel, action) => {
-      handlers.foldLeft((initialModel, Option.empty[ActionResult[M]])) { case ((currentModel, currentResult), handler) =>
-        handler(currentModel, action) match {
-          case None =>
-            (currentModel, currentResult)
-          case Some(result) =>
-            val (nextModel, nextResult) = currentResult match {
-              case Some(cr) =>
-                val newEffect = (cr.effectOpt, result.effectOpt) match {
-                  case (Some(e1), Some(e2)) => Some(e1 + e2)
-                  case (Some(e1), None) => Some(e1)
-                  case (None, Some(e2)) => Some(e2)
-                  case (None, None) => None
-                }
-                val newModel = result.newModelOpt.orElse(cr.newModelOpt)
-                (newModel.getOrElse(currentModel), ActionResult(newModel, newEffect))
+      handlers
+        .foldLeft((initialModel, Option.empty[ActionResult[M]])) {
+          case ((currentModel, currentResult), handler) =>
+            handler(currentModel, action) match {
               case None =>
-                (result.newModelOpt.getOrElse(currentModel), result)
+                (currentModel, currentResult)
+              case Some(result) =>
+                val (nextModel, nextResult) = currentResult match {
+                  case Some(cr) =>
+                    val newEffect = (cr.effectOpt, result.effectOpt) match {
+                      case (Some(e1), Some(e2)) => Some(e1 + e2)
+                      case (Some(e1), None)     => Some(e1)
+                      case (None, Some(e2))     => Some(e2)
+                      case (None, None)         => None
+                    }
+                    val newModel = result.newModelOpt.orElse(cr.newModelOpt)
+                    (newModel.getOrElse(currentModel), ActionResult(newModel, newEffect))
+                  case None =>
+                    (result.newModelOpt.getOrElse(currentModel), result)
+                }
+                (nextModel, Some(nextResult))
             }
-            (nextModel, Some(nextResult))
         }
-      }._2
+        ._2
     }
 
   /**
@@ -323,37 +327,39 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     *
     * @param action Action to dispatch
     */
-  def dispatch[A : ActionType](action: A): Unit = {
+  def dispatch[A: ActionType](action: A): Unit = {
     this.synchronized {
       if (!isDispatching) {
         try {
           isDispatching = true
           val oldModel = model
-          val silent = dispatchBase(action)
+          val silent   = dispatchBase(action)
           if (oldModel ne model) {
             // walk through all listeners and update subscriptions when model has changed
-            val updated = listeners.foldLeft(listeners) { case (l, (key, sub)) =>
-              if (listeners.isDefinedAt(key)) {
-                // Listener still exists
-                sub.changed match {
-                  case Some(newSub) =>
-                    // value at the cursor has changed, call listener and update subscription
-                    if (!silent) sub.call()
-                    l.updated(key, newSub)
-                  case None => l // nothing interesting happened
+            val updated = listeners.foldLeft(listeners) {
+              case (l, (key, sub)) =>
+                if (listeners.isDefinedAt(key)) {
+                  // Listener still exists
+                  sub.changed match {
+                    case Some(newSub) =>
+                      // value at the cursor has changed, call listener and update subscription
+                      if (!silent) sub.call()
+                      l.updated(key, newSub)
+                    case None => l // nothing interesting happened
+                  }
+                } else {
+                  l // Listener was removed since we started
                 }
-              } else {
-                l // Listener was removed since we started
-              }
             }
 
             // Listeners may have changed during processing (subscribe or unsubscribe)
             // so only update the listeners that are still there, and leave any new listeners that may be there now.
-            listeners = updated.foldLeft(listeners) { case (l, (key, sub)) =>
-              if (l.isDefinedAt(key))
-                l.updated(key, sub) // Listener still exists for this key
-              else
-                l // Listener was removed for this key, skip it
+            listeners = updated.foldLeft(listeners) {
+              case (l, (key, sub)) =>
+                if (l.isDefinedAt(key))
+                  l.updated(key, sub) // Listener still exists for this key
+                else
+                  l // Listener was removed for this key, skip it
             }
           }
         } catch {
@@ -363,9 +369,10 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
           isDispatching = false
         }
         // if there is an item in the queue, dispatch it
-        dispatchQueue.dequeueOption foreach { case (nextAction, queue) =>
-          dispatchQueue = queue
-          dispatch(nextAction)(null)
+        dispatchQueue.dequeueOption foreach {
+          case (nextAction, queue) =>
+            dispatchQueue = queue
+            dispatch(nextAction)(null)
         }
       } else {
         // add to the queue
@@ -392,26 +399,32 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
           true
         case ActionResult.EffectOnly(effects) =>
           // run effects
-          effects.run(a => dispatch(a)).recover {
-            case e: Throwable =>
-              handleError(s"Error in processing effects for action $action: $e")
-          }(effects.ec)
+          effects
+            .run(a => dispatch(a))
+            .recover {
+              case e: Throwable =>
+                handleError(s"Error in processing effects for action $action: $e")
+            }(effects.ec)
           true
         case ActionResult.ModelUpdateEffect(newModel, effects) =>
           update(newModel)
           // run effects
-          effects.run(a => dispatch(a)).recover {
-            case e: Throwable =>
-              handleError(s"Error in processing effects for action $action: $e")
-          }(effects.ec)
+          effects
+            .run(a => dispatch(a))
+            .recover {
+              case e: Throwable =>
+                handleError(s"Error in processing effects for action $action: $e")
+            }(effects.ec)
           false
         case ActionResult.ModelUpdateSilentEffect(newModel, effects) =>
           update(newModel)
           // run effects
-          effects.run(a => dispatch(a)).recover {
-            case e: Throwable =>
-              handleError(s"Error in processing effects for action $action: $e")
-          }(effects.ec)
+          effects
+            .run(a => dispatch(a))
+            .recover {
+              case e: Throwable =>
+                handleError(s"Error in processing effects for action $action: $e")
+            }(effects.ec)
           true
       }
     } catch {

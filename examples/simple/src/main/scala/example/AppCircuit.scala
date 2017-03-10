@@ -21,11 +21,11 @@ object AppCircuit extends Circuit[RootModel] {
   def initialModel = RootModel(0)
 
   // zoom into the model, providing access only to the
-  val counterHandler = new ActionHandler(zoomRW(_.counter)((m, v) => m.copy(counter = v))) {
+  val counterHandler = new ActionHandler(zoomTo(_.counter)) {
     override def handle = {
       case Increase(a) => updated(value + a)
       case Decrease(a) => updated(value - a)
-      case Reset => updated(0)
+      case Reset       => updated(0)
     }
   }
 
@@ -39,5 +39,5 @@ object AppCircuit extends Circuit[RootModel] {
         case Reset => Some(ModelUpdate(model.copy(counter = 0)))
         case _ => None
       }
-  */
+ */
 }

@@ -30,8 +30,7 @@ object PotState {
   * @define ready [[Ready]]
   * @define empty [[Empty]]
   */
-sealed abstract class Pot[+A] extends Product with Serializable {
-  self =>
+sealed abstract class Pot[+A] extends Product with Serializable { self =>
 
   def get: A
   def isEmpty: Boolean
@@ -41,7 +40,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
   def isReady = !isEmpty && !isStale
   def isUnavailable: Boolean
   def ready[B >: A](value: B): Pot[B] = Ready(value)
-  def pending(startTime: Long = new Date().getTime): Pot[A]
+  def pending(startTime: Long = Pot.currentTime): Pot[A]
   def fail(exception: Throwable): Pot[A]
   def unavailable() = Unavailable
   def state: PotState
@@ -65,14 +64,14 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     * @see flatMap
     * @see foreach
     */
-  final def map[B](f: A => B): Pot[B] = this match {
-    case Empty => Empty
-    case Ready(x) => Ready(f(x))
-    case Pending(t) => Pending(t)
+  @noinline final def map[B](f: A => B): Pot[B] = this match {
+    case Empty              => Empty
+    case Ready(x)           => Ready(f(x))
+    case Pending(t)         => Pending(t)
     case PendingStale(x, t) => PendingStale(f(x), t)
-    case Failed(e) => Failed(e)
-    case FailedStale(x, e) => FailedStale(f(x), e)
-    case Unavailable => Unavailable
+    case Failed(e)          => Failed(e)
+    case FailedStale(x, e)  => FailedStale(f(x), e)
+    case Unavailable        => Unavailable
   }
 
   /** Returns the result of applying $f to this Pot's
@@ -96,24 +95,26 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     * @see map
     * @see foreach
     */
-  def flatMap[B](f: A => Pot[B]): Pot[B] = map(f).flatten
+  @noinline def flatMap[B](f: A => Pot[B]): Pot[B] = map(f).flatten
 
-  def flatten[B](implicit ev: A <:< Pot[B]): Pot[B] = this match {
-    case Empty => Empty
-    case Ready(x) => x
+  @noinline def flatten[B](implicit ev: A <:< Pot[B]): Pot[B] = this match {
+    case Empty      => Empty
+    case Ready(x)   => x
     case Pending(t) => Pending(t)
-    case PendingStale(x, t) => ev(x) match {
-      case Empty => Pending(t)
-      case Ready(y) => PendingStale(y, t)
-      case Pending(s) => Pending(math.min(s, t))
-      case PendingStale(y, s) => PendingStale(y, math.min(s, t))
-      case other => other
-    }
+    case PendingStale(x, t) =>
+      ev(x) match {
+        case Empty              => Pending(t)
+        case Ready(y)           => PendingStale(y, t)
+        case Pending(s)         => Pending(math.min(s, t))
+        case PendingStale(y, s) => PendingStale(y, math.min(s, t))
+        case other              => other
+      }
     case Failed(e) => Failed(e)
-    case FailedStale(x, e) => ev(x) match {
-      case Empty => Failed(e)
-      case other => other
-    }
+    case FailedStale(x, e) =>
+      ev(x) match {
+        case Empty => Failed(e)
+        case other => other
+      }
     case Unavailable => Unavailable
   }
 
@@ -195,7 +196,7 @@ sealed abstract class Pot[+A] extends Product with Serializable {
     * @see map
     * @see flatMap
     */
-  @inline final def foreach[U](f: A => U):Unit = {
+  @inline final def foreach[U](f: A => U): Unit = {
     if (!isEmpty) f(this.get)
   }
 
@@ -262,11 +263,12 @@ sealed abstract class Pot[+A] extends Product with Serializable {
   def toTry: Try[A] = {
     if (isEmpty)
       Failure(new NoSuchElementException)
-    else this match {
-      case Failed(ex) => Failure(ex)
-      case FailedStale(_, ex) => Failure(ex)
-      case _ => Success(get)
-    }
+    else
+      this match {
+        case Failed(ex)         => Failure(ex)
+        case FailedStale(_, ex) => Failure(ex)
+        case _                  => Success(get)
+      }
   }
 
   /** Returns a singleton list containing the Pot's value
@@ -313,7 +315,7 @@ object Pot {
 
   def fromOption[A](a: Option[A]): Pot[A] = a match {
     case Some(x) => Ready(x)
-    case None => Empty
+    case None    => Empty
   }
 
   /**
@@ -336,93 +338,96 @@ object Pot {
     }
   }
 
+  /** Default value for startTime. */
+  protected[data] def currentTime = new Date().getTime
+
 }
 
 case object Empty extends Pot[Nothing] {
-  def get = throw new NoSuchElementException("Empty.get")
-  def isEmpty = true
-  def isPending = false
-  def isFailed = false
-  def isStale = false
+  def get           = throw new NoSuchElementException("Empty.get")
+  def isEmpty       = true
+  def isPending     = false
+  def isFailed      = false
+  def isStale       = false
   def isUnavailable = false
-  def retriesLeft = 0
-  def state = PotState.PotEmpty
-  def retryPolicy = Retry.None
+  def retriesLeft   = 0
+  def state         = PotState.PotEmpty
+  def retryPolicy   = Retry.None
 
-  override def pending(startTime: Long = new Date().getTime) = Pending()
-  override def fail(exception: Throwable) = Failed(exception)
+  override def pending(startTime: Long = Pot.currentTime) = Pending(startTime)
+  override def fail(exception: Throwable)                    = Failed(exception)
 }
 
 case object Unavailable extends Pot[Nothing] {
-  def get = throw new NoSuchElementException("Unavailable.get")
-  def isEmpty = true
-  def isPending = false
-  def isFailed = true
-  def isStale = false
+  def get           = throw new NoSuchElementException("Unavailable.get")
+  def isEmpty       = true
+  def isPending     = false
+  def isFailed      = true
+  def isStale       = false
   def isUnavailable = true
-  def retriesLeft = 0
-  def state = PotState.PotUnavailable
-  def retryPolicy = Retry.None
+  def retriesLeft   = 0
+  def state         = PotState.PotUnavailable
+  def retryPolicy   = Retry.None
 
-  override def pending(startTime: Long = new Date().getTime) = Pending()
-  override def fail(exception: Throwable) = Failed(exception)
+  override def pending(startTime: Long = Pot.currentTime) = Pending(startTime)
+  override def fail(exception: Throwable)                    = Failed(exception)
 }
 
 final case class Ready[+A](x: A) extends Pot[A] {
-  def get = x
-  def isEmpty = false
-  def isPending = false
-  def isFailed = false
-  def isStale = false
+  def get           = x
+  def isEmpty       = false
+  def isPending     = false
+  def isFailed      = false
+  def isStale       = false
   def isUnavailable = false
-  def retriesLeft = 0
-  def state = PotState.PotReady
-  def retryPolicy = Retry.None
+  def retriesLeft   = 0
+  def state         = PotState.PotReady
+  def retryPolicy   = Retry.None
 
-  override def pending(startTime: Long = new Date().getTime) = PendingStale(x)
-  override def fail(exception: Throwable) = FailedStale(x, exception)
+  override def pending(startTime: Long = Pot.currentTime) = PendingStale(x, startTime)
+  override def fail(exception: Throwable)                    = FailedStale(x, exception)
 }
 
 sealed trait PendingBase {
   def startTime: Long
-  def isPending = true
-  def isUnavailable = false
-  def state = PotState.PotPending
-  def duration(currentTime: Long = new Date().getTime) = (currentTime - startTime).toInt
+  def isPending                                        = true
+  def isUnavailable                                    = false
+  def state                                            = PotState.PotPending
+  def duration(currentTime: Long = Pot.currentTime) = (currentTime - startTime).toInt
 }
 
-final case class Pending(startTime: Long = new Date().getTime) extends Pot[Nothing] with PendingBase {
-  def get = throw new NoSuchElementException("Pending.get")
-  def isEmpty = true
+final case class Pending(startTime: Long = Pot.currentTime) extends Pot[Nothing] with PendingBase {
+  def get      = throw new NoSuchElementException("Pending.get")
+  def isEmpty  = true
   def isFailed = false
-  def isStale = false
+  def isStale  = false
 
-  override def pending(startTime: Long) = copy()
+  override def pending(startTime: Long = Pot.currentTime) = copy(startTime)
   override def fail(exception: Throwable) = Failed(exception)
 }
 
-final case class PendingStale[+A](x: A, startTime: Long = new Date().getTime) extends Pot[A] with PendingBase {
-  def get = x
-  def isEmpty = false
+final case class PendingStale[+A](x: A, startTime: Long = Pot.currentTime) extends Pot[A] with PendingBase {
+  def get      = x
+  def isEmpty  = false
   def isFailed = false
-  def isStale = true
+  def isStale  = true
 
-  override def pending(startTime: Long) = copy(x)
+  override def pending(startTime: Long = Pot.currentTime) = copy(x, startTime)
   override def fail(exception: Throwable) = FailedStale(x, exception)
 }
 
 sealed trait FailedBase {
   def exception: Throwable
-  def isPending = false
-  def isFailed = true
+  def isPending     = false
+  def isFailed      = true
   def isUnavailable = false
-  def state = PotState.PotFailed
+  def state         = PotState.PotFailed
 }
 
 final case class Failed(exception: Throwable) extends Pot[Nothing] with FailedBase {
-  def get = throw new NoSuchElementException("Failed.get")
-  def isEmpty = true
-  def isStale = false
+  def get                      = throw new NoSuchElementException("Failed.get")
+  def isEmpty                  = true
+  def isStale                  = false
   override def exceptionOption = Some(exception)
 
   override def recoverWith[B](f: PartialFunction[Throwable, Pot[B]]): Pot[B] = {
@@ -434,14 +439,14 @@ final case class Failed(exception: Throwable) extends Pot[Nothing] with FailedBa
 
   override def recover[B](f: PartialFunction[Throwable, B]): Pot[B] = this
 
-  override def pending(startTime: Long = new Date().getTime) = Pending()
-  override def fail(exception: Throwable) = Failed(exception)
+  override def pending(startTime: Long = Pot.currentTime) = Pending(startTime)
+  override def fail(exception: Throwable)                    = Failed(exception)
 }
 
 final case class FailedStale[+A](x: A, exception: Throwable) extends Pot[A] with FailedBase {
-  def get = x
-  def isEmpty = false
-  def isStale = true
+  def get                      = x
+  def isEmpty                  = false
+  def isStale                  = true
   override def exceptionOption = Some(exception)
 
   override def recoverWith[B >: A](f: PartialFunction[Throwable, Pot[B]]): Pot[B] = {
@@ -453,6 +458,6 @@ final case class FailedStale[+A](x: A, exception: Throwable) extends Pot[A] with
 
   override def recover[B >: A](f: PartialFunction[Throwable, B]): Pot[B] = this
 
-  override def pending(startTime: Long = new Date().getTime) = PendingStale(x)
-  override def fail(exception: Throwable) = FailedStale(x, exception)
+  override def pending(startTime: Long = Pot.currentTime) = PendingStale(x, startTime)
+  override def fail(exception: Throwable)                    = FailedStale(x, exception)
 }

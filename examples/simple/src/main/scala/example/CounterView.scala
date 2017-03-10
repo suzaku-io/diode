@@ -10,15 +10,16 @@ import scalatags.JsDom.all._
   * @param counter  Model reader for the counter value
   * @param dispatch Dispatcher
   */
-class CounterView(counter: ModelR[_, Int], dispatch: Dispatcher) {
+class CounterView(counter: ModelRO[Int], dispatch: Dispatcher) {
   def render = {
     div(
       h3("Counter"),
       p("Value = ", b(counter())),
-      div(cls := "btn-group",
-        button(cls := "btn btn-default", onclick := { () => dispatch(Increase(2)) }, "Increase"),
-        button(cls := "btn btn-default", onclick := { () => dispatch(Decrease(1)) }, "Decrease"),
-        button(cls := "btn btn-default", onclick := { () => dispatch(Reset) }, "Reset")
+      div(
+        cls := "btn-group",
+        button(cls := "btn btn-default", onclick := (() => dispatch(Increase(2))), "Increase"),
+        button(cls := "btn btn-default", onclick := (() => dispatch(Decrease(1))), "Decrease"),
+        button(cls := "btn btn-default", onclick := (() => dispatch(Reset)), "Reset")
       )
     )
   }

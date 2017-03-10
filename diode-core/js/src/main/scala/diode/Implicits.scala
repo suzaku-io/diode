@@ -1,6 +1,6 @@
 package diode
 
-import diode.util._
+import diode.util.RunAfterJS
 
 object Implicits {
   implicit object runAfterImpl extends RunAfterJS

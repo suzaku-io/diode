@@ -5,7 +5,6 @@ import utest._
 
 import scala.collection.mutable
 import scala.concurrent._
-import scala.concurrent.ExecutionContext.Implicits.global
 
 object CircuitTests extends TestSuite {
 
@@ -31,34 +30,37 @@ object CircuitTests extends TestSuite {
 
   case class ThrowAction(ex: Throwable)
 
-  class AppCircuit(implicit ec: ExecutionContext) extends Circuit[Model] {
+  class AppCircuit(implicit val ec: ExecutionContext) extends Circuit[Model] {
     import diode.ActionResult._
     override def initialModel = Model("Testing", Data(42, true))
-    override protected def actionHandler: HandlerFunction = (model, action) => ({
-      case SetS(s) =>
-        ModelUpdate(model.copy(s = s))
-      case SetSSilent(s) =>
-        ModelUpdateSilent(model.copy(s = s))
-      case SetEffectOnly(effect) =>
-        ModelUpdateEffect(model, effect)
-      case SetD(d) =>
-        ModelUpdate(model.copy(data = d))
-      case SetEffect(s, effect) =>
-        // run effect twice!
-        ModelUpdateEffect(model.copy(s = s), Effect(effect()) + effect)
-      case ThrowAction(ex) =>
-        throw ex
-    }: PartialFunction[Any, ActionResult[Model]]).lift.apply(action)
+    override protected def actionHandler: HandlerFunction =
+      (model, action) =>
+        ({
+          case SetS(s) =>
+            ModelUpdate(model.copy(s = s))
+          case SetSSilent(s) =>
+            ModelUpdateSilent(model.copy(s = s))
+          case SetEffectOnly(effect) =>
+            ModelUpdateEffect(model, effect)
+          case SetD(d) =>
+            ModelUpdate(model.copy(data = d))
+          case SetEffect(s, effect) =>
+            // run effect twice!
+            ModelUpdateEffect(model.copy(s = s), Effect(effect()) + effect)
+          case ThrowAction(ex) =>
+            throw ex
+        }: PartialFunction[Any, ActionResult[Model]]).lift.apply(action)
 
     var lastFatal: (Any, Throwable) = ("", null)
-    var lastError = ""
+    var lastError                   = ""
 
     override def handleFatal(action: Any, e: Throwable): Unit = lastFatal = (action, e)
-    override def handleError(msg: String): Unit = lastError = msg
+    override def handleError(msg: String): Unit               = lastError = msg
   }
 
   def tests = TestSuite {
-    def circuit = new AppCircuit
+    implicit val ec = ExecutionContext.global
+    def circuit     = new AppCircuit
 
     'Dispatch - {
       'Action - {
@@ -99,26 +101,33 @@ object CircuitTests extends TestSuite {
     }
     'Zooming - {
       'read - {
-        val c = circuit
+        val c          = circuit
         val dataReader = c.zoom(_.data)
         assert(dataReader().i == 42)
         assert(dataReader().b == true)
       }
       'write - {
-        val c = circuit
+        val c          = circuit
         val dataWriter = c.zoomRW(_.data)((m, v) => m.copy(data = v))
-        val m = dataWriter.updated(Data(43, false))
+        val m          = dataWriter.updated(Data(43, false))
         assert(m.s == "Testing")
         assert(m.data.i == 43)
         assert(m.data.b == false)
       }
+      'lens - {
+        val c          = circuit
+        val dataWriter = c.zoomTo(_.data.i)
+        val m          = dataWriter.updated(43)
+        assert(m.s == "Testing")
+        assert(m.data.i == 43)
+      }
     }
     'Listener - {
       'Normal - {
-        val c = circuit
-        var state: Model = null
+        val c             = circuit
+        var state: Model  = null
         var callbackCount = 0
-        def listener(cursor: ModelR[Model, String]): Unit = {
+        def listener(cursor: ModelRO[String]): Unit = {
           state = c.model
           callbackCount += 1
         }
@@ -135,15 +144,15 @@ object CircuitTests extends TestSuite {
         assert(state.s == "Listen4")
       }
       'Cursor - {
-        val c = circuit
-        var state: Model = null
+        val c             = circuit
+        var state: Model  = null
         var state2: Model = null
         var callbackCount = 0
-        def listener1(cursor: ModelR[Model, Data]): Unit = {
+        def listener1(cursor: ModelRO[Data]): Unit = {
           state = c.model
           callbackCount += 1
         }
-        def listener2(cursor: ModelR[Model, String]): Unit = {
+        def listener2(cursor: ModelRO[String]): Unit = {
           state2 = c.model
           callbackCount += 1
         }
@@ -161,10 +170,10 @@ object CircuitTests extends TestSuite {
         assert(callbackCount == 2)
       }
       'Silent - {
-        val c = circuit
-        var state: Model = null
+        val c             = circuit
+        var state: Model  = null
         var callbackCount = 0
-        def listener(cursor: ModelR[Model, String]): Unit = {
+        def listener(cursor: ModelRO[String]): Unit = {
           state = c.model
           callbackCount += 1
         }
@@ -176,14 +185,14 @@ object CircuitTests extends TestSuite {
         unsubscribe()
       }
       'NestedSubscribe - {
-        val c = circuit
-        var state1: Model = null
-        var state2: Model = null
-        var callback1Count = 0
-        var callback2Count = 0
+        val c                        = circuit
+        var state1: Model            = null
+        var state2: Model            = null
+        var callback1Count           = 0
+        var callback2Count           = 0
         var unsubscribe2: () => Unit = null
 
-        def listener1(cursor: ModelR[Model, String]): Unit = {
+        def listener1(cursor: ModelRO[String]): Unit = {
           state1 = c.model
           callback1Count += 1
 
@@ -192,7 +201,7 @@ object CircuitTests extends TestSuite {
           }
         }
 
-        def listener2(cursor: ModelR[Model, String]): Unit = {
+        def listener2(cursor: ModelRO[String]): Unit = {
           state2 = c.model
           callback2Count += 1
         }
@@ -227,15 +236,15 @@ object CircuitTests extends TestSuite {
         assert(callback2Count == 2)
       }
       'NestedUnsubscribe - {
-        val c = circuit
-        var state1: Model = null
-        var state2: Model = null
-        var callback1Count = 0
-        var callback2Count = 0
+        val c                        = circuit
+        var state1: Model            = null
+        var state2: Model            = null
+        var callback1Count           = 0
+        var callback2Count           = 0
         var unsubscribe2: () => Unit = null
-        var executeUnsubscribe2 = false
+        var executeUnsubscribe2      = false
 
-        def listener1(cursor: ModelR[Model, String]): Unit = {
+        def listener1(cursor: ModelRO[String]): Unit = {
           state1 = c.model
           callback1Count += 1
 
@@ -245,13 +254,14 @@ object CircuitTests extends TestSuite {
           }
         }
 
-        def listener2(cursor: ModelR[Model, String]): Unit = {
+        def listener2(cursor: ModelRO[String]): Unit = {
           state2 = c.model
           callback2Count += 1
         }
 
-        val unsubscribe1 = c.subscribe(c.zoom(_.s))(listener1)
-        unsubscribe2 = c.subscribe(c.zoom(_.s))(listener2)
+        val sub: Subscriber[String] = c.subscribe(c.zoom(_.s))
+        val unsubscribe1            = sub(listener1)
+        unsubscribe2 = sub(listener2)
 
         c.dispatch(SetS("Listen"))
         assert(state1.s == "Listen")
@@ -270,7 +280,7 @@ object CircuitTests extends TestSuite {
         executeUnsubscribe2 = false
 
         // Check that only listener1 is called
-        val state2Snapshot = state2
+        val state2Snapshot         = state2
         val callback2CountSnapshot = callback2Count
 
         c.dispatch(SetS("Listen2"))
@@ -282,17 +292,17 @@ object CircuitTests extends TestSuite {
     }
     'Effects - {
       'Run - {
-        val c = circuit
+        val c         = circuit
         var effectRun = 0
-        val effect = SetEffect("Effect", () => {effectRun += 1; Future.successful(None)})
+        val effect    = SetEffect("Effect", () => { effectRun += 1; Future.successful(None) })
         c.dispatch(effect)
         assert(c.model.s == "Effect")
         assert(effectRun == 2)
       }
       'EffectOnly - {
-        val c = circuit
+        val c         = circuit
         var effectRun = 0
-        val effect = SetEffectOnly(() => {effectRun += 1; Future.successful(None)})
+        val effect    = SetEffectOnly(() => { effectRun += 1; Future.successful(None) })
         c.dispatch(effect)
         assert(effectRun == 1)
       }
@@ -301,8 +311,7 @@ object CircuitTests extends TestSuite {
       'ModAction - {
         val c = circuit
         val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: Any, next: Any => ActionResult[Model],
-            currentModel: Model) = {
+          override def process(dispatcher: Dispatcher, action: Any, next: Any => ActionResult[Model], currentModel: Model) = {
             next(action match {
               case s: String =>
                 SetS(s)
@@ -320,8 +329,7 @@ object CircuitTests extends TestSuite {
       'Filter - {
         val c = circuit
         val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: Any, next: Any => ActionResult[Model],
-            currentModel: Model) = {
+          override def process(dispatcher: Dispatcher, action: Any, next: Any => ActionResult[Model], currentModel: Model) = {
             action match {
               case SetS(_) =>
                 ActionResult.NoChange
@@ -334,13 +342,12 @@ object CircuitTests extends TestSuite {
         assert(c.model.s == "Testing")
       }
       'LogState - {
-        val c = circuit
+        val c   = circuit
         var log = "log"
         val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: Any, next: Any => ActionResult[Model],
-            currentModel: Model) = {
+          override def process(dispatcher: Dispatcher, action: Any, next: Any => ActionResult[Model], currentModel: Model) = {
             next(action) match {
-              case m: ModelUpdated[Model@unchecked] =>
+              case m: ModelUpdated[Model @unchecked] =>
                 log += m.newModel.s
                 m
               case r => r
@@ -356,8 +363,7 @@ object CircuitTests extends TestSuite {
         class AP extends ActionProcessor[Model] {
           val pending = mutable.Queue.empty[(Any, Dispatcher)]
 
-          override def process(dispatcher: Dispatcher, action: Any, next: Any => ActionResult[Model],
-            currentModel: Model) = {
+          override def process(dispatcher: Dispatcher, action: Any, next: Any => ActionResult[Model], currentModel: Model) = {
             action match {
               case Delay(a) =>
                 pending.enqueue((a, dispatcher))
@@ -380,7 +386,7 @@ object CircuitTests extends TestSuite {
       }
     }
     'FoldHandler - {
-      val c = circuit
+      val c         = circuit
       val origModel = c.model
       val h1 = new ActionHandler[Model, Int](c.zoomRW(_.data.i)((m, t) => m.copy(data = m.data.copy(i = t)))) {
         override protected def handle = {
@@ -402,7 +408,7 @@ object CircuitTests extends TestSuite {
     'NestedDispatch - {
       val c = circuit
       // dispatch in a listener
-      c.subscribe(c.zoom(_.s))( r => c.dispatch(SetD(Data(3, false))))
+      c.subscribe(c.zoom(_.s))(r => c.dispatch(SetD(Data(3, false))))
       c.dispatch(SetS("Nested"))
       assert(c.model.s == "Nested")
       assert(c.model.data == Data(3, false))

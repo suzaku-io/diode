@@ -77,9 +77,7 @@ started, we handle only the most simple action of replacing the whole tree.
 
 ```scala
 // zoom into the model, providing access only to the `root` directory of the tree
-val treeHandler = new ActionHandler(
-  zoomRW(_.tree)((m, v) => m.copy(tree = v))
-    .zoomRW(_.root)((m, v) => m.copy(root = v))) {
+val treeHandler = new ActionHandler(zoomTo(_.tree.root)) {
   override def handle = {
     case ReplaceTree(newTree) =>
       updated(newTree)
@@ -88,12 +86,6 @@ val treeHandler = new ActionHandler(
 
 override val actionHandler = composeHandlers(treeHandler)
 ```
-
-The zoom call could've been written as a single 
-```scala
-zoomRW(_.tree.root)((m, v) => m.copy(tree = m.tree.copy(root = v)))
-``` 
-but it's easier to understand when it's split up.
 
 Now our application is ready to handle dispatched `ReplaceTree` actions successfully!
 
@@ -124,7 +116,7 @@ a valid path, so we should wrap the result in an `Option`.
 def zoomToChildren[M](path: Seq[String], rw: ModelRW[M, Directory])
   : Option[ModelRW[M, IndexedSeq[FileNode]]] = {
   if (path.isEmpty) {
-    Some(rw.zoomRW(_.children)((m, v) => m.copy(children = v)))
+    Some(rw.zoomTo(_.children))
   } else {
     ???
   }
@@ -139,7 +131,7 @@ Let's take a look at the full implementation.
 def zoomToChildren[M](path: Seq[String], rw: ModelRW[M, Directory])
   : Option[ModelRW[M, IndexedSeq[FileNode]]] = {
   if (path.isEmpty) {
-    Some(rw.zoomRW(_.children)((m, v) => m.copy(children = v)))
+    Some(rw.zoomTo(_.children))
   } else {
     // find the index for the next directory in the path and make sure it's a directory
     rw.value.children.indexWhere(n => n.id == path.head && n.isDirectory) match {
@@ -211,9 +203,7 @@ As the `Select` action affects the `Tree` and not something under the root direc
 `treeHandler`. We'll need another action handler for it.
 
 ```scala
-val selectionHandler = new ActionHandler(
-  zoomRW(_.tree)((m, v) => m.copy(tree = v))
-    .zoomRW(_.selected)((m, v) => m.copy(selected = v))) {
+val selectionHandler = new ActionHandler(zoomTo(_.tree.selected)) {
   override def handle = {
     case Select(sel) => updated(sel)
   }
@@ -237,9 +227,7 @@ model from one handler to the next and combining the resulting effects.
 For example if we wanted to change the selection to parent node when the selected node is removed, we could do:
 
 ```scala
-val selectionHandler = new ActionHandler(
-  zoomRW(_.tree)((m, v) => m.copy(tree = v))
-    .zoomRW(_.selected)((m, v) => m.copy(selected = v))) {
+val selectionHandler = new ActionHandler(zoomTo(_.tree.selected)) {
   override def handle = {
     case Select(sel) => updated(sel)
     case RemoveNode(path) =>
@@ -273,9 +261,7 @@ class DirectoryTreeHandler[M](modelRW: ModelRW[M, Directory]) extends ActionHand
 }
 
 object AppCircuit extends Circuit[RootModel] {
-  val treeHandler = new DirectoryTreeHandler(
-    zoomRW(_.tree)((m, v) => m.copy(tree = v))
-      .zoomRW(_.root)((m, v) => m.copy(root = v)))
+  val treeHandler = new DirectoryTreeHandler(zoomTo(_.tree.root))
   ...
 }
 ```
