@@ -1,12 +1,10 @@
 package diode.react
 
 import diode._
-import japgolly.scalajs.react.CtorType.{ArgKey, Props}
-import japgolly.scalajs.react.ScalaComponent.Unmounted
+import japgolly.scalajs.react.CtorType
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.ReactElement
-import japgolly.scalajs.react.vdom.all.svg
-import org.scalajs.dom
+import japgolly.scalajs.react.raw.React
+import japgolly.scalajs.react.vdom.{Attr, VdomElement}
 
 import scala.language.existentials
 import scala.scalajs.js
@@ -36,7 +34,7 @@ case class ModelProxy[S](modelReader: ModelR[_, S], theDispatch: Any => Unit,
   def zoom[T](f: S => T)(implicit feq: FastEq[_ >: T]) = ModelProxy(modelReader.zoom(f), theDispatch, connector)
 
   def wrap[T <: AnyRef, C](f: S => T)(compB: ModelProxy[T] => C)
-    (implicit ev: C => ReactElement, feq: FastEq[_ >: T]): C = compB(zoom(f))
+    (implicit ev: C => VdomElement, feq: FastEq[_ >: T]): C = compB(zoom(f))
 
   def connect[T <: AnyRef](f: S => T)
     (implicit feq: FastEq[_ >: T]): ReactConnectProxy[T] = {
@@ -55,7 +53,7 @@ trait ReactConnector[M <: AnyRef] {
     * @return The component returned by `compB`
     */
   def wrap[S <: AnyRef, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)
-    (implicit ev: C => ReactElement, feq: FastEq[_ >: S]): C = {
+    (implicit ev: C => VdomElement, feq: FastEq[_ >: S]): C = {
     wrap(circuit.zoom(zoomFunc))(compB)
   }
 
@@ -67,7 +65,7 @@ trait ReactConnector[M <: AnyRef] {
     * @return The component returned by `compB`
     */
   def wrap[S <: AnyRef, C](modelReader: ModelR[_, S])(compB: ModelProxy[S] => C)
-    (implicit ev: C => ReactElement, feq: FastEq[_ >: S]): C = {
+    (implicit ev: C => VdomElement, feq: FastEq[_ >: S]): C = {
     implicit object aType extends ActionType[Any]
     compB(ModelProxy(modelReader, action => circuit.dispatch(action), ReactConnector.this))
   }
@@ -80,7 +78,7 @@ trait ReactConnector[M <: AnyRef] {
     * @param key      Optional parameter specifying a unique React key for this component.
     * @return A React component accepting a prop that is a function to creates the wrapped component
     */
-  def connect[S <: AnyRef](zoomFunc: M => S, key: ArgKey)
+  def connect[S <: AnyRef](zoomFunc: M => S, key: Key)
     (implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
     connect(circuit.zoom(zoomFunc), key)
   }
@@ -98,10 +96,21 @@ trait ReactConnector[M <: AnyRef] {
     * @param key         Optional parameter specifying a unique React key for this component.
     * @return A React component accepting a prop that is a function to create the wrapped component
     */
-  def connect[S <: AnyRef](modelReader: ModelR[_, S], key: ArgKey = js.undefined)
+  def connect[S <: AnyRef](modelReader: ModelR[_, S], key: Key): ReactConnectProxy[S] = {
+    connect[S](modelReader).withKey(key)
+  }
+
+  /**
+    * Connects a React component into the Circuit by wrapping it in another component that listens to
+    * relevant state changes and updates the wrapped component as needed.
+    *
+    * @param modelReader A reader that returns the piece of model we are interested in
+    * @return A React component accepting a prop that is a function to create the wrapped component
+    */
+  def connect[S <: AnyRef](modelReader: ModelR[_, S])
     (implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
 
-    class Backend(t: BackendScope[ModelProxy[S] => ReactElement, S]) {
+    class Backend(t: BackendScope[ModelProxy[S] => VdomElement, S]) {
       private var unsubscribe = Option.empty[() => Unit]
 
       def willMount = {
@@ -123,19 +132,19 @@ trait ReactConnector[M <: AnyRef] {
           .flatMap(mustUpdate => t.setState(modelReader()) when mustUpdate).runNow()
       }
 
-      def render(s: S, compB: ModelProxy[S] => ReactElement) = {
+      def render(s: S, compB: ModelProxy[S] => VdomElement) = {
         wrap(modelReader)(compB)
       }
     }
 
-    ScalaComponent.build[ModelProxy[S] => ReactElement]("DiodeWrapper")
+    ScalaComponent.build[ModelProxy[S] => VdomElement]("DiodeWrapper")
       .initialState(modelReader())
       .renderBackend[Backend]
       .componentWillMount(scope => scope.backend.willMount)
       .componentWillUnmount(scope => scope.backend.willUnmount )
-      .shouldComponentUpdate(scope => (scope.currentState ne scope.nextState) || (scope.currentProps ne scope.nextProps))
+      .shouldComponentUpdate(ctx => CallbackTo[Boolean] { (ctx.currentState ne ctx.nextState) || (ctx.currentProps ne ctx.nextProps) })
       .build
       .ctor
-      .set(key) _
+
   }
 }

@@ -152,7 +152,7 @@ lazy val diodeReact = project.in(file("diode-react"))
   .settings(
     name := "diode-react",
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "neo" % "1.0.0-SNAPSHOT"
+      "com.github.japgolly.scalajs-react" %%% "core" % "1.0.0-RC1"
     ),
     scalaJSUseRhino in Global := false,
     scalacOptions ++= sourceMapSetting.value
