@@ -100,7 +100,7 @@ trait ReactConnector[M <: AnyRef] { circuit: Circuit[M] =>
   def connect[S <: AnyRef](modelReader: ModelRO[S], key: js.UndefOr[js.Any] = js.undefined)(
       implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
 
-    class Backend(t: BackendScope[ModelProxy[S] => VdomElement, S]) {
+    class Backend(t: BackendScope[ReactConnectProps[S], S]) {
       private var unsubscribe = Option.empty[() => Unit]
 
       def willMount = {
@@ -119,8 +119,8 @@ trait ReactConnector[M <: AnyRef] { circuit: Circuit[M] =>
         val isMounted = t.isMounted.map(_.getOrElse(false))
         val stateHasChanged = t.state.map(state => modelReader =!= state)
 
-        def updateState(really: Boolean): Callback =
-          Callback.when(really)(t.setState(modelReader()))
+        def updateState(shouldUpdate: Boolean): Callback =
+          Callback.when(shouldUpdate)(t.setState(modelReader()))
 
         ((isMounted && stateHasChanged) >>= updateState).runNow()
       }
