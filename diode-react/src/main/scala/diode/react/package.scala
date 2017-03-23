@@ -1,9 +1,10 @@
 package diode
 
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.component.Generic.Unmounted
+import japgolly.scalajs.react.component.Generic.UnmountedWithRoot
 import japgolly.scalajs.react.vdom.VdomElement
 
 package object react {
-  type ReactConnectProxy[A] = CtorType.Props[ModelProxy[A] => VdomElement, Unmounted[ModelProxy[A] => VdomElement, _]]
+  type ReactConnectProps[A] = ModelProxy[A] => VdomElement
+  type ReactConnectProxy[A] = CtorType.Props[ReactConnectProps[A], UnmountedWithRoot[ReactConnectProps[A], _, _, _]]
 }
