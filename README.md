@@ -4,8 +4,8 @@
 >
 > a semiconductor device with two terminals, typically allowing the flow of current in one direction only
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ochrons/diode)
-[![Build Status](https://travis-ci.org/ochrons/diode.svg?branch=master)](https://travis-ci.org/ochrons/diode)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/suzaku-io/diode)
+[![Build Status](https://travis-ci.org/suzaku-io/diode.svg?branch=master)](https://travis-ci.org/suzaku-io/diode)
 [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.13.svg)](https://www.scala-js.org)
 
 Diode is a Scala/Scala.js library for managing immutable application state with unidirectional data flow. It is heavily
