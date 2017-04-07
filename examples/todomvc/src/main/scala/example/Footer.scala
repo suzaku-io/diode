@@ -1,12 +1,12 @@
 package example
 
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom.html_<^._
 
 object Footer {
 
   case class Props(
-      filterLink: TodoFilter => ReactTag,
+      filterLink: TodoFilter => VdomTag,
       onSelectFilter: TodoFilter => Callback,
       onClearCompleted: Callback,
       currentFilter: TodoFilter,
@@ -20,11 +20,11 @@ object Footer {
         ^.className := "clear-completed",
         ^.onClick --> p.onClearCompleted,
         "Clear completed",
-        (p.completedCount == 0) ?= ^.visibility.hidden
+        ^.visibility.hidden.when(p.completedCount == 0)
       )
 
     def filterLink(p: Props)(s: TodoFilter) =
-      <.li(p.filterLink(s)((p.currentFilter == s) ?= (^.className := "selected"), s.title))
+      <.li(p.filterLink(s)((^.className := "selected").when(p.currentFilter == s), s.title))
 
     def render(p: Props) =
       <.footer(
@@ -36,13 +36,13 @@ object Footer {
         ),
         <.ul(
           ^.className := "filters",
-          TodoFilter.values.map(filterLink(p)(_))
+          TodoFilter.values.map(filterLink(p)(_)).toTagMod
         ),
         clearButton(p)
       )
   }
 
-  private val component = ReactComponentB[Props]("Footer").stateless
+  private val component = ScalaComponent.builder[Props]("Footer").stateless
     .renderBackend[Backend]
     .build
 
