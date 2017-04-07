@@ -1,7 +1,7 @@
 package example
 
 import japgolly.scalajs.react._
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom.html_<^._
 import org.scalajs.dom.ext.KeyCode
 
 object TodoView {
@@ -36,10 +36,10 @@ object TodoView {
           case _              => None
       }
 
-    val editFieldChanged: ReactEventI => Callback =
+    val editFieldChanged: ReactEventFromInput => Callback =
       e => Callback { e.persist() } >> $.modState(_.copy(editText = e.target.value))
 
-    def render(p: Props, s: State): ReactElement = {
+    def render(p: Props, s: State): VdomElement = {
       <.li(
         ^.classSet(
           "completed" -> p.todo.isCompleted,
@@ -72,7 +72,7 @@ object TodoView {
     }
   }
 
-  val component = ReactComponentB[Props]("CTodoItem")
+  val component = ScalaComponent.builder[Props]("CTodoItem")
     .initialState_P(p => State(p.todo.title))
     .renderBackend[Backend]
     .build
