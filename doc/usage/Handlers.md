@@ -61,8 +61,6 @@ case class RootModel(tree: Tree)
 And some actions, too!
 
 ```scala
-trait Action
-
 case class ReplaceTree(newTree: Directory) extends Action
 case class AddNode(path: Seq[String], node: FileNode) extends Action
 case class RemoveNode(path: Seq[String]) extends Action
@@ -89,7 +87,7 @@ override val actionHandler = composeHandlers(treeHandler)
 
 Now our application is ready to handle dispatched `ReplaceTree` actions successfully!
 
-`ActionHandler` is just an utility class providing common patterns for defining action handlers. If we look at its code,
+`ActionHandler` is just a utility class providing common patterns for defining action handlers. If we look at its code,
 it's rather straightforward:
 
 ```scala

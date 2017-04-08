@@ -71,7 +71,9 @@ ensures that React will update your component rather than unmounting and remount
 and store your component once and reuse it.
 
 ```scala
-case class State(component: ReactConnectProxy[Pot[String])
+import scala.language.existentials // needed for the ReactConnectProxy in State
+
+case class State(component: ReactConnectProxy[Pot[String]])
 
 val Dashboard = ReactComponentB[ModelProxy[RootModel]]("Dashboard")
 .initialState_P(proxy => State(proxy.connect(_.asyncData)))

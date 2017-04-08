@@ -7,7 +7,9 @@ import org.scalajs.dom
 import scala.scalajs.js.JSApp
 import scala.scalajs.js.annotation.JSExport
 import japgolly.scalajs.react._
+import japgolly.scalajs.react.extra.OnUnmount
 import japgolly.scalajs.react.extra.router._
+import japgolly.scalajs.react.vdom.Implicits._
 
 import scala.scalajs.js.typedarray.TypedArrayBufferOps._
 import scala.scalajs.js.typedarray._
@@ -31,8 +33,8 @@ object TodoMVC extends JSApp {
     filterRoutes.notFound(redirectToPage(TodoFilter.All)(Redirect.Replace))
   }
 
-  /** The router is itself a React component, which at this point is not mounted (U-suffix) */
-  val router: ReactComponentU[Unit, Resolution[TodoFilter], Any, TopNode] =
+  /** The router is itself a React component, which at this point is not mounted */
+  val router: ScalaComponent.Unmounted[Unit, Resolution[TodoFilter], OnUnmount.Backend] =
     Router(baseUrl, routerConfig.logToConsole)()
 
   /**
@@ -64,6 +66,6 @@ object TodoMVC extends JSApp {
     Hooks.hookPersistState("test", AppCircuit)
 
     AppCircuit.dispatch(InitTodos)
-    ReactDOM.render(router, dom.document.getElementsByClassName("todoapp")(0))
+    router.renderIntoDOM(dom.document.getElementsByClassName("todoapp")(0).domAsHtml)
   }
 }

@@ -4,7 +4,7 @@ import diode.react.ModelProxy
 import diode.Action
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.router._
-import japgolly.scalajs.react.vdom.prefix_<^._
+import japgolly.scalajs.react.vdom.html_<^._
 import org.scalajs.dom.ext.KeyCode
 
 object TodoList {
@@ -16,7 +16,7 @@ object TodoList {
   class Backend($ : BackendScope[Props, State]) {
     def mounted(props: Props) = Callback {}
 
-    def handleNewTodoKeyDown(dispatch: Action => Callback)(e: ReactKeyboardEventI): Option[Callback] = {
+    def handleNewTodoKeyDown(dispatch: Action => Callback)(e: ReactKeyboardEventFromInput): Option[Callback] = {
       val title = e.target.value.trim
       if (e.nativeEvent.keyCode == KeyCode.Enter && title.nonEmpty) {
         Some(Callback(e.target.value = "") >> dispatch(AddTodo(title)))
@@ -50,8 +50,8 @@ object TodoList {
             ^.autoFocus := true
           )
         ),
-        todos.nonEmpty ?= todoList(dispatch, s.editing, filteredTodos, activeCount),
-        todos.nonEmpty ?= footer(p, dispatch, p.currentFilter, activeCount, completedCount)
+        todoList(dispatch, s.editing, filteredTodos, activeCount).when(todos.nonEmpty),
+        footer(p, dispatch, p.currentFilter, activeCount, completedCount).when(todos.nonEmpty)
       )
     }
 
@@ -61,7 +61,7 @@ object TodoList {
         <.input.checkbox(
           ^.className := "toggle-all",
           ^.checked := activeCount == 0,
-          ^.onChange ==> { e: ReactEventI =>
+          ^.onChange ==> { e: ReactEventFromInput =>
             dispatch(ToggleAll(e.target.checked))
           }
         ),
@@ -77,11 +77,11 @@ object TodoList {
                 onCancelEditing = editingDone(),
                 todo = todo,
                 isEditing = editing.contains(todo.id)
-              )))
+              ))).toTagMod
         )
       )
 
-    def footer(p: Props, dispatch: Action => Callback, currentFilter: TodoFilter, activeCount: Int, completedCount: Int): ReactElement =
+    def footer(p: Props, dispatch: Action => Callback, currentFilter: TodoFilter, activeCount: Int, completedCount: Int): VdomElement =
       Footer(
         Footer.Props(
           filterLink = p.ctl.link,
@@ -93,7 +93,7 @@ object TodoList {
         ))
   }
 
-  private val component = ReactComponentB[Props]("TodoList")
+  private val component = ScalaComponent.builder[Props]("TodoList")
     .initialState_P(p => State(None))
     .renderBackend[Backend]
     .componentDidMount(scope => scope.backend.mounted(scope.props))
