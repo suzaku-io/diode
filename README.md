@@ -4,8 +4,8 @@
 >
 > a semiconductor device with two terminals, typically allowing the flow of current in one direction only
 
-[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ochrons/diode)
-[![Build Status](https://travis-ci.org/ochrons/diode.svg?branch=master)](https://travis-ci.org/ochrons/diode)
+[![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/suzaku-io/diode)
+[![Build Status](https://travis-ci.org/suzaku-io/diode.svg?branch=master)](https://travis-ci.org/suzaku-io/diode)
 [![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.14.svg)](https://www.scala-js.org)
 
 Diode is a Scala/Scala.js library for managing immutable application state with unidirectional data flow. It is heavily
@@ -23,11 +23,15 @@ Full documentation [available here](https://diode.suzaku.io).
 
 Add following dependency declaration to your Scala project.
 
-<pre><code class="lang-scala">"io.suzaku" %% "diode" % "1.1.1"</code></pre>
+```scala
+"io.suzaku" %% "diode" % "1.1.1"
+```
 
 In a Scala.js project the dependency looks like this.
 
-<pre><code class="lang-scala">"io.suzaku" %%% "diode" % "1.1.1"</code></pre>
+```scala
+"io.suzaku" %%% "diode" % "1.1.1"
+```
 
 <img align="right" src="doc/images/architecture.png">
 
@@ -58,7 +62,7 @@ case classes work best due to their pattern matching capability.
 Application state is stored in a `Circuit[M]` which also takes care of all of the action handling. In your application
 you'd typically define a singleton object extending the Circuit. Your only responsibilities are to define the
 `initialModel` and `actionHandler` methods, everything else is taken care by Diode's Circuit.
- 
+
 ```scala
 object AppCircuit extends Circuit[RootModel] {
   def initialModel = RootModel(0)
@@ -69,7 +73,7 @@ object AppCircuit extends Circuit[RootModel] {
       case Reset => Some(ModelUpdate(model.copy(counter = 0)))
       case _ => None
     }
-  }
+}
 ```
 
 The `actionHandler` is a function receiving the current model and action and returning a result of type
