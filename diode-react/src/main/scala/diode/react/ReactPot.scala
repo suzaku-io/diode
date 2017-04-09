@@ -1,7 +1,7 @@
 package diode.react
 
 import diode.data.{PendingBase, Pot}
-import japgolly.scalajs.react.vdom.VdomNode
+import japgolly.scalajs.react.vdom.{VdomArray, VdomNode}
 
 object ReactPot {
 
@@ -16,7 +16,7 @@ object ReactPot {
       * @return
       */
     def render(f: A => VdomNode): VdomNode =
-      if (pot.nonEmpty) f(pot.get) else null
+      if (pot.nonEmpty) f(pot.get) else VdomArray.empty()
 
     /**
       * Render content in Ready state, not including stale states
@@ -25,7 +25,7 @@ object ReactPot {
       * @return
       */
     def renderReady(f: A => VdomNode): VdomNode =
-      if (pot.isReady) f(pot.get) else null
+      if (pot.isReady) f(pot.get) else VdomArray.empty()
 
     /**
       * Render when Pot is pending
@@ -34,7 +34,7 @@ object ReactPot {
       * @return
       */
     def renderPending(f: Int => VdomNode): VdomNode =
-      if (pot.isPending) f(pot.asInstanceOf[PendingBase].duration()) else null
+      if (pot.isPending) f(pot.asInstanceOf[PendingBase].duration()) else VdomArray.empty()
 
     /**
       * Render when Pot is pending with a filter on duration
@@ -46,8 +46,8 @@ object ReactPot {
     def renderPending(b: Int => Boolean, f: Int => VdomNode): VdomNode = {
       if (pot.isPending) {
         val duration = pot.asInstanceOf[PendingBase].duration()
-        if (b(duration)) f(duration) else null
-      } else null
+        if (b(duration)) f(duration) else VdomArray.empty()
+      } else VdomArray.empty()
     }
 
     /**
@@ -57,7 +57,7 @@ object ReactPot {
       * @return
       */
     def renderFailed(f: Throwable => VdomNode): VdomNode =
-      pot.exceptionOption.map(f).orNull
+      pot.exceptionOption.map(f).getOrElse(VdomArray.empty())
 
     /**
       * Render stale content (`PendingStale` or `FailedStale`)
@@ -66,7 +66,7 @@ object ReactPot {
       * @return
       */
     def renderStale(f: A => VdomNode): VdomNode =
-      if (pot.isStale) f(pot.get) else null
+      if (pot.isStale) f(pot.get) else VdomArray.empty()
 
     /**
       * Render when Pot is empty
@@ -75,7 +75,7 @@ object ReactPot {
       * @return
       */
     def renderEmpty(f: => VdomNode): VdomNode =
-      if (pot.isEmpty) f else null
+      if (pot.isEmpty) f else VdomArray.empty()
   }
 
 }
