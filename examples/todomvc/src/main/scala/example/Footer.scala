@@ -36,7 +36,7 @@ object Footer {
         ),
         <.ul(
           ^.className := "filters",
-          TodoFilter.values.map(filterLink(p)(_)).toTagMod
+          TodoFilter.values.toTagMod(filterLink(p)(_))
         ),
         clearButton(p)
       )
