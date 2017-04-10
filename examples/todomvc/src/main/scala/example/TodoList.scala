@@ -67,7 +67,7 @@ object TodoList {
         ),
         <.ul(
           ^.className := "todo-list",
-          todos.map(
+          todos.toTagMod(
             todo =>
               TodoView(TodoView.Props(
                 onToggle = dispatch(ToggleCompleted(todo.id)),
@@ -77,7 +77,7 @@ object TodoList {
                 onCancelEditing = editingDone(),
                 todo = todo,
                 isEditing = editing.contains(todo.id)
-              ))).toTagMod
+              )))
         )
       )
 
