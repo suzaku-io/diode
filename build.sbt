@@ -160,7 +160,7 @@ lazy val diodeReact = project
   .settings(
     name := "diode-react",
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "core" % "1.0.0-RC3"
+      "com.github.japgolly.scalajs-react" %%% "core" % "1.0.0"
     ),
     scalacOptions ++= sourceMapSetting.value
   )
