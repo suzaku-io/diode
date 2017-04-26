@@ -94,7 +94,7 @@ object TodoList {
   }
 
   private val component = ScalaComponent.builder[Props]("TodoList")
-    .initialState_P(p => State(None))
+    .initialStateFromProps(p => State(None))
     .renderBackend[Backend]
     .componentDidMount(scope => scope.backend.mounted(scope.props))
     .build
