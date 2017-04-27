@@ -77,7 +77,7 @@ object TodoList {
                 onCancelEditing = editingDone(),
                 todo = todo,
                 isEditing = editing.contains(todo.id)
-              ))).toTagMod
+              )))
         )
       )
 
