@@ -21,7 +21,7 @@ object CircuitJVMTests extends TestSuite {
 
   case class RunEffects(effects: Seq[Effect], parallel: Boolean = false)
 
-  class TestCircuit(implicit ec: ExecutionContext) extends Circuit[Model] {
+  class TestCircuit extends Circuit[Model] {
     import diode.ActionResult._
     override def initialModel = Model(Vector.empty)
     override protected def actionHandler: HandlerFunction =

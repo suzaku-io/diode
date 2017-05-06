@@ -2,12 +2,12 @@ import sbt._
 import Keys._
 import com.typesafe.sbt.pgp.PgpKeys._
 
-crossScalaVersions := Seq("2.11.8", "2.12.1")
+crossScalaVersions := Seq("2.11.11", "2.12.2")
 
 val commonSettings = Seq(
   organization := "io.suzaku",
   version := Version.library,
-  scalaVersion := "2.11.8",
+  scalaVersion := "2.12.2",
   scalacOptions := Seq(
     "-deprecation",
     "-encoding",
@@ -15,6 +15,7 @@ val commonSettings = Seq(
     "-feature",
     "-unchecked",
     "-language:experimental.macros",
+    "-language:existentials",
     "-Xfatal-warnings",
     "-Xlint",
     "-Yno-adapted-args",
@@ -42,8 +43,8 @@ val publishSettings = Seq(
     <url>https://github.com/suzaku-io/diode</url>
       <licenses>
         <license>
-          <name>MIT license</name>
-          <url>http://www.opensource.org/licenses/mit-license.php</url>
+          <name>Apache 2.0 license</name>
+          <url>http://www.opensource.org/licenses/Apache-2.0</url>
         </license>
       </licenses>
       <developers>
@@ -169,4 +170,12 @@ lazy val diodeReact = project
 
 lazy val root = preventPublication(project.in(file(".")))
   .settings(commonSettings: _*)
-  .aggregate(diodeJS, diodeJVM, diodeCoreJS, diodeCoreJVM, diodeDataJS, diodeDataJVM, diodeReact, diodeDevToolsJS, diodeDevToolsJVM)
+  .aggregate(diodeJS,
+             diodeJVM,
+             diodeCoreJS,
+             diodeCoreJVM,
+             diodeDataJS,
+             diodeDataJVM,
+             diodeReact,
+             diodeDevToolsJS,
+             diodeDevToolsJVM)

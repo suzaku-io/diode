@@ -260,7 +260,7 @@ object CircuitTests extends TestSuite {
         }
 
         val sub: Subscriber[String] = c.subscribe(c.zoom(_.s))
-        val unsubscribe1            = sub(listener1)
+        val _                       = sub(listener1)
         unsubscribe2 = sub(listener2)
 
         c.dispatch(SetS("Listen"))

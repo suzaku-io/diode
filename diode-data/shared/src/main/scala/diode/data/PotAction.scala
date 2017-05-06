@@ -82,7 +82,8 @@ object PotAction {
     *
     * @param progressInterval Interval at which to update progress
     */
-  def handler[A, M, P <: PotAction[A, P]](progressInterval: FiniteDuration)(implicit runner: RunAfter, ec: ExecutionContext) = {
+  def handler[A, M, P <: PotAction[A, P]](progressInterval: FiniteDuration)(implicit runner: RunAfter,
+                                                                            ec: ExecutionContext) = {
     (action: PotAction[A, P], handler: ActionHandler[M, Pot[A]], updateEffect: Effect) =>
       {
         import PotState._
@@ -115,8 +116,8 @@ object PotActionRetriable {
   /**
     * Provides state machine handling of a retriable `Pot` action
     */
-  def handler[A, M, P <: PotActionRetriable[A, P]]()(
-      implicit ec: ExecutionContext): (PotActionRetriable[A, P], ActionHandler[M, Pot[A]], RetryPolicy => Effect) => ActionResult[M] =
+  def handler[A, M, P <: PotActionRetriable[A, P]]()(implicit ec: ExecutionContext)
+    : (PotActionRetriable[A, P], ActionHandler[M, Pot[A]], RetryPolicy => Effect) => ActionResult[M] =
     handler(Duration.Zero)(diode.Implicits.runAfterImpl, ec)
 
   /**
@@ -124,7 +125,8 @@ object PotActionRetriable {
     *
     * @param progressInterval Interval at which to update progress
     */
-  def handler[A, M, P <: PotActionRetriable[A, P]](progressInterval: FiniteDuration)(implicit runner: RunAfter, ec: ExecutionContext) = {
+  def handler[A, M, P <: PotActionRetriable[A, P]](progressInterval: FiniteDuration)(implicit runner: RunAfter,
+                                                                                     ec: ExecutionContext) = {
     (action: PotActionRetriable[A, P], handler: ActionHandler[M, Pot[A]], updateEffect: RetryPolicy => Effect) =>
       {
         import PotState._
@@ -132,7 +134,8 @@ object PotActionRetriable {
         action.state match {
           case PotEmpty =>
             if (progressInterval > Duration.Zero)
-              updated(value.pending(), updateEffect(action.retryPolicy) + Effect.action(action.pending).after(progressInterval))
+              updated(value.pending(),
+                      updateEffect(action.retryPolicy) + Effect.action(action.pending).after(progressInterval))
             else
               updated(value.pending(), updateEffect(action.retryPolicy))
 
@@ -146,8 +149,9 @@ object PotActionRetriable {
           case PotReady =>
             updated(action.potResult)
           case PotFailed =>
-            action.retryPolicy.retry(action.potResult.exceptionOption.getOrElse(new IllegalStateException("Pot is not in a failed state")),
-                                     updateEffect) match {
+            action.retryPolicy.retry(
+              action.potResult.exceptionOption.getOrElse(new IllegalStateException("Pot is not in a failed state")),
+              updateEffect) match {
               case Right((_, retryEffect)) =>
                 effectOnly(retryEffect)
               case Left(ex) =>

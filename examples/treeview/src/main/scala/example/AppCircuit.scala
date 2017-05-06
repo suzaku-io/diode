@@ -77,7 +77,8 @@ class DirectoryTreeHandler[M](modelRW: ModelRW[M, Directory]) extends ActionHand
     * `Some(childrenRW)` if the directory was found or
     * `None` if something went wrong
     */
-  @tailrec private def zoomToChildren(path: Seq[String], rw: ModelRW[M, Directory]): Option[ModelRW[M, IndexedSeq[FileNode]]] = {
+  @tailrec private def zoomToChildren(path: Seq[String],
+                                      rw: ModelRW[M, Directory]): Option[ModelRW[M, IndexedSeq[FileNode]]] = {
     if (path.isEmpty) {
       Some(rw.zoomTo(_.children))
     } else {

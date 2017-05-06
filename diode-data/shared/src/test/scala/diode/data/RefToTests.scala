@@ -28,27 +28,36 @@ object RefToTests extends TestSuite {
       val root    = Model(PotMap(fetcher, Map("ceoID" -> Ready(User("Ms. CEO")))), Seq())
       val modelRW = new RootModelRW(root)
       val m = root.copy(
-        employees = Seq(Employee("CEO", RefTo("ceoID", modelRW.zoom(_.users))((id, value) => RefAction(s"Update $id to $value")))))
+        employees =
+          Seq(Employee("CEO", RefTo("ceoID", modelRW.zoom(_.users))((id, value) => RefAction(s"Update $id to $value")))))
       assert(m.employees.head.user().get.name == "Ms. CEO")
-      assert(m.employees.head.user.updated(Ready(User("Ms. Kathy CEO"))) == RefAction("Update ceoID to Ready(User(Ms. Kathy CEO))"))
+      assert(
+        m.employees.head.user.updated(Ready(User("Ms. Kathy CEO"))) == RefAction(
+          "Update ceoID to Ready(User(Ms. Kathy CEO))"))
     }
     'refToVector - {
       val fetcher = new TestFetcher[Int]
       val root    = ModelV(PotVector(fetcher, 5, Vector(Ready(User("Ms. CEO")))), Seq())
       val modelRW = new RootModelRW(root)
       val m =
-        root.copy(employees = Seq(Employee("CEO", RefTo(0, modelRW.zoom(_.users))((id, value) => RefAction(s"Update $id to $value")))))
+        root.copy(
+          employees =
+            Seq(Employee("CEO", RefTo(0, modelRW.zoom(_.users))((id, value) => RefAction(s"Update $id to $value")))))
       assert(m.employees.head.user().get.name == "Ms. CEO")
-      assert(m.employees.head.user.updated(Ready(User("Ms. Kathy CEO"))) == RefAction("Update 0 to Ready(User(Ms. Kathy CEO))"))
+      assert(
+        m.employees.head.user.updated(Ready(User("Ms. Kathy CEO"))) == RefAction("Update 0 to Ready(User(Ms. Kathy CEO))"))
     }
     'refToStream - {
       val fetcher = new TestFetcher[String]
       val root    = ModelS(PotStream(fetcher, Seq("ceoID" -> Ready(User("Ms. CEO")))), Seq())
       val modelRW = new RootModelRW(root)
       val m = root.copy(
-        employees = Seq(Employee("CEO", RefTo.stream("ceoID", modelRW.zoom(_.users))((id, value) => RefAction(s"Update $id to $value")))))
+        employees = Seq(
+          Employee("CEO", RefTo.stream("ceoID", modelRW.zoom(_.users))((id, value) => RefAction(s"Update $id to $value")))))
       assert(m.employees.head.user().get.name == "Ms. CEO")
-      assert(m.employees.head.user.updated(Ready(User("Ms. Kathy CEO"))) == RefAction("Update ceoID to Ready(User(Ms. Kathy CEO))"))
+      assert(
+        m.employees.head.user.updated(Ready(User("Ms. Kathy CEO"))) == RefAction(
+          "Update ceoID to Ready(User(Ms. Kathy CEO))"))
     }
   }
 }

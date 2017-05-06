@@ -1,12 +1,10 @@
 package diode.data
 
-import diode.{ActionHandler, ModelRW, Dispatcher}
-import diode.data.PotState._
 import diode.Implicits.runAfterImpl
+import diode.data.PotState._
 import utest._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 import scala.util._
 
 object PotCollectionTests extends TestSuite {
@@ -189,6 +187,7 @@ object PotCollectionTests extends TestSuite {
           UpdateUsers(keys, newState, newValue)
       }
 
+/*
       // an implementation of Fetch for users
       class UserFetch(dispatch: Dispatcher) extends Fetch[String] {
         override def fetch(key: String): Unit =
@@ -197,7 +196,8 @@ object PotCollectionTests extends TestSuite {
           dispatch(UpdateUsers(keys = Set() ++ keys))
       }
 
-      abstract class Handler[M](modelRW: ModelRW[M, PotMap[String, User]], keys: Set[String]) extends ActionHandler(modelRW) {
+      abstract class Handler[M](modelRW: ModelRW[M, PotMap[String, User]], keys: Set[String])
+          extends ActionHandler(modelRW) {
 
         // function to load a set of users based on keys
         def loadUsers(keys: Set[String]): Future[Map[String, Pot[User]]]
@@ -209,6 +209,7 @@ object PotCollectionTests extends TestSuite {
             action.handleWith(this, updateEffect)(AsyncAction.mapHandler(action.keys))
         }
       }
+*/
     }
   }
 }

@@ -16,8 +16,9 @@ import scala.language.higherKinds
   *
   * @tparam A Action type
   */
-@implicitNotFound(msg =
-  "Cannot find an ActionType type class for action of type ${A}. Make sure to provide an implicit ActionType for dispatched actions.")
+@implicitNotFound(
+  msg =
+    "Cannot find an ActionType type class for action of type ${A}. Make sure to provide an implicit ActionType for dispatched actions.")
 trait ActionType[-A]
 
 trait Dispatcher {
@@ -95,7 +96,10 @@ object ActionResult {
 
   final case class ModelUpdateEffect[M](newModel: M, effect: Effect) extends ModelUpdated[M] with HasEffect[M]
 
-  final case class ModelUpdateSilentEffect[M](newModel: M, effect: Effect) extends ModelUpdated[M] with HasEffect[M] with UpdateSilent
+  final case class ModelUpdateSilentEffect[M](newModel: M, effect: Effect)
+      extends ModelUpdated[M]
+      with HasEffect[M]
+      with UpdateSilent
 
   def apply[M](model: Option[M], effect: Option[Effect]): ActionResult[M] = (model, effect) match {
     case (Some(m), Some(e)) => ModelUpdateEffect(m, e)
@@ -144,7 +148,8 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
 
   private def buildProcessChain = {
     // chain processing functions
-    processors.reverse.foldLeft(process _)((next, processor) => (action: Any) => processor.process(this, action, next, model))
+    processors.reverse.foldLeft(process _)((next, processor) =>
+      (action: Any) => processor.process(this, action, next, model))
   }
 
   private def baseHandler(action: Any) = action match {

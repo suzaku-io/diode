@@ -355,7 +355,7 @@ case object Empty extends Pot[Nothing] {
   def retryPolicy   = Retry.None
 
   override def pending(startTime: Long = Pot.currentTime) = Pending(startTime)
-  override def fail(exception: Throwable)                    = Failed(exception)
+  override def fail(exception: Throwable)                 = Failed(exception)
 }
 
 case object Unavailable extends Pot[Nothing] {
@@ -370,7 +370,7 @@ case object Unavailable extends Pot[Nothing] {
   def retryPolicy   = Retry.None
 
   override def pending(startTime: Long = Pot.currentTime) = Pending(startTime)
-  override def fail(exception: Throwable)                    = Failed(exception)
+  override def fail(exception: Throwable)                 = Failed(exception)
 }
 
 final case class Ready[+A](x: A) extends Pot[A] {
@@ -385,14 +385,14 @@ final case class Ready[+A](x: A) extends Pot[A] {
   def retryPolicy   = Retry.None
 
   override def pending(startTime: Long = Pot.currentTime) = PendingStale(x, startTime)
-  override def fail(exception: Throwable)                    = FailedStale(x, exception)
+  override def fail(exception: Throwable)                 = FailedStale(x, exception)
 }
 
 sealed trait PendingBase {
   def startTime: Long
-  def isPending                                        = true
-  def isUnavailable                                    = false
-  def state                                            = PotState.PotPending
+  def isPending                                     = true
+  def isUnavailable                                 = false
+  def state                                         = PotState.PotPending
   def duration(currentTime: Long = Pot.currentTime) = (currentTime - startTime).toInt
 }
 
@@ -403,7 +403,7 @@ final case class Pending(startTime: Long = Pot.currentTime) extends Pot[Nothing]
   def isStale  = false
 
   override def pending(startTime: Long = Pot.currentTime) = copy(startTime)
-  override def fail(exception: Throwable) = Failed(exception)
+  override def fail(exception: Throwable)                 = Failed(exception)
 }
 
 final case class PendingStale[+A](x: A, startTime: Long = Pot.currentTime) extends Pot[A] with PendingBase {
@@ -413,7 +413,7 @@ final case class PendingStale[+A](x: A, startTime: Long = Pot.currentTime) exten
   def isStale  = true
 
   override def pending(startTime: Long = Pot.currentTime) = copy(x, startTime)
-  override def fail(exception: Throwable) = FailedStale(x, exception)
+  override def fail(exception: Throwable)                 = FailedStale(x, exception)
 }
 
 sealed trait FailedBase {
@@ -440,7 +440,7 @@ final case class Failed(exception: Throwable) extends Pot[Nothing] with FailedBa
   override def recover[B](f: PartialFunction[Throwable, B]): Pot[B] = this
 
   override def pending(startTime: Long = Pot.currentTime) = Pending(startTime)
-  override def fail(exception: Throwable)                    = Failed(exception)
+  override def fail(exception: Throwable)                 = Failed(exception)
 }
 
 final case class FailedStale[+A](x: A, exception: Throwable) extends Pot[A] with FailedBase {
@@ -459,5 +459,5 @@ final case class FailedStale[+A](x: A, exception: Throwable) extends Pot[A] with
   override def recover[B >: A](f: PartialFunction[Throwable, B]): Pot[B] = this
 
   override def pending(startTime: Long = Pot.currentTime) = PendingStale(x, startTime)
-  override def fail(exception: Throwable)                    = FailedStale(x, exception)
+  override def fail(exception: Throwable)                 = FailedStale(x, exception)
 }

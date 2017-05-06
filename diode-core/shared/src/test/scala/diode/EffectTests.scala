@@ -39,9 +39,8 @@ object EffectTests extends TestSuite {
         }
       }
       'after - {
-        import diode.Implicits._
         val now = System.currentTimeMillis()
-        efA.after(100.milliseconds).map(x => s"$x$x").toFuture.map { z =>
+        efA.after(100.milliseconds)(diode.Implicits.runAfterImpl).map(x => s"$x$x").toFuture.map { z =>
           assert(z == "AA")
           assert(System.currentTimeMillis() - now > 80)
         }

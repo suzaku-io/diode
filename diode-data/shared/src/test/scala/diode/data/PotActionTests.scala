@@ -5,7 +5,6 @@ import diode._
 import diode.data.PotState._
 import diode.util.Retry.Immediate
 import diode.util.{RetryPolicy, Retry}
-import diode.Implicits.runAfterImpl
 import utest._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -96,8 +95,10 @@ object PotActionTests extends TestSuite {
         }
       }
       'EffectFail - {
-        val ta  = TestAction()
-        val eff = ta.effect(Future { if (true) throw new Exception("Oh no!") else 42 })(_.toString, ex => new Exception(ex.getMessage * 2))
+        val ta = TestAction()
+        val eff =
+          ta.effect(Future { if (true) throw new Exception("Oh no!") else 42 })(_.toString,
+                                                                                ex => new Exception(ex.getMessage * 2))
 
         eff.toFuture.map { action =>
           assert(action.potResult.exceptionOption.exists(_.getMessage == "Oh no!Oh no!"))

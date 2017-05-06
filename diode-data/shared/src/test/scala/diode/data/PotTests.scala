@@ -33,18 +33,18 @@ object PotTests extends TestSuite {
         assert(Pot.fromOption(none) == Empty)
       }
       'startTime - {
-        val empty = Pot.empty[String]
+        val empty      = Pot.empty[String]
         val startTime0 = Pot.currentTime - 1L
-        val pend = empty.pending(startTime0)
-        assert( pend.asInstanceOf[PendingBase].startTime == startTime0 )
-        assert( pend.pending(startTime0).asInstanceOf[PendingBase].startTime == startTime0 )
-        assert( pend.pending().asInstanceOf[PendingBase].startTime > startTime0 )
+        val pend       = empty.pending(startTime0)
+        assert(pend.asInstanceOf[PendingBase].startTime == startTime0)
+        assert(pend.pending(startTime0).asInstanceOf[PendingBase].startTime == startTime0)
+        assert(pend.pending().asInstanceOf[PendingBase].startTime > startTime0)
         val ready = pend.ready("a")
-        assert( ready.pending(startTime0).asInstanceOf[PendingBase].startTime == startTime0 )
-        assert( ready.pending().asInstanceOf[PendingBase].startTime != startTime0 )
+        assert(ready.pending(startTime0).asInstanceOf[PendingBase].startTime == startTime0)
+        assert(ready.pending().asInstanceOf[PendingBase].startTime != startTime0)
         val fail = ready.fail(new Exception)
-        assert( fail.pending(startTime0).asInstanceOf[PendingBase].startTime == startTime0 )
-        assert( fail.pending().asInstanceOf[PendingBase].startTime > startTime0 )
+        assert(fail.pending(startTime0).asInstanceOf[PendingBase].startTime == startTime0)
+        assert(fail.pending().asInstanceOf[PendingBase].startTime > startTime0)
       }
     }
   }

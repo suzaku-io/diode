@@ -181,5 +181,6 @@ object Effect {
   def action[A: ActionType](action: => A)(implicit ec: ExecutionContext): EffectSingle[A] =
     new EffectSingle(() => Future.successful(action), ec)
 
-  implicit def f2effect[A: ActionType](f: EffectF[A])(implicit ec: ExecutionContext): EffectSingle[A] = new EffectSingle(f, ec)
+  implicit def f2effect[A: ActionType](f: EffectF[A])(implicit ec: ExecutionContext): EffectSingle[A] =
+    new EffectSingle(f, ec)
 }

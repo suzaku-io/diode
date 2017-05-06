@@ -25,7 +25,8 @@ object TodoMVC extends JSApp {
     val todoConnection = AppCircuit.connect(_.todos)
 
     /* how the application renders the list given a filter */
-    def filterRoute(s: TodoFilter): Rule = staticRoute("#/" + s.link, s) ~> renderR(router => todoConnection(p => TodoList(p, s, router)))
+    def filterRoute(s: TodoFilter): Rule =
+      staticRoute("#/" + s.link, s) ~> renderR(router => todoConnection(p => TodoList(p, s, router)))
 
     val filterRoutes: Rule = TodoFilter.values.map(filterRoute).reduce(_ | _)
 

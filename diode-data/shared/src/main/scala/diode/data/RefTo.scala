@@ -2,8 +2,6 @@ package diode.data
 
 import diode._
 
-import scala.language.existentials
-
 /**
   * Provides a reference to a value elsewhere in the model.
   *

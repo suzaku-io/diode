@@ -5,8 +5,11 @@ import diode.ModelRW
 import scala.reflect.macros.blackbox
 
 object GenLens {
-  def generate[M: c.WeakTypeTag, A: c.WeakTypeTag, B: c.WeakTypeTag](c: blackbox.Context)(field: c.Expr[A => B]): c.Expr[ModelRW[M, B]] = {
-    def mkLens_impl[T](model: c.Expr[ModelRW[M, Any]], fieldName: c.Expr[String], modelType: c.WeakTypeTag[T]): c.Expr[ModelRW[M, Any]] = {
+  def generate[M: c.WeakTypeTag, A: c.WeakTypeTag, B: c.WeakTypeTag](c: blackbox.Context)(
+      field: c.Expr[A => B]): c.Expr[ModelRW[M, B]] = {
+    def mkLens_impl[T](model: c.Expr[ModelRW[M, Any]],
+                       fieldName: c.Expr[String],
+                       modelType: c.WeakTypeTag[T]): c.Expr[ModelRW[M, Any]] = {
       import c.universe._
 
       val sTpe = modelType.tpe
@@ -78,7 +81,8 @@ object GenLens {
         }
         finalModel.asInstanceOf[c.Expr[ModelRW[M, B]]]
 
-      case _ => c.abort(c.enclosingPosition, s"Illegal field reference ${show(field.tree)}; please use _.field1.field2... instead")
+      case _ =>
+        c.abort(c.enclosingPosition, s"Illegal field reference ${show(field.tree)}; please use _.field1.field2... instead")
     }
     // println(res)
     res

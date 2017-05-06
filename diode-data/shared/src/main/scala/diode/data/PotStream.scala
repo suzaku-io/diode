@@ -4,7 +4,11 @@ import diode.Implicits.runAfterImpl
 
 import scala.annotation.tailrec
 
-final case class StreamValue[K, V](key: K, value: V, stream: PotStream[K, V], prevKey: Option[K] = None, nextKey: Option[K] = None) {
+final case class StreamValue[K, V](key: K,
+                                   value: V,
+                                   stream: PotStream[K, V],
+                                   prevKey: Option[K] = None,
+                                   nextKey: Option[K] = None) {
   def apply() = value
 
   def prev = stream.get(prevKey)
@@ -60,7 +64,8 @@ class PotStream[K, V](
       val headKey   = headKeyOption.getOrElse(firstKey)
       // join new values and update the previously last value to point to the first of the new values
       val newElems: Map[K, StreamValue[K, V]] =
-        elems ++ newValues.map(sv => sv.key -> sv) ++ lastKeyOption.map(lk => lk -> elems(lk).copy(nextKey = Some(firstKey)))
+        elems ++ newValues.map(sv => sv.key -> sv) ++ lastKeyOption.map(lk =>
+          lk                                -> elems(lk).copy(nextKey = Some(firstKey)))
       new PotStream(fetcher, newElems, updatedHead(headKey), Some(lastKey))
     }
   }
@@ -89,13 +94,15 @@ class PotStream[K, V](
       }
 
       val reversedKvs = kvs.reverse
-      val newValues   = buildStream(reversedKvs.tail.headOption.map(_._1), headKeyOption, reversedKvs.head, reversedKvs.tail, Nil)
-      val firstKey    = reversedKvs.head._1
-      val headKey     = kvs.head._1
-      val lastKey     = lastKeyOption.getOrElse(headKey)
+      val newValues =
+        buildStream(reversedKvs.tail.headOption.map(_._1), headKeyOption, reversedKvs.head, reversedKvs.tail, Nil)
+      val firstKey = reversedKvs.head._1
+      val headKey  = kvs.head._1
+      val lastKey  = lastKeyOption.getOrElse(headKey)
       // join new values and update the previously head value to point to the last of the new values
       val newElems: Map[K, StreamValue[K, V]] =
-        elems ++ newValues.map(sv => sv.key -> sv) ++ headKeyOption.map(hk => hk -> elems(hk).copy(prevKey = Some(firstKey)))
+        elems ++ newValues.map(sv => sv.key -> sv) ++ headKeyOption.map(hk =>
+          hk                                -> elems(hk).copy(prevKey = Some(firstKey)))
       new PotStream(fetcher, newElems, Some(headKey), updatedLast(lastKey))
     }
   }
