@@ -49,13 +49,13 @@ your component.
 
 ```scala
 // connect with ModelProxy
-val smartComponent = ReactComponentB[ModelProxy[Seq[String]]]("SmartComponent").build
+val smartComponent = ScalaComponent.builder[ModelProxy[Seq[String]]]("SmartComponent").build
 ...
 val sc = AppCircuit.connect(_.data)
 
 // wrap with specific props
 case class Props(data: Seq[String], onClick: Callback)
-val dummyComponent = ReactComponentB[Props]("DummyComponent").build
+val dummyComponent = ScalaComponent.builder[Props]("DummyComponent").build
 ...
 val dc = AppCircuit.wrap(_.data)(p => dummyComponent(Props(p(), p.dispatch(DummyClicked)))
 
@@ -75,8 +75,8 @@ import scala.language.existentials // needed for the ReactConnectProxy in State
 
 case class State(component: ReactConnectProxy[Pot[String]])
 
-val Dashboard = ReactComponentB[ModelProxy[RootModel]]("Dashboard")
-.initialState_P(proxy => State(proxy.connect(_.asyncData)))
+val Dashboard = ScalaComponent.builder[ModelProxy[RootModel]]("Dashboard")
+.initialStateFromProps(proxy => State(proxy.connect(_.asyncData)))
 .renderPS { (_, proxy, state) =>
   <.div(
     <.h3("Data"),
@@ -101,7 +101,7 @@ import diode.react.ReactPot._
 An example from the [SPA tutorial](https://github.com/ochrons/scalajs-spa-tutorial)
 
 ```scala
-val Motd = ReactComponentB[ModelProxy[Pot[String]]]("Motd")
+val Motd = ScalaComponent.builder[ModelProxy[Pot[String]]]("Motd")
   .render_P { proxy =>
     Panel(Panel.Props("Message of the day"),
       // render messages depending on the state of the Pot
