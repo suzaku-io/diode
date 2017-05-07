@@ -1,11 +1,11 @@
 package example
 
 import scala.scalajs.js.JSApp
-import scala.scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scalatags.JsDom.all._
 import org.scalajs.dom
 
-@JSExport("SimpleApp")
+@JSExportTopLevel("SimpleApp")
 object SimpleApp extends JSApp {
   @JSExport
   override def main(): Unit = {

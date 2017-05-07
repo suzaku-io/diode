@@ -5,11 +5,11 @@ import java.util.UUID
 import diode._
 
 import scala.scalajs.js.JSApp
-import scala.scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scalatags.JsDom.all._
 import org.scalajs.dom
 
-@JSExport("SimpleApp")
+@JSExportTopLevel("SimpleApp")
 object SimpleApp extends JSApp {
   // initial data
   val data = Directory("/",

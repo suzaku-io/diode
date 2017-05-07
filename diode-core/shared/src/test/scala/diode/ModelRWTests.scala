@@ -53,8 +53,8 @@ object ModelRWTests extends TestSuite {
 
       // need explicit import due to implicit priorities
       implicit val ptEq = PartialToo.partialEq
-      val r5    = mr.zoom(m => PartialToo(m.c.s, m.a.i))
-      val oldPT = r5()
+      val r5            = mr.zoom(m => PartialToo(m.c.s, m.a.i))
+      val oldPT         = r5()
       m = m.copy(a = A(9, "str"))
       // use custom FastEq
       assert(r5 === oldPT)

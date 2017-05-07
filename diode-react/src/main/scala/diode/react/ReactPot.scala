@@ -5,8 +5,6 @@ import japgolly.scalajs.react.vdom.{VdomArray, VdomNode}
 
 object ReactPot {
 
-  import scala.language.implicitConversions
-
   implicit class potWithReact[A](val pot: Pot[A]) extends AnyVal {
 
     /**

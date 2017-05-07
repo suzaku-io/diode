@@ -5,7 +5,7 @@ import diode.dev.{Hooks, PersistStateIDB}
 import org.scalajs.dom
 
 import scala.scalajs.js.JSApp
-import scala.scalajs.js.annotation.JSExport
+import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import japgolly.scalajs.react._
 import japgolly.scalajs.react.extra.OnUnmount
 import japgolly.scalajs.react.extra.router._
@@ -14,7 +14,7 @@ import japgolly.scalajs.react.vdom.Implicits._
 import scala.scalajs.js.typedarray.TypedArrayBufferOps._
 import scala.scalajs.js.typedarray._
 
-@JSExport("TodoMVC")
+@JSExportTopLevel("TodoMVC")
 object TodoMVC extends JSApp {
 
   val baseUrl = BaseUrl(dom.window.location.href.takeWhile(_ != '#'))

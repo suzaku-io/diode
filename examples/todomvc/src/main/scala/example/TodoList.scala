@@ -81,7 +81,11 @@ object TodoList {
         )
       )
 
-    def footer(p: Props, dispatch: Action => Callback, currentFilter: TodoFilter, activeCount: Int, completedCount: Int): VdomElement =
+    def footer(p: Props,
+               dispatch: Action => Callback,
+               currentFilter: TodoFilter,
+               activeCount: Int,
+               completedCount: Int): VdomElement =
       Footer(
         Footer.Props(
           filterLink = p.ctl.link,
@@ -93,11 +97,13 @@ object TodoList {
         ))
   }
 
-  private val component = ScalaComponent.builder[Props]("TodoList")
+  private val component = ScalaComponent
+    .builder[Props]("TodoList")
     .initialStateFromProps(p => State(None))
     .renderBackend[Backend]
     .componentDidMount(scope => scope.backend.mounted(scope.props))
     .build
 
-  def apply(proxy: ModelProxy[Todos], currentFilter: TodoFilter, ctl: RouterCtl[TodoFilter]) = component(Props(proxy, currentFilter, ctl))
+  def apply(proxy: ModelProxy[Todos], currentFilter: TodoFilter, ctl: RouterCtl[TodoFilter]) =
+    component(Props(proxy, currentFilter, ctl))
 }

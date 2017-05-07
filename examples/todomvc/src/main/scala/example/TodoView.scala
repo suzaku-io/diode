@@ -72,7 +72,8 @@ object TodoView {
     }
   }
 
-  val component = ScalaComponent.builder[Props]("CTodoItem")
+  val component = ScalaComponent
+    .builder[Props]("CTodoItem")
     .initialStateFromProps(p => State(p.todo.title))
     .renderBackend[Backend]
     .build

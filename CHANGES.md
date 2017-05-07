@@ -1,5 +1,10 @@
 # Changes
 
+## 1.1.2
+- Upgrade to Scala 2.11.11, 2.12.2 and Scala.js 0.6.15
+- Update diode-react to scalajs-react 1.0.0
+- Change license to Apache 2.0 (was MIT)
+
 ## 1.1.1
 
 - New `zoomTo` macro to simplify common `zoomRW` use-cases. For example what used to be

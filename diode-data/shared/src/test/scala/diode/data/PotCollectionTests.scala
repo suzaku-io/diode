@@ -187,7 +187,7 @@ object PotCollectionTests extends TestSuite {
           UpdateUsers(keys, newState, newValue)
       }
 
-/*
+      /*
       // an implementation of Fetch for users
       class UserFetch(dispatch: Dispatcher) extends Fetch[String] {
         override def fetch(key: String): Unit =
@@ -209,7 +209,7 @@ object PotCollectionTests extends TestSuite {
             action.handleWith(this, updateEffect)(AsyncAction.mapHandler(action.keys))
         }
       }
-*/
+     */
     }
   }
 }

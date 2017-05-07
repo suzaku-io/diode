@@ -42,7 +42,9 @@ object Footer {
       )
   }
 
-  private val component = ScalaComponent.builder[Props]("Footer").stateless
+  private val component = ScalaComponent
+    .builder[Props]("Footer")
+    .stateless
     .renderBackend[Backend]
     .build
 
