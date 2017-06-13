@@ -36,10 +36,11 @@ override def handle = {
       case PotPending =>
         noChange
       case PotReady =>
-        updated(action.value)
+        updated(action.potResult)
       case PotUnavailable =>
         updated(value.unavailable())
       case PotFailed =>
+        val ex = action.result.failed.get
         updated(value.fail(ex))
     }
 }
