@@ -262,6 +262,15 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
   def handleError(msg: String): Unit = throw new Exception(s"handleError called with: $msg")
 
   /**
+    *
+    * @param action the action that caused the effects
+    * @param error the Exception that was encountered while processing the effects
+    */
+  def handleEffectProcessingError[A](action: A, error: Throwable): Unit = {
+    handleError(s"Error in processing effects for action $action: $error")
+  }
+
+  /**
     * Updates the model if it has changed (reference equality check)
     */
   private def update(newModel: M) = {
@@ -407,8 +416,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
           effects
             .run(a => dispatch(a))
             .recover {
-              case e: Throwable =>
-                handleError(s"Error in processing effects for action $action: $e")
+              case e: Throwable => handleEffectProcessingError(action, e)
             }(effects.ec)
           true
         case ActionResult.ModelUpdateEffect(newModel, effects) =>
@@ -417,8 +425,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
           effects
             .run(a => dispatch(a))
             .recover {
-              case e: Throwable =>
-                handleError(s"Error in processing effects for action $action: $e")
+              case e: Throwable => handleEffectProcessingError(action, e)
             }(effects.ec)
           false
         case ActionResult.ModelUpdateSilentEffect(newModel, effects) =>
@@ -427,8 +434,7 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
           effects
             .run(a => dispatch(a))
             .recover {
-              case e: Throwable =>
-                handleError(s"Error in processing effects for action $action: $e")
+              case e: Throwable => handleEffectProcessingError(action, e)
             }(effects.ec)
           true
       }
