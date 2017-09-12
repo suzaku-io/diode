@@ -38,12 +38,14 @@ object PotTests extends TestSuite {
         val pend       = empty.pending(startTime0)
         assert(pend.asInstanceOf[PendingBase].startTime == startTime0)
         assert(pend.pending(startTime0).asInstanceOf[PendingBase].startTime == startTime0)
-        assert(pend.pending().asInstanceOf[PendingBase].startTime > startTime0)
+        assert(pend.pending().asInstanceOf[PendingBase].startTime == startTime0)
         val ready = pend.ready("a")
         assert(ready.pending(startTime0).asInstanceOf[PendingBase].startTime == startTime0)
+        assert(ready.pending(startTime0).pending().asInstanceOf[PendingBase].startTime == startTime0)
         assert(ready.pending().asInstanceOf[PendingBase].startTime != startTime0)
         val fail = ready.fail(new Exception)
         assert(fail.pending(startTime0).asInstanceOf[PendingBase].startTime == startTime0)
+        assert(fail.pending(startTime0).pending().asInstanceOf[PendingBase].startTime == startTime0)
         assert(fail.pending().asInstanceOf[PendingBase].startTime > startTime0)
       }
     }
