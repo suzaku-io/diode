@@ -2,7 +2,7 @@
 
 This example demonstrates how to batch and execute actions using `requestAnimationFrame` and an action processor. 
 
-See [live demonstration](http://ochrons.github.io/diode/examples/raf/)
+See [live demonstration](http://diode.suzaku.io/examples/raf/)
 
 ## Usage
 

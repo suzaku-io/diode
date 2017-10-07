@@ -2,7 +2,7 @@
 
 This is a bit more complex example application using Diode. It features a hierarchical data structure representing a directory tree. 
 
-See [live demonstration](http://ochrons.github.io/diode/examples/treeview/)
+See [live demonstration](http://diode.suzaku.io/examples/treeview/)
 
 ## Usage
 
