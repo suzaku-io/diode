@@ -21,7 +21,7 @@ trait RetryPolicy {
   def canRetry(reason: Throwable): Boolean
 
   /**
-    * Retries an effect. Returns `Left` is retry is not possible and `Right[(RetryPolicy, Effects)]` if it is.
+    * Retries an effect. Returns `Left` if retry is not possible and `Right[(RetryPolicy, Effects)]` if it is.
     *
     * @param reason Reason for failure leading to this retry. Used for filtering.
     * @param effectProvider Effect to be retried.
