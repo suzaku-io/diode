@@ -2,12 +2,12 @@ import sbt._
 import Keys._
 import com.typesafe.sbt.pgp.PgpKeys._
 
-crossScalaVersions := Seq("2.11.11", "2.12.3")
+crossScalaVersions := Seq("2.11.11", "2.12.4")
 
 val commonSettings = Seq(
   organization := "io.suzaku",
   version := Version.library,
-  scalaVersion := "2.12.2",
+  scalaVersion := "2.12.4",
   scalacOptions := Seq(
     "-deprecation",
     "-encoding",
