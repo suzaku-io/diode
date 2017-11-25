@@ -81,7 +81,7 @@ object SimpleApp extends JSApp {
 
     val e = div(
       cls := "container",
-      div(img(src := "diode-logo-small.png")),
+      div(img(src := "classes/diode-logo-small.png")),
       h1("Treeview example"),
       p(a(href := "https://github.com/suzaku-io/diode/tree/master/examples/treeview", "Source code")),
       renderButtons(selectionLoc.nonEmpty),

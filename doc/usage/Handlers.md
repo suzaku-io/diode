@@ -82,7 +82,7 @@ val treeHandler = new ActionHandler(zoomTo(_.tree.root)) {
   }
 }
 
-override val actionHandler = composeHandlers(treeHandler)
+override protected val actionHandler = composeHandlers(treeHandler)
 ```
 
 Now our application is ready to handle dispatched `ReplaceTree` actions successfully!
@@ -207,7 +207,7 @@ val selectionHandler = new ActionHandler(zoomTo(_.tree.selected)) {
   }
 }
 
-override val actionHandler = composeHandlers(treeHandler, selectionHandler)
+override protected val actionHandler = composeHandlers(treeHandler, selectionHandler)
 ```
 
 Again we zoom into the `tree` but this time we continue to `selected`. The handler implementation is as trivial as with
@@ -237,13 +237,13 @@ val selectionHandler = new ActionHandler(zoomTo(_.tree.selected)) {
   }
 }
 
-override val actionHandler = foldHandlers(treeHandler, selectionHandler)
+override protected val actionHandler = foldHandlers(treeHandler, selectionHandler)
 ```
 
 You can combine `composeHandlers` and `foldHandlers` to build more complex action handler hierarchies.
 
 ```scala
-override val actionHandler = foldHandlers(composeHandlers(h1, h2, h3), composeHandlers(h4, h5))
+override protected val actionHandler = foldHandlers(composeHandlers(h1, h2, h3), composeHandlers(h4, h5))
 ```
 
 The above handler would pass the action to both of the composed handlers.

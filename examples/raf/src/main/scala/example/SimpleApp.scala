@@ -4,6 +4,7 @@ import scala.scalajs.js.JSApp
 import scala.scalajs.js.annotation.{JSExport, JSExportTopLevel}
 import scalatags.JsDom.all._
 import org.scalajs.dom
+import org.scalajs.dom.raw.Node
 
 @JSExportTopLevel("SimpleApp")
 object SimpleApp extends JSApp {
@@ -33,7 +34,7 @@ object SimpleApp extends JSApp {
     elem
   }
 
-  def renderAnimation(animId: Int, animated: Animated, prevAnim: Option[Animated]) = {
+  def renderAnimation(animId: Int, animated: Animated, prevAnim: Option[Animated]): Unit = {
     import scalatags.JsDom.{svgTags => svg, svgAttrs => svga}
     // only render if animation has changed
     if (!prevAnim.exists(_.isRunning == animated.isRunning)) {
@@ -73,7 +74,7 @@ object SimpleApp extends JSApp {
     }
   }
 
-  def renderAnimations(animations: Map[Int, Animated]) = {
+  def renderAnimations(animations: Map[Int, Animated]): Unit = {
     if (animations.size != prevAnimations.size) {
       // number of animations has changed, render everything
       prevAnimations = Map()
@@ -89,10 +90,10 @@ object SimpleApp extends JSApp {
     prevAnimations = animations
   }
 
-  def render(root: dom.Element) = {
+  def render(root: dom.Element): Unit = {
     val e = div(
       cls := "container",
-      div(img(src := "diode-logo-small.png")),
+      div(img(src := "classes/diode-logo-small.png")),
       h1("RAF example"),
       p(a(href := "https://github.com/suzaku-io/diode/tree/master/examples/raf", "Source code")),
       div(

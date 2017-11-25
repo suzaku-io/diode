@@ -22,7 +22,7 @@ object SimpleApp extends JSApp {
   def render(root: Element) = {
     val e = div(
       cls := "container",
-      div(img(src := "diode-logo-small.png")),
+      div(img(src := "classes/diode-logo-small.png")),
       h1("Simple counter example"),
       p(a(href := "https://github.com/suzaku-io/diode/tree/master/examples/simple", "Source code")),
       counter.render // renders the counter view

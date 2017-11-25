@@ -1,5 +1,12 @@
 # Changes
 
+## 1.1.3
+- Upgrade to Scala 2.12.4 and Scala.js 0.6.19
+- Update diode-react to scalajs-react 1.1.0
+- Use the existing `startTime` in `Pending` and `PendingStale` `PotState`
+- Add a hook to log exceptions encountered while processing effects
+- Documentation fixes
+
 ## 1.1.2
 - Upgrade to Scala 2.11.11, 2.12.2 and Scala.js 0.6.15
 - Update diode-react to scalajs-react 1.0.0

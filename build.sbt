@@ -4,6 +4,9 @@ import com.typesafe.sbt.pgp.PgpKeys._
 
 crossScalaVersions := Seq("2.11.11", "2.12.4")
 
+scalafmtOnCompile in ThisBuild := true
+scalafmtVersion in ThisBuild := "1.3.0"
+
 val commonSettings = Seq(
   organization := "io.suzaku",
   version := Version.library,
@@ -23,12 +26,15 @@ val commonSettings = Seq(
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard",
     "-Xfuture"
-  ),
+  ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, 12)) => Seq("-Xlint:-unused")
+    case _             => Nil
+  }),
   scalacOptions in Compile -= "-Ywarn-value-discard",
   scalacOptions in (Compile, doc) -= "-Xfatal-warnings",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %%% "utest" % "0.4.4" % "test"
+    "com.lihaoyi" %%% "utest" % "0.5.3" % "test"
   )
 )
 
@@ -143,7 +149,7 @@ lazy val diodeDevtools = crossProject
   )
   .jsSettings(
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.1"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.3"
     ),
     scalacOptions ++= sourceMapSetting.value
   )
@@ -161,7 +167,7 @@ lazy val diodeReact = project
   .settings(
     name := "diode-react",
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "core" % "1.1.1"
+      "com.github.japgolly.scalajs-react" %%% "core" % "1.1.0"
     ),
     scalacOptions ++= sourceMapSetting.value
   )
