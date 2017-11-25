@@ -2,7 +2,7 @@ import sbt._
 import Keys._
 import com.typesafe.sbt.pgp.PgpKeys._
 
-crossScalaVersions := Seq("2.11.11", "2.12.2")
+crossScalaVersions := Seq("2.11.11", "2.12.3")
 
 val commonSettings = Seq(
   organization := "io.suzaku",
