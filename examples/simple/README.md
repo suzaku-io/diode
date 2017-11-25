@@ -2,7 +2,7 @@
 
 This is a very simple example application using Diode. See the Diode documentation for further information.
 
-See [live demonstration](http://ochrons.github.io/diode/examples/simple/)
+See [live demonstration](http://diode.suzaku.io/examples/simple/)
 
 ## Usage
 
