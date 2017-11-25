@@ -1,5 +1,5 @@
-addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.15")
+addSbtPlugin("org.scala-js" % "sbt-scalajs" % "0.6.21")
 
-addSbtPlugin("com.lihaoyi" % "workbench" % "0.2.3")
+addSbtPlugin("com.lihaoyi" % "workbench" % "0.3.1")
 
-addSbtPlugin("com.geirsson" % "sbt-scalafmt" % "0.6.8")
+addSbtPlugin("com.lucidchart" % "sbt-scalafmt" % "1.13")

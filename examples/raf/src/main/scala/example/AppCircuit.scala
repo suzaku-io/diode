@@ -51,15 +51,15 @@ case object Reset extends Action
 
 case class AddAnimation(animation: Animation) extends Action
 
-case class UpdateAnimation(id: Int) extends RAFAction with Action
+case class UpdateAnimation(id: Int) extends RAFAction
 
-case class StartAnimation(id: Int, animation: Animation) extends RAFAction with Action
+case class StartAnimation(id: Int, animation: Animation) extends Action
 
-case class PauseAnimation(id: Int) extends RAFAction with Action
+case class PauseAnimation(id: Int) extends Action
 
-case class ContinueAnimation(id: Int) extends RAFAction with Action
+case class ContinueAnimation(id: Int) extends Action
 
-case class DeleteAnimation(id: Int) extends RAFAction with Action
+case class DeleteAnimation(id: Int) extends Action
 
 /**
   * AppCircuit provides the actual instance of the `RootModel` and all the action
@@ -70,16 +70,16 @@ object AppCircuit extends Circuit[RootModel] {
   def initialModel = RootModel(Map(), System.currentTimeMillis())
 
   // zoom into the model, providing access only to the animations
-  val animationHandler = new AnimationHandler(zoomTo(_.animations), zoom(_.now))
+  private val animationHandler = new AnimationHandler(zoomTo(_.animations), zoom(_.now))
 
-  val timestampHandler = new ActionHandler(zoomTo(_.now)) {
+  private val timestampHandler = new ActionHandler(zoomTo(_.now)) {
     override def handle = {
       case RAFTimeStamp(time) =>
         updated(time)
     }
   }
 
-  val actionHandler = composeHandlers(animationHandler, timestampHandler)
+  override protected val actionHandler = composeHandlers(animationHandler, timestampHandler)
 }
 
 class AnimationHandler[M](modelRW: ModelRW[M, Map[Int, Animated]], now: ModelRO[Double]) extends ActionHandler(modelRW) {

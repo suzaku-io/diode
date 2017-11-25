@@ -137,8 +137,7 @@ trait ReactConnector[M <: AnyRef] { circuit: Circuit[M] =>
       .renderBackend[Backend]
       .componentWillMount(_.backend.willMount)
       .componentWillUnmount(_.backend.willUnmount)
-      .shouldComponentUpdatePure(scope =>
-        (scope.currentState ne scope.nextState) || (scope.currentProps ne scope.nextProps))
+      .shouldComponentUpdatePure(scope => (scope.currentState ne scope.nextState) || (scope.currentProps ne scope.nextProps))
       .build
       .withRawProp("key", key)
   }

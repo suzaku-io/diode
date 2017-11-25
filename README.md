@@ -6,7 +6,7 @@
 
 [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/suzaku-io/diode)
 [![Build Status](https://travis-ci.org/suzaku-io/diode.svg?branch=master)](https://travis-ci.org/suzaku-io/diode)
-[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.15.svg)](https://www.scala-js.org)
+[![Scala.js](https://www.scala-js.org/assets/badges/scalajs-0.6.17.svg)](https://www.scala-js.org)
 
 Diode is a Scala/Scala.js library for managing immutable application state with unidirectional data flow. It is heavily
 influenced and inspired by [Flux](https://facebook.github.io/flux/) and
@@ -24,13 +24,13 @@ Full documentation [available here](https://diode.suzaku.io).
 Add following dependency declaration to your Scala project.
 
 ```scala
-"io.suzaku" %% "diode" % "1.1.2"
+"io.suzaku" %% "diode" % "1.1.3"
 ```
 
 In a Scala.js project the dependency looks like this.
 
 ```scala
-"io.suzaku" %%% "diode" % "1.1.2"
+"io.suzaku" %%% "diode" % "1.1.3"
 ```
 
 <img align="right" src="doc/images/architecture.png">
