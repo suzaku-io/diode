@@ -14,12 +14,6 @@ case class ModelProxy[S](modelReader: ModelRO[S], theDispatch: Any => Unit, conn
   def value = modelReader()
 
   /**
-    * Perform a dispatch action in a `Callback`. Use `dispatchCB` instead to make meaning explicit.
-    */
-  @deprecated("Use dispatchCB instead", "1.1.0")
-  def dispatch[A: ActionType](action: A): Callback = dispatchCB(action)
-
-  /**
     * Perform a dispatch action in a `Callback`
     */
   def dispatchCB[A: ActionType](action: A): Callback = Callback(theDispatch(action))
@@ -119,13 +113,12 @@ trait ReactConnector[M <: AnyRef] { circuit: Circuit[M] =>
       }
 
       private def changeHandler(cursor: ModelRO[S]): Unit = {
-        val isMounted       = t.isMounted.map(_.getOrElse(true))
         val stateHasChanged = t.state.map(state => modelReader =!= state)
 
         def updateState(shouldUpdate: Boolean): Callback =
           Callback.when(shouldUpdate)(t.setState(cursor()))
 
-        ((isMounted && stateHasChanged) >>= updateState).runNow()
+        (stateHasChanged >>= updateState).runNow()
       }
 
       def render(s: S, compB: ReactConnectProps[S]) = wrap(modelReader)(compB)
