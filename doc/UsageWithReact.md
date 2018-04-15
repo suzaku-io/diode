@@ -5,7 +5,7 @@ with your [scalajs-react](https://github.com/japgolly/scalajs-react) application
 
 To use Diode React in your application add following dependency declaration to your Scala.js project.
 
-<pre><code class="lang-scala">"io.suzaku" %%% "diode-react" % "{{ book.version }}"</code></pre>
+<pre><code class="lang-scala">"io.suzaku" %%% "diode-react" % "{{ book.version }}.{{ book.reactVersion }}"</code></pre>
 
 ## Overview
 

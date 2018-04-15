@@ -166,8 +166,9 @@ lazy val diodeReact = project
   .settings(publishSettings: _*)
   .settings(
     name := "diode-react",
+    version := s"${Version.library}.${Version.sjsReact.filterNot(_ == '.')}",
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "core" % "1.2.0"
+      "com.github.japgolly.scalajs-react" %%% "core" % Version.sjsReact
     ),
     scalacOptions ++= sourceMapSetting.value
   )
