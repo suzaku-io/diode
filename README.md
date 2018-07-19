@@ -111,7 +111,7 @@ it using Scalatags, but typically you would be using some framework like React i
 convenient integration).
 
 ```scala
-class CounterView(counter: ModelR[Int], dispatch: Dispatcher) {
+class CounterView(counter: ModelRO[Int], dispatch: Dispatcher) {
   def render = {
     div(
       h3("Counter"),
