@@ -116,9 +116,9 @@ class CounterView(counter: ModelRO[Int], dispatch: Dispatcher) {
     div(
       h3("Counter"),
       p("Value = ", b(counter.value)),
-      button(onclick := { () => dispatch(Increase(2)) }, "Increase"),
-      button(onclick := { () => dispatch(Decrease(1)) }, "Decrease"),
-      button(onclick := { () => dispatch(Reset) }, "Reset")
+      button(onClick := { () => dispatch(Increase(2)) }, "Increase"),
+      button(onClick := { () => dispatch(Decrease(1)) }, "Decrease"),
+      button(onClick := { () => dispatch(Reset) }, "Reset")
     )
   }
 }
