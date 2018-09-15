@@ -75,6 +75,8 @@ object ModelRWTests extends TestSuite {
       val v2 = z2.value
       assert(z2.value == ((m.a.i, m.b.max)))
 
+      assert(z1 ===((r1.value, r4.value)))
+
       m = m.copy(m.a.copy(s = "diode"))
       assert(v1 ne z1.value)
       // a.i and b have not changed
@@ -88,6 +90,21 @@ object ModelRWTests extends TestSuite {
       m = m.copy(b = m.b.copy(max = 44))
       // a.i and b.max have both changed
       assert(v2 ne z2.value)
+
+      // Previous behaviour before supporting subscribe for zip
+
+      // should not be === when providing a different value
+      assert(!(z1 ===((r1.value.copy(i = 0), r4.value))))
+      assert(!(z1 ===((r1.value, Seq(-1, -2)))))
+
+      // should not be === when providing a copy with changed reference
+      assert(!(z1 ===((m.a.copy(i = m.a.i), r4.value))))
+      assert(!(z1 ===((r1.value, m.b.fs.toArray.toSeq))))
+
+      // new behaviour after supporting subscribe for zip
+      // should be === when unchanged
+      assert(z1 ===((r1.value, r4.value)))
+
     }
     'map - {
       'equality - {

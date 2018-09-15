@@ -289,6 +289,49 @@ object CircuitTests extends TestSuite {
         assert(state2.s == state2Snapshot.s)
         assert(callback2Count == callback2CountSnapshot)
       }
+      'ZippedSubscribe - {
+
+        val c                        = circuit
+        var state1: (String, Boolean)   = null
+        var callback1Count           = 0
+
+        val zoomS = c.zoom(_.s)
+        val zoomDataBool = c.zoom(_.data.b)
+        val zipped = zoomS zip zoomDataBool
+
+        def listener(cursor: ModelRO[(String, Boolean)]): Unit = {
+          state1 = cursor()
+          callback1Count += 1
+        }
+
+        val unsubscribe = c.subscribe(zipped)(listener)
+
+        // update on first zipped element should call te callback
+        c.dispatch(SetS("Listen"))
+        assert(state1._1 == "Listen")
+        assert(callback1Count == 1)
+
+        // Data.i is updated
+        // but boolean is already true so the callback is not called
+        val newData = Data(-42, state1._2)
+        c.dispatch(SetD(newData))
+        assert(state1._2 == newData.b)
+        assert(callback1Count == 1)
+
+        // boolean is changed so the callback is called
+        val newData2 = newData.copy(b = !newData.b)
+        c.dispatch(SetD(newData2))
+        assert(state1._2 == newData2.b)
+        assert(callback1Count == 2)
+
+        unsubscribe()
+
+        // unsubscribed so the listener is not called
+        c.dispatch(SetD(newData2))
+        assert(state1._2 == newData2.b)
+        assert(callback1Count == 2)
+
+      }
     }
     'Effects - {
       'Run - {

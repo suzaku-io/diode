@@ -275,7 +275,10 @@ class ZipModelR[M, S, SS](val root: ModelR[M, M], get1: M => S, get2: M => SS)(i
     zipped
   }
 
-  override def ===(that: (S, SS)) = zipped eq that
+  override def ===(that: (S, SS)) = {
+    // using fast eq is required to support zip in subscribe
+    feqS.eqv(get1(root.value), that._1) && feqSS.eqv(get2(root.value), that._2)
+  }
 }
 
 /**
