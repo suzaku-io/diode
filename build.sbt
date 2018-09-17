@@ -85,10 +85,10 @@ val sourceMapSetting =
 
 def preventPublication(p: Project) =
   p.settings(
-    publish := (),
-    publishLocal := (),
-    publishSigned := (),
-    publishLocalSigned := (),
+    publish := (()),
+    publishLocal := (()),
+    publishSigned := (()),
+    publishLocalSigned := (()),
     publishArtifact := false,
     publishTo := Some(Resolver.file("Unused transient repository", target.value / "fakepublish")),
     packagedArtifacts := Map.empty
