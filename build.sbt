@@ -2,15 +2,14 @@ import sbt._
 import Keys._
 import com.typesafe.sbt.pgp.PgpKeys._
 
-crossScalaVersions := Seq("2.11.11", "2.12.4")
+crossScalaVersions := Seq("2.11.12", "2.12.6")
 
-scalafmtOnCompile in ThisBuild := true
-scalafmtVersion in ThisBuild := "1.3.0"
+ThisBuild / scalafmtOnCompile := true
 
 val commonSettings = Seq(
   organization := "io.suzaku",
   version := Version.library,
-  scalaVersion := "2.12.4",
+  scalaVersion := "2.12.6",
   scalacOptions := Seq(
     "-deprecation",
     "-encoding",
@@ -30,8 +29,8 @@ val commonSettings = Seq(
     case Some((2, 12)) => Seq("-Xlint:-unused")
     case _             => Nil
   }),
-  scalacOptions in Compile -= "-Ywarn-value-discard",
-  scalacOptions in (Compile, doc) -= "-Xfatal-warnings",
+  Compile / scalacOptions -= "-Ywarn-value-discard",
+  Compile / doc / scalacOptions -= "-Xfatal-warnings",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
     "com.lihaoyi" %%% "utest" % "0.5.3" % "test"
@@ -44,7 +43,7 @@ val publishSettings = Seq(
             "scm:git:git@github.com:suzaku-io/diode.git",
             Some("scm:git:git@github.com:suzaku-io/diode.git"))),
   publishMavenStyle := true,
-  publishArtifact in Test := false,
+  Test / publishArtifact := false,
   pomExtra :=
     <url>https://github.com/suzaku-io/diode</url>
       <licenses>

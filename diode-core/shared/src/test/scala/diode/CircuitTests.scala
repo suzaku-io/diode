@@ -291,13 +291,13 @@ object CircuitTests extends TestSuite {
       }
       'ZippedSubscribe - {
 
-        val c                        = circuit
-        var state1: (String, Boolean)   = null
-        var callback1Count           = 0
+        val c                         = circuit
+        var state1: (String, Boolean) = null
+        var callback1Count            = 0
 
-        val zoomS = c.zoom(_.s)
+        val zoomS        = c.zoom(_.s)
         val zoomDataBool = c.zoom(_.data.b)
-        val zipped = zoomS zip zoomDataBool
+        val zipped       = zoomS zip zoomDataBool
 
         def listener(cursor: ModelRO[(String, Boolean)]): Unit = {
           state1 = cursor()
@@ -354,7 +354,10 @@ object CircuitTests extends TestSuite {
       'ModAction - {
         val c = circuit
         val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: Any, next: Any => ActionResult[Model], currentModel: Model) = {
+          override def process(dispatcher: Dispatcher,
+                               action: Any,
+                               next: Any => ActionResult[Model],
+                               currentModel: Model) = {
             next(action match {
               case s: String =>
                 SetS(s)
@@ -372,7 +375,10 @@ object CircuitTests extends TestSuite {
       'Filter - {
         val c = circuit
         val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: Any, next: Any => ActionResult[Model], currentModel: Model) = {
+          override def process(dispatcher: Dispatcher,
+                               action: Any,
+                               next: Any => ActionResult[Model],
+                               currentModel: Model) = {
             action match {
               case SetS(_) =>
                 ActionResult.NoChange
@@ -388,7 +394,10 @@ object CircuitTests extends TestSuite {
         val c   = circuit
         var log = "log"
         val p = new ActionProcessor[Model] {
-          override def process(dispatcher: Dispatcher, action: Any, next: Any => ActionResult[Model], currentModel: Model) = {
+          override def process(dispatcher: Dispatcher,
+                               action: Any,
+                               next: Any => ActionResult[Model],
+                               currentModel: Model) = {
             next(action) match {
               case m: ModelUpdated[Model @unchecked] =>
                 log += m.newModel.s
@@ -406,7 +415,10 @@ object CircuitTests extends TestSuite {
         class AP extends ActionProcessor[Model] {
           val pending = mutable.Queue.empty[(Any, Dispatcher)]
 
-          override def process(dispatcher: Dispatcher, action: Any, next: Any => ActionResult[Model], currentModel: Model) = {
+          override def process(dispatcher: Dispatcher,
+                               action: Any,
+                               next: Any => ActionResult[Model],
+                               currentModel: Model) = {
             action match {
               case Delay(a) =>
                 pending.enqueue((a, dispatcher))

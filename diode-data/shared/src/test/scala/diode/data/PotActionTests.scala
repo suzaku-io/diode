@@ -4,7 +4,7 @@ import diode.ActionResult._
 import diode._
 import diode.data.PotState._
 import diode.util.Retry.Immediate
-import diode.util.{RetryPolicy, Retry}
+import diode.util.{Retry, RetryPolicy}
 import utest._
 
 import scala.concurrent.ExecutionContext.Implicits.global

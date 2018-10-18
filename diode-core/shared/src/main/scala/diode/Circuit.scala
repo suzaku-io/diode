@@ -148,8 +148,8 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
 
   private def buildProcessChain = {
     // chain processing functions
-    processors.reverse.foldLeft(process _)((next, processor) =>
-      (action: Any) => processor.process(this, action, next, model))
+    processors.reverse.foldLeft(process _)(
+      (next, processor) => (action: Any) => processor.process(this, action, next, model))
   }
 
   private def baseHandler(action: Any) = action match {

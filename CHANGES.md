@@ -1,5 +1,10 @@
 # Changes
 
+## 1.1.4
+- Upgrade to Scala 2.12.6 and Scala.js 0.6.22
+- Update diode-react to scalajs-react 1.3.1
+- Allow to subscribe to a ZipModel
+
 ## 1.1.3
 - Upgrade to Scala 2.12.4 and Scala.js 0.6.19
 - Update diode-react to scalajs-react 1.1.0

@@ -2,7 +2,7 @@ enablePlugins(ScalaJSPlugin, WorkbenchPlugin)
 
 name := "Diode Treeview"
 
-scalaVersion := "2.12.4"
+scalaVersion := "2.12.6"
 
 testFrameworks += new TestFramework("utest.runner.Framework")
 

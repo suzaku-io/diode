@@ -24,13 +24,13 @@ Full documentation [available here](https://diode.suzaku.io).
 Add following dependency declaration to your Scala project.
 
 ```scala
-"io.suzaku" %% "diode" % "1.1.3"
+"io.suzaku" %% "diode" % "1.1.4"
 ```
 
 In a Scala.js project the dependency looks like this.
 
 ```scala
-"io.suzaku" %%% "diode" % "1.1.3"
+"io.suzaku" %%% "diode" % "1.1.4"
 ```
 
 <img align="right" src="doc/images/architecture.png">
@@ -190,4 +190,5 @@ See separate [changes document](CHANGES.md)
 Diode was created and is maintained by [Otto Chrons](https://github.com/ochrons) - otto@chrons.me - Twitter:
 [@ochrons](https://twitter.com/ochrons).
 
-Contributors: @PerWiklander, @DylanArnold, @netzwerg, @alonsodomin, @glmars, @vpavkin, @bpatters
+Contributors: @PerWiklander, @DylanArnold, @netzwerg, @alonsodomin, @glmars, @vpavkin, @bpatters, 
+@cquiroz, @teozkr, @mla310, @mprevel, @an-tex, @torstenrudolf, @devkat

@@ -64,8 +64,7 @@ class PotStream[K, V](
       val headKey   = headKeyOption.getOrElse(firstKey)
       // join new values and update the previously last value to point to the first of the new values
       val newElems: Map[K, StreamValue[K, V]] =
-        elems ++ newValues.map(sv => sv.key -> sv) ++ lastKeyOption.map(lk =>
-          lk                                -> elems(lk).copy(nextKey = Some(firstKey)))
+        elems ++ newValues.map(sv => sv.key -> sv) ++ lastKeyOption.map(lk => lk -> elems(lk).copy(nextKey = Some(firstKey)))
       new PotStream(fetcher, newElems, updatedHead(headKey), Some(lastKey))
     }
   }
@@ -101,8 +100,7 @@ class PotStream[K, V](
       val lastKey  = lastKeyOption.getOrElse(headKey)
       // join new values and update the previously head value to point to the last of the new values
       val newElems: Map[K, StreamValue[K, V]] =
-        elems ++ newValues.map(sv => sv.key -> sv) ++ headKeyOption.map(hk =>
-          hk                                -> elems(hk).copy(prevKey = Some(firstKey)))
+        elems ++ newValues.map(sv => sv.key -> sv) ++ headKeyOption.map(hk => hk -> elems(hk).copy(prevKey = Some(firstKey)))
       new PotStream(fetcher, newElems, Some(headKey), updatedLast(lastKey))
     }
   }

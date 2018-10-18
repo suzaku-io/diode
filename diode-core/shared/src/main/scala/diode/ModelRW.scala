@@ -325,8 +325,8 @@ class ZoomModelRW[M, S](root: ModelR[M, M], get: M => S, set: (M, S) => M)(impli
 /**
   * Model reader/writer for a mapped value
   */
-class MapModelRW[F[_], M, A, B](root: ModelR[M, M], get: M => F[A], f: A => B)(
-    set: (M, F[B]) => M)(implicit monad: Monad[F], feq: FastEq[_ >: B])
+class MapModelRW[F[_], M, A, B](root: ModelR[M, M], get: M => F[A], f: A => B)(set: (M, F[B]) => M)(implicit monad: Monad[F],
+                                                                                                    feq: FastEq[_ >: B])
     extends MapModelR(root, get, f)
     with BaseModelRW[M, F[B]] {
   override def updatedWith(model: M, value: F[B]) = set(model, value)
@@ -335,8 +335,9 @@ class MapModelRW[F[_], M, A, B](root: ModelR[M, M], get: M => F[A], f: A => B)(
 /**
   * Model reader/writer for a flatMapped value
   */
-class FlatMapModelRW[F[_], M, A, B](root: ModelR[M, M], get: M => F[A], f: A => F[B])(
-    set: (M, F[B]) => M)(implicit monad: Monad[F], feq: FastEq[_ >: B])
+class FlatMapModelRW[F[_], M, A, B](root: ModelR[M, M], get: M => F[A], f: A => F[B])(set: (M, F[B]) => M)(
+    implicit monad: Monad[F],
+    feq: FastEq[_ >: B])
     extends FlatMapModelR(root, get, f)
     with BaseModelRW[M, F[B]] {
   override def updatedWith(model: M, value: F[B]) = set(model, value)

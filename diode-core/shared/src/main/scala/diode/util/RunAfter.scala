@@ -3,7 +3,7 @@ package diode.util
 import java.util.concurrent.TimeUnit
 
 import scala.annotation.implicitNotFound
-import scala.concurrent.{Promise, Future}
+import scala.concurrent.{Future, Promise}
 import scala.concurrent.duration.FiniteDuration
 
 @implicitNotFound("""Cannot find an implicit RunAfter. You might pass

@@ -34,10 +34,6 @@ object TodoMVC extends JSApp {
     filterRoutes.notFound(redirectToPage(TodoFilter.All)(Redirect.Replace))
   }
 
-  /** The router is itself a React component, which at this point is not mounted */
-  val router: ScalaComponent.Unmounted[Unit, Resolution[TodoFilter], OnUnmount.Backend] =
-    Router(baseUrl, routerConfig.logToConsole)()
-
   /**
     * Function to pickle application model into a TypedArray
     *
@@ -61,12 +57,19 @@ object TodoMVC extends JSApp {
 
   @JSExport
   override def main(): Unit = {
+    println("Starting")
     // add a development tool to persist application state
     AppCircuit.addProcessor(new PersistStateIDB(pickle, unpickle))
     // hook it into Ctrl+Shift+S and Ctrl+Shift+L
+    println("Hooking")
     Hooks.hookPersistState("test", AppCircuit)
 
+    println("Init")
     AppCircuit.dispatch(InitTodos)
-    router.renderIntoDOM(dom.document.getElementsByClassName("todoapp")(0).domAsHtml)
+    /** The router is itself a React component, which at this point is not mounted */
+    val router = Router(baseUrl, routerConfig.logToConsole)
+
+    println("Render")
+    router().renderIntoDOM(dom.document.getElementsByClassName("todoapp")(0).domAsHtml)
   }
 }
