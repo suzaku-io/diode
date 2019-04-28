@@ -1,15 +1,17 @@
 import sbt._
 import Keys._
 import com.typesafe.sbt.pgp.PgpKeys._
+// shadow sbt-scalajs' crossProject and CrossType from Scala.js 0.6.x
+import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
-crossScalaVersions := Seq("2.11.12", "2.12.6")
+crossScalaVersions := Seq("2.11.12", "2.12.8")
 
 ThisBuild / scalafmtOnCompile := true
 
 val commonSettings = Seq(
   organization := "io.suzaku",
   version := Version.library,
-  scalaVersion := "2.12.6",
+  scalaVersion := "2.12.8",
   scalacOptions := Seq(
     "-deprecation",
     "-encoding",
@@ -33,7 +35,7 @@ val commonSettings = Seq(
   Compile / doc / scalacOptions -= "-Xfatal-warnings",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %%% "utest" % "0.5.3" % "test"
+    "com.lihaoyi" %%% "utest" % "0.6.6" % "test"
   )
 )
 
@@ -93,7 +95,8 @@ def preventPublication(p: Project) =
     packagedArtifacts := Map.empty
   )
 
-lazy val diodeCore = crossProject
+lazy val diodeCore = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
   .in(file("diode-core"))
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
@@ -110,7 +113,8 @@ lazy val diodeCoreJS = diodeCore.js
 
 lazy val diodeCoreJVM = diodeCore.jvm
 
-lazy val diodeData = crossProject
+lazy val diodeData = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
   .in(file("diode-data"))
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
@@ -127,7 +131,9 @@ lazy val diodeDataJS = diodeData.js
 
 lazy val diodeDataJVM = diodeData.jvm
 
-lazy val diode = crossProject
+lazy val diode = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
+  .in(file("diode"))
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
   .settings(
@@ -139,7 +145,8 @@ lazy val diodeJS = diode.js
 
 lazy val diodeJVM = diode.jvm
 
-lazy val diodeDevtools = crossProject
+lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
+  .crossType(CrossType.Full)
   .in(file("diode-devtools"))
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
@@ -148,7 +155,7 @@ lazy val diodeDevtools = crossProject
   )
   .jsSettings(
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.3"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.6"
     ),
     scalacOptions ++= sourceMapSetting.value
   )
