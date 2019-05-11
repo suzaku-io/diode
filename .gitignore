@@ -26,4 +26,5 @@ out
 _book
 _examples
 node_modules
-
+.metals
+.bloop
