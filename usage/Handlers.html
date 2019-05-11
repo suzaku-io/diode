@@ -1,0 +1,656 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Action Handlers · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.2">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-prism/prism.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="Views.html" />
+    
+    
+    <link rel="prev" href="Actions.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Usage
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="ApplicationModel.html">
+            
+                <a href="ApplicationModel.html">
+            
+                    
+                    Application Model
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="Actions.html">
+            
+                <a href="Actions.html">
+            
+                    
+                    Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.2.3" data-path="Handlers.html">
+            
+                <a href="Handlers.html">
+            
+                    
+                    Action Handlers
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.4" data-path="Views.html">
+            
+                <a href="Views.html">
+            
+                    
+                    Views
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.5" data-path="Effects.html">
+            
+                <a href="Effects.html">
+            
+                    
+                    Async Effects
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="../advanced/">
+            
+                <a href="../advanced/">
+            
+                    
+                    Advanced Topics
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="../advanced/Pot.html">
+            
+                <a href="../advanced/Pot.html">
+            
+                    
+                    Async Model Data
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="../advanced/PotActions.html">
+            
+                <a href="../advanced/PotActions.html">
+            
+                    
+                    Stateful Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="../advanced/PotCollection.html">
+            
+                <a href="../advanced/PotCollection.html">
+            
+                    
+                    Async Virtual Collections
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="../advanced/ActionProcessors.html">
+            
+                <a href="../advanced/ActionProcessors.html">
+            
+                    
+                    Action Processors
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="../UsageWithReact.html">
+            
+                <a href="../UsageWithReact.html">
+            
+                    
+                    Usage with React
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../examples/">
+            
+                <a href="../examples/">
+            
+                    
+                    Examples
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Action Handlers</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="action-handlers">Action Handlers</h1>
+<p><img src="../images/architecture-circuit.png" style="float: right; padding: 10px">
+For dispatched actions to actually do anything, they need to be processed by <em>action handlers</em>. In principle, an action
+handler is a pure function of type <code>(model, action) =&gt; model</code> that takes in the current model and the dispatched action,
+and returns a new model. In practice, the handlers are typically partial functions that process different (related)
+actions, access only part of the model through a <code>ModelRW</code> trait and return an <code>ActionResult</code>.</p>
+<h2 id="in-the-circuit">In the Circuit</h2>
+<p>All action handling takes place within the <code>Circuit</code>, which has a single <code>actionHandler</code> method that takes care of all
+actions. Actually your application must define this method, typically by composing multiple <code>ActionHandler</code> classes
+together to form the final handler function that then handles the actions. There is also a <code>baseHandler</code> that handles
+any action that was not handled by the <code>actionHandler</code>, ensuring we don&apos;t get a runtime <code>MatchError</code>.</p>
+<p>The type of <code>actionHandler</code> is <code>(M, AnyRef) =&gt; Option[ActionResult[M]]</code>, where <code>M</code> is the type of your root model. There
+is an implicit conversion from <code>ActionHandler</code> to this function type, so you can just pass your <code>ActionHandler</code> class
+directly.</p>
+<p>You may define your action handlers within your application <code>Circuit</code> singleton object as anonymous classes, or use
+external classes. The former is simpler to implement while the latter is better for independent testing. In our examples
+the handlers are defined using both strategies.</p>
+<h2 id="example-tree-data-model">Example Tree data model</h2>
+<p>Let&apos;s use a bit more complex example for building our action handlers, to show how you would do it in real-life
+applications. Our data will represent a hierarchical directory structure with both files and directories. This can be
+defined as a trait and two case classes.</p>
+<pre><code class="lang-scala"><span class="token keyword">sealed</span> <span class="token keyword">trait</span> FileNode <span class="token punctuation">{</span>
+  <span class="token keyword">def</span> id<span class="token operator">:</span> <span class="token builtin">String</span>
+  <span class="token keyword">def</span> name<span class="token operator">:</span> <span class="token builtin">String</span>
+  <span class="token keyword">def</span> children<span class="token operator">:</span> IndexedSeq<span class="token punctuation">[</span>FileNode<span class="token punctuation">]</span>
+  <span class="token keyword">def</span> isDirectory<span class="token operator">:</span> <span class="token builtin">Boolean</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">final</span> <span class="token keyword">case</span> <span class="token keyword">class</span> Directory<span class="token punctuation">(</span>
+  id<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">,</span> 
+  name<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">,</span> 
+  children<span class="token operator">:</span> IndexedSeq<span class="token punctuation">[</span>FileNode<span class="token punctuation">]</span> <span class="token operator">=</span> IndexedSeq<span class="token punctuation">.</span>empty<span class="token punctuation">)</span> <span class="token keyword">extends</span> FileNode <span class="token punctuation">{</span>
+  <span class="token keyword">override</span> <span class="token keyword">def</span> isDirectory <span class="token operator">=</span> <span class="token boolean">true</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">final</span> <span class="token keyword">case</span> <span class="token keyword">class</span> File<span class="token punctuation">(</span>id<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">,</span> name<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">)</span> <span class="token keyword">extends</span> FileNode <span class="token punctuation">{</span>
+  <span class="token keyword">val</span> children <span class="token operator">=</span> IndexedSeq<span class="token punctuation">.</span>empty<span class="token punctuation">[</span>FileNode<span class="token punctuation">]</span>
+  <span class="token keyword">override</span> <span class="token keyword">def</span> isDirectory <span class="token operator">=</span> <span class="token boolean">false</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>In our root model we don&apos;t want to have anything like a <code>Directory</code> so let&apos;s further define an intermediate model <code>Tree</code>
+to hold the root of the hierarchy and also some additional data.</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> Tree<span class="token punctuation">(</span>root<span class="token operator">:</span> Directory<span class="token punctuation">,</span> selected<span class="token operator">:</span> Seq<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true">// Define the root of our application model</span>
+<span class="token keyword">case</span> <span class="token keyword">class</span> RootModel<span class="token punctuation">(</span>tree<span class="token operator">:</span> Tree<span class="token punctuation">)</span>
+</code></pre>
+<p>And some actions, too!</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> ReplaceTree<span class="token punctuation">(</span>newTree<span class="token operator">:</span> Directory<span class="token punctuation">)</span> <span class="token keyword">extends</span> Action
+<span class="token keyword">case</span> <span class="token keyword">class</span> AddNode<span class="token punctuation">(</span>path<span class="token operator">:</span> Seq<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span><span class="token punctuation">,</span> node<span class="token operator">:</span> FileNode<span class="token punctuation">)</span> <span class="token keyword">extends</span> Action
+<span class="token keyword">case</span> <span class="token keyword">class</span> RemoveNode<span class="token punctuation">(</span>path<span class="token operator">:</span> Seq<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token keyword">extends</span> Action
+<span class="token keyword">case</span> <span class="token keyword">class</span> ReplaceNode<span class="token punctuation">(</span>path<span class="token operator">:</span> Seq<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span><span class="token punctuation">,</span> node<span class="token operator">:</span> FileNode<span class="token punctuation">)</span> <span class="token keyword">extends</span> Action
+<span class="token keyword">case</span> <span class="token keyword">class</span> Select<span class="token punctuation">(</span>selected<span class="token operator">:</span> Seq<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token keyword">extends</span> Action
+</code></pre>
+<h3 id="writing-an-action-handler">Writing an Action Handler</h3>
+<p>Our action handler needs to deal with the directory hierarchy, so we need to zoom into it in our <code>ActionHandler</code>. To get
+started, we handle only the most simple action of replacing the whole tree.</p>
+<pre><code class="lang-scala"><span class="token comment" spellcheck="true">// zoom into the model, providing access only to the `root` directory of the tree</span>
+<span class="token keyword">val</span> treeHandler <span class="token operator">=</span> <span class="token keyword">new</span> ActionHandler<span class="token punctuation">(</span>zoomTo<span class="token punctuation">(</span>_<span class="token punctuation">.</span>tree<span class="token punctuation">.</span>root<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">override</span> <span class="token keyword">def</span> handle <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token keyword">case</span> ReplaceTree<span class="token punctuation">(</span>newTree<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+      updated<span class="token punctuation">(</span>newTree<span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">override</span> <span class="token keyword">protected</span> <span class="token keyword">val</span> actionHandler <span class="token operator">=</span> composeHandlers<span class="token punctuation">(</span>treeHandler<span class="token punctuation">)</span>
+</code></pre>
+<p>Now our application is ready to handle dispatched <code>ReplaceTree</code> actions successfully!</p>
+<p><code>ActionHandler</code> is just a utility class providing common patterns for defining action handlers. If we look at its code,
+it&apos;s rather straightforward:</p>
+<pre><code class="lang-scala"><span class="token keyword">abstract</span> <span class="token keyword">class</span> ActionHandler<span class="token punctuation">[</span>M<span class="token punctuation">,</span> T<span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">val</span> modelRW<span class="token operator">:</span> ModelRW<span class="token punctuation">[</span>M<span class="token punctuation">,</span> T<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">def</span> handle<span class="token operator">:</span> PartialFunction<span class="token punctuation">[</span><span class="token builtin">AnyRef</span><span class="token punctuation">,</span> ActionResult<span class="token punctuation">[</span>M<span class="token punctuation">]</span><span class="token punctuation">]</span>
+  <span class="token keyword">def</span> value<span class="token operator">:</span> T <span class="token operator">=</span> modelRW<span class="token punctuation">.</span>eval<span class="token punctuation">(</span>currentModel<span class="token punctuation">)</span>
+  <span class="token keyword">def</span> updated<span class="token punctuation">(</span>newValue<span class="token operator">:</span> T<span class="token punctuation">)</span><span class="token operator">:</span> ActionResult<span class="token punctuation">[</span>M<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h3 id="deep-diving">Deep Diving</h3>
+<p>The handler for <code>ReplaceTree</code> was trivial, since there was no need to dive into the directory hierarchy, but how would
+something like <code>AddNode</code> be handled? It gets a path as a parameter, defining the directory we are interested in. This is
+actually a sequence of identifiers, so we need to walk down the hierarchy to reach our goal. Because the same is needed
+in the other actions as well, let&apos;s define a common function to perform this traversal.</p>
+<p>We are actually interested in the <code>children</code> sequence of the directory, not the directory itself, so our traversal
+function should return a <code>ModelRW</code> that allows us to manipulate that indexed sequence directly. It may also fail to find
+a valid path, so we should wrap the result in an <code>Option</code>.</p>
+<pre><code class="lang-scala"><span class="token keyword">def</span> zoomToChildren<span class="token punctuation">[</span>M<span class="token punctuation">]</span><span class="token punctuation">(</span>path<span class="token operator">:</span> Seq<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span><span class="token punctuation">,</span> rw<span class="token operator">:</span> ModelRW<span class="token punctuation">[</span>M<span class="token punctuation">,</span> Directory<span class="token punctuation">]</span><span class="token punctuation">)</span>
+  <span class="token operator">:</span> Option<span class="token punctuation">[</span>ModelRW<span class="token punctuation">[</span>M<span class="token punctuation">,</span> IndexedSeq<span class="token punctuation">[</span>FileNode<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>path<span class="token punctuation">.</span>isEmpty<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    Some<span class="token punctuation">(</span>rw<span class="token punctuation">.</span>zoomTo<span class="token punctuation">(</span>_<span class="token punctuation">.</span>children<span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token operator">?</span><span class="token operator">?</span><span class="token operator">?</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>In the trivial case (and at the end of the recursion) the path is empty and we&apos;ll return a <code>ModelRW</code> for the current
+directory&apos;s <code>children</code>.</p>
+<p>Let&apos;s take a look at the full implementation.</p>
+<pre><code class="lang-scala"><span class="token keyword">def</span> zoomToChildren<span class="token punctuation">[</span>M<span class="token punctuation">]</span><span class="token punctuation">(</span>path<span class="token operator">:</span> Seq<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span><span class="token punctuation">,</span> rw<span class="token operator">:</span> ModelRW<span class="token punctuation">[</span>M<span class="token punctuation">,</span> Directory<span class="token punctuation">]</span><span class="token punctuation">)</span>
+  <span class="token operator">:</span> Option<span class="token punctuation">[</span>ModelRW<span class="token punctuation">[</span>M<span class="token punctuation">,</span> IndexedSeq<span class="token punctuation">[</span>FileNode<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>path<span class="token punctuation">.</span>isEmpty<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    Some<span class="token punctuation">(</span>rw<span class="token punctuation">.</span>zoomTo<span class="token punctuation">(</span>_<span class="token punctuation">.</span>children<span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// find the index for the next directory in the path and make sure it&apos;s a directory</span>
+    rw<span class="token punctuation">.</span>value<span class="token punctuation">.</span>children<span class="token punctuation">.</span>indexWhere<span class="token punctuation">(</span>n <span class="token keyword">=&gt;</span> n<span class="token punctuation">.</span>id <span class="token operator">==</span> path<span class="token punctuation">.</span>head <span class="token operator">&amp;&amp;</span> n<span class="token punctuation">.</span>isDirectory<span class="token punctuation">)</span> <span class="token keyword">match</span> <span class="token punctuation">{</span>
+      <span class="token keyword">case</span> <span class="token operator">-</span><span class="token number">1</span> <span class="token keyword">=&gt;</span>
+        <span class="token comment" spellcheck="true">// should not happen!</span>
+        None
+      <span class="token keyword">case</span> idx <span class="token keyword">=&gt;</span>
+        <span class="token comment" spellcheck="true">// zoom into the directory position given by `idx` and continue recursion</span>
+        zoomToChildren<span class="token punctuation">(</span>path<span class="token punctuation">.</span>tail<span class="token punctuation">,</span> rw<span class="token punctuation">.</span>zoomRW<span class="token punctuation">(</span>_<span class="token punctuation">.</span>children<span class="token punctuation">(</span>idx<span class="token punctuation">)</span><span class="token punctuation">.</span>asInstanceOf<span class="token punctuation">[</span>Directory<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span>m<span class="token punctuation">,</span> v<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+          m<span class="token punctuation">.</span>copy<span class="token punctuation">(</span>children <span class="token operator">=</span> <span class="token punctuation">(</span>m<span class="token punctuation">.</span>children<span class="token punctuation">.</span>take<span class="token punctuation">(</span>idx<span class="token punctuation">)</span> <span class="token operator">:</span><span class="token operator">+</span> v<span class="token punctuation">)</span> <span class="token operator">++</span> m<span class="token punctuation">.</span>children<span class="token punctuation">.</span>drop<span class="token punctuation">(</span>idx <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>First we try to find the index to the <code>children</code> sequence, where the next directory in our path resides and depending on
+the result we either return <code>None</code> for failure, or dive deeper into the hierarchy by recursively calling the same
+function again with am updated reader/writer and path. The writer function copies all nodes preceding the one we are
+interested in, then adds a new node and then any nodes succeeding the original node.</p>
+<p>Now we are ready to write action handlers for rest of the tree manipulation functions.</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> AddNode<span class="token punctuation">(</span>path<span class="token punctuation">,</span> node<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+  <span class="token comment" spellcheck="true">// zoom to the directory and add new node at the end of its children list</span>
+  zoomToChildren<span class="token punctuation">(</span>path<span class="token punctuation">.</span>tail<span class="token punctuation">,</span> modelRW<span class="token punctuation">)</span> <span class="token keyword">match</span> <span class="token punctuation">{</span>
+    <span class="token keyword">case</span> Some<span class="token punctuation">(</span>rw<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span> ModelUpdate<span class="token punctuation">(</span>rw<span class="token punctuation">.</span>updated<span class="token punctuation">(</span>rw<span class="token punctuation">.</span>value <span class="token operator">:</span><span class="token operator">+</span> node<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">case</span> None <span class="token keyword">=&gt;</span> noChange
+  <span class="token punctuation">}</span>
+</code></pre>
+<p>With the helper function to navigate the hierarchy the actual implementation of <code>AddNode</code> turns out to be quite trivial.
+Since we have access to the <code>children</code> of the parent directory, we simply need to add the new node at the end of it.</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> RemoveNode<span class="token punctuation">(</span>path<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>path<span class="token punctuation">.</span>init<span class="token punctuation">.</span>nonEmpty<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// zoom to parent directory and remove node from its children list</span>
+    <span class="token keyword">val</span> nodeId <span class="token operator">=</span> path<span class="token punctuation">.</span>last
+    zoomToChildren<span class="token punctuation">(</span>path<span class="token punctuation">.</span>init<span class="token punctuation">.</span>tail<span class="token punctuation">,</span> modelRW<span class="token punctuation">)</span> <span class="token keyword">match</span> <span class="token punctuation">{</span>
+      <span class="token keyword">case</span> Some<span class="token punctuation">(</span>rw<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span> ModelUpdate<span class="token punctuation">(</span>rw<span class="token punctuation">.</span>updated<span class="token punctuation">(</span>rw<span class="token punctuation">.</span>value<span class="token punctuation">.</span>filterNot<span class="token punctuation">(</span>_<span class="token punctuation">.</span>id <span class="token operator">==</span> nodeId<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+      <span class="token keyword">case</span> None <span class="token keyword">=&gt;</span> noChange
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// cannot remove root</span>
+    noChange
+  <span class="token punctuation">}</span>
+<span class="token keyword">case</span> ReplaceNode<span class="token punctuation">(</span>path<span class="token punctuation">,</span> node<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>path<span class="token punctuation">.</span>init<span class="token punctuation">.</span>nonEmpty<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// zoom to parent directory and replace node in its children list with a new one</span>
+    <span class="token keyword">val</span> nodeId <span class="token operator">=</span> path<span class="token punctuation">.</span>last
+    zoomToChildren<span class="token punctuation">(</span>path<span class="token punctuation">.</span>init<span class="token punctuation">.</span>tail<span class="token punctuation">,</span> modelRW<span class="token punctuation">)</span> <span class="token keyword">match</span> <span class="token punctuation">{</span>
+      <span class="token keyword">case</span> Some<span class="token punctuation">(</span>rw<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span> ModelUpdate<span class="token punctuation">(</span>rw<span class="token punctuation">.</span>updated<span class="token punctuation">(</span>rw<span class="token punctuation">.</span>value<span class="token punctuation">.</span>map<span class="token punctuation">(</span>n <span class="token keyword">=&gt;</span> <span class="token keyword">if</span> <span class="token punctuation">(</span>n<span class="token punctuation">.</span>id <span class="token operator">==</span> nodeId<span class="token punctuation">)</span> node <span class="token keyword">else</span> n<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+      <span class="token keyword">case</span> None <span class="token keyword">=&gt;</span> noChange
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// cannot replace root</span>
+    noChange
+  <span class="token punctuation">}</span>
+</code></pre>
+<p>Removal and replacement are almost identical, except for the final transformation of the <code>children</code> sequence. Here we
+also prevent removal or change of the root directory.</p>
+<h3 id="handling-selection">Handling Selection</h3>
+<p>As the <code>Select</code> action affects the <code>Tree</code> and not something under the root directory, we cannot handle it within the
+<code>treeHandler</code>. We&apos;ll need another action handler for it.</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> selectionHandler <span class="token operator">=</span> <span class="token keyword">new</span> ActionHandler<span class="token punctuation">(</span>zoomTo<span class="token punctuation">(</span>_<span class="token punctuation">.</span>tree<span class="token punctuation">.</span>selected<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">override</span> <span class="token keyword">def</span> handle <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token keyword">case</span> Select<span class="token punctuation">(</span>sel<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span> updated<span class="token punctuation">(</span>sel<span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">override</span> <span class="token keyword">protected</span> <span class="token keyword">val</span> actionHandler <span class="token operator">=</span> composeHandlers<span class="token punctuation">(</span>treeHandler<span class="token punctuation">,</span> selectionHandler<span class="token punctuation">)</span>
+</code></pre>
+<p>Again we zoom into the <code>tree</code> but this time we continue to <code>selected</code>. The handler implementation is as trivial as with
+<code>ReplaceTree</code>. To inform <code>Circuit</code> about this new handler, we include it into the call to the <code>composeHandlers</code>
+function.</p>
+<h2 id="handling-actions-multiple-times">Handling actions multiple times</h2>
+<p>The default behaviour of <code>composeHandlers</code> combines your handler functions in such a way that only one of them gets to
+handle the passed action. In some cases you&apos;ll want to divide the processing of an action into multiple handlers, for 
+example when a change in model causes some secondary changes elsewhere in the model (typically related to the UI). For
+these purposes you can use <code>foldHandlers</code>, which runs the action through all the provided handlers, passing an updated
+model from one handler to the next and combining the resulting effects.</p>
+<p>For example if we wanted to change the selection to parent node when the selected node is removed, we could do:</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> selectionHandler <span class="token operator">=</span> <span class="token keyword">new</span> ActionHandler<span class="token punctuation">(</span>zoomTo<span class="token punctuation">(</span>_<span class="token punctuation">.</span>tree<span class="token punctuation">.</span>selected<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">override</span> <span class="token keyword">def</span> handle <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token keyword">case</span> Select<span class="token punctuation">(</span>sel<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span> updated<span class="token punctuation">(</span>sel<span class="token punctuation">)</span>
+    <span class="token keyword">case</span> RemoveNode<span class="token punctuation">(</span>path<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+      <span class="token comment" spellcheck="true">// select parent node if selected node is removed</span>
+      <span class="token keyword">if</span><span class="token punctuation">(</span>path<span class="token punctuation">.</span>init<span class="token punctuation">.</span>nonEmpty <span class="token operator">&amp;&amp;</span> path <span class="token operator">==</span> value<span class="token punctuation">)</span>
+        updated<span class="token punctuation">(</span>path<span class="token punctuation">.</span>init<span class="token punctuation">)</span>
+      <span class="token keyword">else</span>
+        noChange
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">override</span> <span class="token keyword">protected</span> <span class="token keyword">val</span> actionHandler <span class="token operator">=</span> foldHandlers<span class="token punctuation">(</span>treeHandler<span class="token punctuation">,</span> selectionHandler<span class="token punctuation">)</span>
+</code></pre>
+<p>You can combine <code>composeHandlers</code> and <code>foldHandlers</code> to build more complex action handler hierarchies.</p>
+<pre><code class="lang-scala"><span class="token keyword">override</span> <span class="token keyword">protected</span> <span class="token keyword">val</span> actionHandler <span class="token operator">=</span> foldHandlers<span class="token punctuation">(</span>composeHandlers<span class="token punctuation">(</span>h1<span class="token punctuation">,</span> h2<span class="token punctuation">,</span> h3<span class="token punctuation">)</span><span class="token punctuation">,</span> composeHandlers<span class="token punctuation">(</span>h4<span class="token punctuation">,</span> h5<span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>The above handler would pass the action to both of the composed handlers.</p>
+<h2 id="testing">Testing</h2>
+<p>As action handlers are pure functions, testing them is rather trivial. Although you can define handlers inline within
+your <code>Circuit</code> implementation, it&apos;s usually better to have them as separate classes for easy testing. For example:</p>
+<pre><code class="lang-scala"><span class="token keyword">class</span> DirectoryTreeHandler<span class="token punctuation">[</span>M<span class="token punctuation">]</span><span class="token punctuation">(</span>modelRW<span class="token operator">:</span> ModelRW<span class="token punctuation">[</span>M<span class="token punctuation">,</span> Directory<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token keyword">extends</span> ActionHandler<span class="token punctuation">(</span>modelRW<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">override</span> <span class="token keyword">def</span> handle <span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">object</span> AppCircuit <span class="token keyword">extends</span> Circuit<span class="token punctuation">[</span>RootModel<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+  <span class="token keyword">val</span> treeHandler <span class="token operator">=</span> <span class="token keyword">new</span> DirectoryTreeHandler<span class="token punctuation">(</span>zoomTo<span class="token punctuation">(</span>_<span class="token punctuation">.</span>tree<span class="token punctuation">.</span>root<span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>In your test class you can instantiate the handler by supplying it with an appropriate reader/writer. Since the handler
+doesn&apos;t care about the root model type, usually easiest is just to use the data what your handler expects.</p>
+<pre><code class="lang-scala"><span class="token keyword">object</span> DirectoryTreeHandlerTests <span class="token keyword">extends</span> TestSuite <span class="token punctuation">{</span>
+  <span class="token keyword">def</span> tests <span class="token operator">=</span> TestSuite <span class="token punctuation">{</span>
+    <span class="token comment" spellcheck="true">// test data</span>
+    <span class="token keyword">val</span> dir <span class="token operator">=</span> Directory<span class="token punctuation">(</span><span class="token string">&quot;/&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;/&quot;</span><span class="token punctuation">,</span> Vector<span class="token punctuation">(</span>
+      Directory<span class="token punctuation">(</span><span class="token string">&quot;2&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;My files&quot;</span><span class="token punctuation">,</span> Vector<span class="token punctuation">(</span>
+        Directory<span class="token punctuation">(</span><span class="token string">&quot;3&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;Documents&quot;</span><span class="token punctuation">,</span> Vector<span class="token punctuation">(</span>
+          File<span class="token punctuation">(</span><span class="token string">&quot;F3&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;HaukiOnKala.doc&quot;</span><span class="token punctuation">)</span>
+        <span class="token punctuation">)</span><span class="token punctuation">)</span>
+      <span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> File<span class="token punctuation">(</span><span class="token string">&quot;F1&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;boot.sys&quot;</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> build <span class="token operator">=</span> <span class="token keyword">new</span> DirectoryTreeHandler<span class="token punctuation">(</span><span class="token keyword">new</span> RootModelRW<span class="token punctuation">(</span>dir<span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>In individual test cases</p>
+<ol>
+<li>Build a handler instance.</li>
+<li>Call the <code>handleAction</code> method with an appropriate action and current model.</li>
+<li>Check the result.</li>
+</ol>
+<pre><code class="lang-scala"><span class="token symbol">&apos;RemoveNode</span> <span class="token operator">-</span> <span class="token punctuation">{</span>
+  <span class="token keyword">val</span> handler <span class="token operator">=</span> build
+  <span class="token keyword">val</span> result <span class="token operator">=</span> handler<span class="token punctuation">.</span>handleAction<span class="token punctuation">(</span>dir<span class="token punctuation">,</span> RemoveNode<span class="token punctuation">(</span>Seq<span class="token punctuation">(</span><span class="token string">&quot;/&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;2&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  assertMatch<span class="token punctuation">(</span>result<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">case</span> Some<span class="token punctuation">(</span>ModelUpdate<span class="token punctuation">(</span>Directory<span class="token punctuation">(</span><span class="token string">&quot;/&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;/&quot;</span><span class="token punctuation">,</span> Vector<span class="token punctuation">(</span>File<span class="token punctuation">(</span><span class="token string">&quot;F1&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;boot.sys&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>If your handler returns any <em>effects</em>, you can safely just ignore them in your test.</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="Actions.html" class="navigation navigation-prev " aria-label="Previous page: Actions">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="Views.html" class="navigation navigation-next " aria-label="Next page: Views">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Action Handlers","level":"1.2.3","depth":2,"next":{"title":"Views","level":"1.2.4","depth":2,"path":"usage/Views.md","ref":"usage/Views.md","articles":[]},"previous":{"title":"Actions","level":"1.2.2","depth":2,"path":"usage/Actions.md","ref":"usage/Actions.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"3.2.x","theme":"default","variables":{"version":"1.1.5","reactVersion":"142"},"plugins":["editlink","prism","-highlight","github"],"pluginsConfig":{"editlink":{"label":"Edit This Page","multilingual":false,"base":"https://github.com/suzaku-io/diode/tree/master/doc"},"github":{"url":"https://github.com/suzaku-io/diode/"},"prism":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"usage/Handlers.md","mtime":"2018-04-15T12:06:31.376Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2019-05-11T10:59:36.439Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-editlink/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

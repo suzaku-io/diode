@@ -1,0 +1,532 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Stateful Actions · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.2">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-prism/prism.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="PotCollection.html" />
+    
+    
+    <link rel="prev" href="Pot.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../usage/">
+            
+                <a href="../usage/">
+            
+                    
+                    Usage
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="../usage/ApplicationModel.html">
+            
+                <a href="../usage/ApplicationModel.html">
+            
+                    
+                    Application Model
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="../usage/Actions.html">
+            
+                <a href="../usage/Actions.html">
+            
+                    
+                    Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.3" data-path="../usage/Handlers.html">
+            
+                <a href="../usage/Handlers.html">
+            
+                    
+                    Action Handlers
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.4" data-path="../usage/Views.html">
+            
+                <a href="../usage/Views.html">
+            
+                    
+                    Views
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.5" data-path="../usage/Effects.html">
+            
+                <a href="../usage/Effects.html">
+            
+                    
+                    Async Effects
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Advanced Topics
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="Pot.html">
+            
+                <a href="Pot.html">
+            
+                    
+                    Async Model Data
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.3.2" data-path="PotActions.html">
+            
+                <a href="PotActions.html">
+            
+                    
+                    Stateful Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="PotCollection.html">
+            
+                <a href="PotCollection.html">
+            
+                    
+                    Async Virtual Collections
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="ActionProcessors.html">
+            
+                <a href="ActionProcessors.html">
+            
+                    
+                    Action Processors
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="../UsageWithReact.html">
+            
+                <a href="../UsageWithReact.html">
+            
+                    
+                    Usage with React
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../examples/">
+            
+                <a href="../examples/">
+            
+                    
+                    Examples
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Stateful Actions</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="stateful-actions">Stateful Actions</h1>
+<p>After you start using <code>Pot</code> (for medicinal purposes!) in your application, you will soon realize you have a lot of actions covering various aspects of the
+loading process.</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> LoadTodos <span class="token keyword">extends</span> Action
+<span class="token keyword">case</span> <span class="token keyword">class</span> UpdateTodos <span class="token keyword">extends</span> Action
+<span class="token keyword">case</span> <span class="token keyword">class</span> LoadTodosFailed <span class="token keyword">extends</span> Action
+<span class="token keyword">case</span> <span class="token keyword">class</span> LoadTodosPending <span class="token keyword">extends</span> Action
+</code></pre>
+<p>Because this is such a common pattern, wouldn&apos;t it be nice to abstract this functionality into a trait and reuse it for all your <code>Pot</code> actions?</p>
+<h2 id="potaction"><code>PotAction</code></h2>
+<p>The <code>PotAction</code> trait simplifies creation of stateful actions for <code>Pot</code> data. To use it, simply define a case class extending <code>PotAction</code> and define the <code>next</code>
+function to build a new instance of your action. The <code>PotAction</code> trait extends Diode&apos;s <code>Action</code> trait, so all your classes using it will automatically be
+valid for dispatching.</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> UpdateTodos<span class="token punctuation">(</span>potResult<span class="token operator">:</span> Pot<span class="token punctuation">[</span>Todos<span class="token punctuation">]</span> <span class="token operator">=</span> Empty<span class="token punctuation">)</span> <span class="token keyword">extends</span> PotAction<span class="token punctuation">[</span>Todos<span class="token punctuation">,</span> UpdateTodos<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+  <span class="token keyword">def</span> next<span class="token punctuation">(</span>newResult<span class="token operator">:</span> Pot<span class="token punctuation">[</span>Todos<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">=</span> UpdateTodos<span class="token punctuation">(</span>newResult<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Now you can write an action handler managing the different states of your <code>UpdateTodos</code>.</p>
+<pre><code class="lang-scala"><span class="token keyword">override</span> <span class="token keyword">def</span> handle <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token keyword">case</span> action<span class="token operator">:</span> UpdateTodos <span class="token keyword">=&gt;</span>
+    <span class="token keyword">val</span> updateEffect <span class="token operator">=</span> action<span class="token punctuation">.</span>effect<span class="token punctuation">(</span>loadTodos<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">(</span>todos <span class="token keyword">=&gt;</span> Todos<span class="token punctuation">(</span>todos<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    action<span class="token punctuation">.</span>handle <span class="token punctuation">{</span>
+      <span class="token keyword">case</span> PotEmpty <span class="token keyword">=&gt;</span>
+        updated<span class="token punctuation">(</span>value<span class="token punctuation">.</span>pending<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> updateEffect<span class="token punctuation">)</span>
+      <span class="token keyword">case</span> PotPending <span class="token keyword">=&gt;</span>
+        noChange
+      <span class="token keyword">case</span> PotReady <span class="token keyword">=&gt;</span>
+        updated<span class="token punctuation">(</span>action<span class="token punctuation">.</span>potResult<span class="token punctuation">)</span>
+      <span class="token keyword">case</span> PotUnavailable <span class="token keyword">=&gt;</span>
+        updated<span class="token punctuation">(</span>value<span class="token punctuation">.</span>unavailable<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+      <span class="token keyword">case</span> PotFailed <span class="token keyword">=&gt;</span>
+        <span class="token keyword">val</span> ex <span class="token operator">=</span> action<span class="token punctuation">.</span>result<span class="token punctuation">.</span>failed<span class="token punctuation">.</span>get
+        updated<span class="token punctuation">(</span>value<span class="token punctuation">.</span>fail<span class="token punctuation">(</span>ex<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>We use <code>action.effect</code> to convert a normal function call returning a future into an <code>Effect</code> returning a new <code>PotAction</code>. The second parameter is a mapping
+function to transform the result of the future into the correct type for our action.</p>
+<p>Looking at the state handler it seems that there is nothing specific to our <code>UpdateTodos</code> action, so perhaps we can further reduce code size?</p>
+<h3 id="common-handlers">Common Handlers</h3>
+<p>The state management of your <code>PotAction</code>s is typically identical, so it makes sense to extract it into a common handler. <code>PotAction</code> supports handling the
+action via an external handler function through <code>handleWith</code>.</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> updateEffect <span class="token operator">=</span> action<span class="token punctuation">.</span>effect<span class="token punctuation">(</span>loadTodos<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">(</span>todos <span class="token keyword">=&gt;</span> Todos<span class="token punctuation">(</span>todos<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token keyword">override</span> <span class="token keyword">def</span> handle <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token keyword">case</span> action<span class="token operator">:</span> UpdateTodos <span class="token keyword">=&gt;</span>
+    action<span class="token punctuation">.</span>handleWith<span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> updateEffect<span class="token punctuation">)</span><span class="token punctuation">(</span>PotAction<span class="token punctuation">.</span>handler<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Here we use a predefined handler from the <code>PotAction</code> object. Note how the <code>updateEffect</code> definition can be moved outside the handling function because it&apos;s
+immutable.</p>
+<h3 id="notifications-while-pending">Notifications while Pending</h3>
+<p>If a <code>Pot</code> stays in pending state for too long, you often want to notify the user by showing something in the user interface. But by default the model is not
+updated while an operation is running, so we need to do that ourselves. Easiest way to do that is to use a delayed effect that refreshes model state at a
+given interval. You can create a second, delayed effect with <code>Effect.action(action.pending).after(someTime)</code> and combine it with the normal update effect using
+the <code>+</code> operator.</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> PotEmpty <span class="token keyword">=&gt;</span>
+  updated<span class="token punctuation">(</span>value<span class="token punctuation">.</span>pending<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> updateEffect <span class="token operator">+</span> Effect<span class="token punctuation">.</span>action<span class="token punctuation">(</span>action<span class="token punctuation">.</span>pending<span class="token punctuation">)</span><span class="token punctuation">.</span>after<span class="token punctuation">(</span>someTime<span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>Now after <code>someTime</code> the effect completes and dispatches the <code>action.pending</code> action which is handled below:</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> PotPending <span class="token keyword">=&gt;</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span>value<span class="token punctuation">.</span>isPending<span class="token punctuation">)</span>
+    updated<span class="token punctuation">(</span>value<span class="token punctuation">.</span>pending<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> Effect<span class="token punctuation">.</span>action<span class="token punctuation">(</span>action<span class="token punctuation">.</span>pending<span class="token punctuation">)</span><span class="token punctuation">.</span>after<span class="token punctuation">(</span>someTime<span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token keyword">else</span>
+    noChange
+</code></pre>
+<p>First we check if the <code>Pot</code> is still pending (it hasn&apos;t transitioned into failed or ready state in the meanwhile) and if so, we &quot;update&quot; the value to pending
+state (which makes a copy of the <code>Pot</code>, creating a new reference, triggering an update in the view) and resubmit a delayed effect. This continues while the
+<code>PotAction</code> is in pending state, updating the model at a steady interval.</p>
+<p>The common handlers also support sending updates while pending. You just need to provide the interval time to the handler</p>
+<pre><code class="lang-scala"><span class="token keyword">import</span> scala<span class="token punctuation">.</span>concurrent<span class="token punctuation">.</span>duration<span class="token punctuation">.</span>_
+
+<span class="token keyword">override</span> <span class="token keyword">def</span> handle <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token keyword">case</span> action<span class="token operator">:</span> UpdateTodos <span class="token keyword">=&gt;</span>
+    action<span class="token punctuation">.</span>handleWith<span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> updateEffect<span class="token punctuation">)</span><span class="token punctuation">(</span>PotAction<span class="token punctuation">.</span>handler<span class="token punctuation">(</span><span class="token number">400</span><span class="token punctuation">.</span>milliseconds<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>In the view you can check how long the <code>Pot</code> has been pending by calling <code>duration()</code> and act accordingly.</p>
+<pre><code class="lang-scala"><span class="token keyword">if</span> <span class="token punctuation">(</span>pot<span class="token punctuation">.</span>isPending<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">val</span> duration <span class="token operator">=</span> pot<span class="token punctuation">.</span>asInstanceOf<span class="token punctuation">[</span>PendingBase<span class="token punctuation">]</span><span class="token punctuation">.</span>duration<span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+</code></pre>
+<h2 id="asyncaction"><code>AsyncAction</code></h2>
+<p>For actions not involving <code>Pot</code> data you can use <code>AsyncAction</code>. It provides the same functionality but the state is separated from the value and the type of
+value is <code>Try[A]</code> to indicate success/failure.</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> UpdateTodos<span class="token punctuation">(</span>
+  state<span class="token operator">:</span> PotState <span class="token operator">=</span> PotState<span class="token punctuation">.</span>Empty<span class="token punctuation">,</span> 
+  result<span class="token operator">:</span> Try<span class="token punctuation">[</span>Todos<span class="token punctuation">]</span> <span class="token operator">=</span> Failure<span class="token punctuation">(</span><span class="token keyword">new</span> AsyncAction<span class="token punctuation">.</span>PendingException<span class="token punctuation">)</span>
+<span class="token punctuation">)</span> <span class="token keyword">extends</span> AsyncAction<span class="token punctuation">[</span>Todos<span class="token punctuation">,</span> UpdateTodos<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+  <span class="token keyword">def</span> next<span class="token punctuation">(</span>newState<span class="token operator">:</span> PotState<span class="token punctuation">,</span> newResult<span class="token operator">:</span> Try<span class="token punctuation">[</span>Todos<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">:</span> P <span class="token operator">=</span> UpdateTodos<span class="token punctuation">(</span>newState<span class="token punctuation">,</span> newResult<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h2 id="retries">Retries</h2>
+<p>A common pattern with async data is to retry failed operations a few times. <code>AsyncActionRetriable</code> and <code>PotActionRetriable</code> support this pattern by providing
+a retry policy. The retry policy resides in the action and it&apos;s updated on every retry. Therefore you need to pass it forward in the <code>next</code> method.</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> UpdateTodos<span class="token punctuation">(</span>result<span class="token operator">:</span> Pot<span class="token punctuation">[</span>Todos<span class="token punctuation">]</span> <span class="token operator">=</span> Empty<span class="token punctuation">,</span> retryPolicy<span class="token operator">:</span> RetryPolicy <span class="token operator">=</span> Retry<span class="token punctuation">.</span>None<span class="token punctuation">)</span> 
+  <span class="token keyword">extends</span> PotActionRetriable<span class="token punctuation">[</span>Todos<span class="token punctuation">,</span> UpdateTodos<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+  <span class="token keyword">def</span> next<span class="token punctuation">(</span>newResult<span class="token operator">:</span> Pot<span class="token punctuation">[</span>Todos<span class="token punctuation">]</span><span class="token punctuation">,</span> newRetryPolicy<span class="token operator">:</span> RetryPolicy<span class="token punctuation">)</span> <span class="token operator">=</span> UpdateTodos<span class="token punctuation">(</span>newResult<span class="token punctuation">,</span> newRetryPolicy<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>When a failure is encountered, the retry policy is consulted on what to do next:</p>
+<pre><code class="lang-scala"><span class="token comment" spellcheck="true">// create an effect function that takes retry policy</span>
+<span class="token keyword">val</span> updateEffect <span class="token operator">=</span> action<span class="token punctuation">.</span>effectWithRetry<span class="token punctuation">(</span>loadTodos<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">(</span>todos <span class="token keyword">=&gt;</span> Todos<span class="token punctuation">(</span>todos<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+<span class="token keyword">case</span> PotFailed <span class="token keyword">=&gt;</span>
+  <span class="token comment" spellcheck="true">// extract exception from action and call retryPolicy</span>
+  action<span class="token punctuation">.</span>retryPolicy<span class="token punctuation">.</span>retry<span class="token punctuation">(</span>action<span class="token punctuation">.</span>result<span class="token punctuation">.</span>failed<span class="token punctuation">.</span>get<span class="token punctuation">,</span> updateEffect<span class="token punctuation">)</span> <span class="token keyword">match</span> <span class="token punctuation">{</span>
+    <span class="token keyword">case</span> Right<span class="token punctuation">(</span><span class="token punctuation">(</span>_<span class="token punctuation">,</span> retryEffect<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+      effectOnly<span class="token punctuation">(</span>retryEffect<span class="token punctuation">)</span>
+    <span class="token keyword">case</span> Left<span class="token punctuation">(</span>ex<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+      updated<span class="token punctuation">(</span>value<span class="token punctuation">.</span>fail<span class="token punctuation">(</span>ex<span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+</code></pre>
+<p>Common retry policies <code>Immediate</code> and <code>Backoff</code> are available in the <code>Retry</code> object, but feel free to roll your own.</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="Pot.html" class="navigation navigation-prev " aria-label="Previous page: Async Model Data">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="PotCollection.html" class="navigation navigation-next " aria-label="Next page: Async Virtual Collections">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Stateful Actions","level":"1.3.2","depth":2,"next":{"title":"Async Virtual Collections","level":"1.3.3","depth":2,"path":"advanced/PotCollection.md","ref":"advanced/PotCollection.md","articles":[]},"previous":{"title":"Async Model Data","level":"1.3.1","depth":2,"path":"advanced/Pot.md","ref":"advanced/Pot.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"3.2.x","theme":"default","variables":{"version":"1.1.5","reactVersion":"142"},"plugins":["editlink","prism","-highlight","github"],"pluginsConfig":{"editlink":{"label":"Edit This Page","multilingual":false,"base":"https://github.com/suzaku-io/diode/tree/master/doc"},"github":{"url":"https://github.com/suzaku-io/diode/"},"prism":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"advanced/PotActions.md","mtime":"2017-11-25T10:45:36.455Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2019-05-11T10:59:36.439Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-editlink/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

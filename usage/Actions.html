@@ -1,0 +1,463 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Actions · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.2">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-prism/prism.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="Handlers.html" />
+    
+    
+    <link rel="prev" href="ApplicationModel.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Usage
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="ApplicationModel.html">
+            
+                <a href="ApplicationModel.html">
+            
+                    
+                    Application Model
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.2.2" data-path="Actions.html">
+            
+                <a href="Actions.html">
+            
+                    
+                    Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.3" data-path="Handlers.html">
+            
+                <a href="Handlers.html">
+            
+                    
+                    Action Handlers
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.4" data-path="Views.html">
+            
+                <a href="Views.html">
+            
+                    
+                    Views
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.5" data-path="Effects.html">
+            
+                <a href="Effects.html">
+            
+                    
+                    Async Effects
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="../advanced/">
+            
+                <a href="../advanced/">
+            
+                    
+                    Advanced Topics
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="../advanced/Pot.html">
+            
+                <a href="../advanced/Pot.html">
+            
+                    
+                    Async Model Data
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="../advanced/PotActions.html">
+            
+                <a href="../advanced/PotActions.html">
+            
+                    
+                    Stateful Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="../advanced/PotCollection.html">
+            
+                <a href="../advanced/PotCollection.html">
+            
+                    
+                    Async Virtual Collections
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="../advanced/ActionProcessors.html">
+            
+                <a href="../advanced/ActionProcessors.html">
+            
+                    
+                    Action Processors
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="../UsageWithReact.html">
+            
+                <a href="../UsageWithReact.html">
+            
+                    
+                    Usage with React
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../examples/">
+            
+                <a href="../examples/">
+            
+                    
+                    Examples
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Actions</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="actions">Actions</h1>
+<p><img src="../images/architecture-action.png" style="float: right; padding: 10px">
+Actions hold information on how to update the model and they are the <em>only</em> way to make these updates. Basically the current model is a result of all previous
+actions, much like in <a href="http://martinfowler.com/eaaDev/EventSourcing.html" target="_blank">event sourcing</a>.</p>
+<h2 id="designing-actions">Designing Actions</h2>
+<p>Actions are very much application specific but can generally be classified into <em>global</em> and <em>targeted</em> actions. A global action is something like the examples
+below, always changing the same part of the model.</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> Increase<span class="token punctuation">(</span>amount<span class="token operator">:</span> <span class="token builtin">Int</span><span class="token punctuation">)</span> <span class="token keyword">extends</span> Action
+<span class="token keyword">case</span> <span class="token keyword">class</span> Decrease<span class="token punctuation">(</span>amount<span class="token operator">:</span> <span class="token builtin">Int</span><span class="token punctuation">)</span> <span class="token keyword">extends</span> Action
+<span class="token keyword">case</span> <span class="token keyword">object</span> Reset <span class="token keyword">extends</span> Action
+</code></pre>
+<p>Targeted actions, on the other hand, can change different parts of the model depending on the value of the action. For example if your data is in a tree, you
+would need to know what part of the tree should be changed. One option is to have unique IDs for data and search for the ID in the action handler, but typically
+it&apos;s more efficient and easier to use a <em>path</em> to the data.</p>
+<pre><code class="lang-scala"><span class="token comment" spellcheck="true">// path is defined by a sequence of identifiers</span>
+<span class="token keyword">case</span> <span class="token keyword">class</span> AddNode<span class="token punctuation">(</span>path<span class="token operator">:</span> Seq<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span><span class="token punctuation">,</span> node<span class="token operator">:</span> FileNode<span class="token punctuation">)</span> <span class="token keyword">extends</span> Action
+<span class="token keyword">case</span> <span class="token keyword">class</span> RemoveNode<span class="token punctuation">(</span>path<span class="token operator">:</span> Seq<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token keyword">extends</span> Action
+<span class="token keyword">case</span> <span class="token keyword">class</span> ReplaceNode<span class="token punctuation">(</span>path<span class="token operator">:</span> Seq<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span><span class="token punctuation">,</span> node<span class="token operator">:</span> FileNode<span class="token punctuation">)</span> <span class="token keyword">extends</span> Action
+<span class="token keyword">case</span> <span class="token keyword">class</span> Select<span class="token punctuation">(</span>selected<span class="token operator">:</span> Seq<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token keyword">extends</span> Action
+</code></pre>
+<p>If you need an action to update multiple independent parts of your model, it&apos;s usually better to break it down into several consecutive actions. This way each
+action handler can focus on its own part of the model and the logic is kept simple and easy to reason about. Actions are processed in the order they are
+dispatched, so you can be sure your sequence of actions are processed in correct order.</p>
+<h2 id="typesafe-actions">Typesafe actions</h2>
+<p>In Diode actions can be anything but typically case classes are used for easy pattern matching. By anything, we mean anything with a valid
+<code>ActionType[A]</code> type class in scope. Diode uses this type class to implicitly verify that the dispatched action is actually a valid action. It is up
+to you as the developer to decide what actions are valid by providing appropriate type class instances.</p>
+<p>Typically a good way to accomplish this is to create a single base trait (say <code>MyAction</code>) for all your actions and provide an implicit
+<code>ActionType[MyAction]</code> for it in the companion object.</p>
+<pre><code class="lang-scala"><span class="token keyword">trait</span> MyAction
+
+<span class="token keyword">object</span> MyAction <span class="token punctuation">{</span>
+  <span class="token keyword">implicit</span> <span class="token keyword">object</span> actionType <span class="token keyword">extends</span> ActionType<span class="token punctuation">[</span>MyAction<span class="token punctuation">]</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>To make your life easier, Diode provides such a base trait (named <code>Action</code>) by default so you can start using it right away!</p>
+<p>If you want to forgo type safety altogether, you can import the provided <code>AnyAction</code> implicit, which allows <code>Any</code> to be used as action. This can be used
+for adapting legacy Diode code to a new version.</p>
+<pre><code class="lang-scala"><span class="token keyword">import</span> diode<span class="token punctuation">.</span>AnyAction<span class="token punctuation">.</span>_
+</code></pre>
+<h2 id="special-actions">Special actions</h2>
+<p>Diode defines two special actions: <code>ActionBatch</code> and <code>NoAction</code>, both extending the <code>Action</code> trait.</p>
+<p>Use <code>ActionBatch</code> to create a batch of actions that are dispatched in sequence without calling any model update listeners in between. This can be used as an
+optimization.</p>
+<p><code>NoAction</code>, as its name implies, performs no action and can be used as a result in purely side-effecting Effects.</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="ApplicationModel.html" class="navigation navigation-prev " aria-label="Previous page: Application Model">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="Handlers.html" class="navigation navigation-next " aria-label="Next page: Action Handlers">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Actions","level":"1.2.2","depth":2,"next":{"title":"Action Handlers","level":"1.2.3","depth":2,"path":"usage/Handlers.md","ref":"usage/Handlers.md","articles":[]},"previous":{"title":"Application Model","level":"1.2.1","depth":2,"path":"usage/ApplicationModel.md","ref":"usage/ApplicationModel.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"3.2.x","theme":"default","variables":{"version":"1.1.5","reactVersion":"142"},"plugins":["editlink","prism","-highlight","github"],"pluginsConfig":{"editlink":{"label":"Edit This Page","multilingual":false,"base":"https://github.com/suzaku-io/diode/tree/master/doc"},"github":{"url":"https://github.com/suzaku-io/diode/"},"prism":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"usage/Actions.md","mtime":"2017-01-28T10:43:30.000Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2019-05-11T10:59:36.439Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-editlink/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

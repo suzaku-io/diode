@@ -1,0 +1,600 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Application Model · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.2">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-prism/prism.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="Actions.html" />
+    
+    
+    <link rel="prev" href="./" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Usage
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter active" data-level="1.2.1" data-path="ApplicationModel.html">
+            
+                <a href="ApplicationModel.html">
+            
+                    
+                    Application Model
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="Actions.html">
+            
+                <a href="Actions.html">
+            
+                    
+                    Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.3" data-path="Handlers.html">
+            
+                <a href="Handlers.html">
+            
+                    
+                    Action Handlers
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.4" data-path="Views.html">
+            
+                <a href="Views.html">
+            
+                    
+                    Views
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.5" data-path="Effects.html">
+            
+                <a href="Effects.html">
+            
+                    
+                    Async Effects
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="../advanced/">
+            
+                <a href="../advanced/">
+            
+                    
+                    Advanced Topics
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="../advanced/Pot.html">
+            
+                <a href="../advanced/Pot.html">
+            
+                    
+                    Async Model Data
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="../advanced/PotActions.html">
+            
+                <a href="../advanced/PotActions.html">
+            
+                    
+                    Stateful Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="../advanced/PotCollection.html">
+            
+                <a href="../advanced/PotCollection.html">
+            
+                    
+                    Async Virtual Collections
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="../advanced/ActionProcessors.html">
+            
+                <a href="../advanced/ActionProcessors.html">
+            
+                    
+                    Action Processors
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="../UsageWithReact.html">
+            
+                <a href="../UsageWithReact.html">
+            
+                    
+                    Usage with React
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../examples/">
+            
+                <a href="../examples/">
+            
+                    
+                    Examples
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Application Model</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="application-model">Application Model</h1>
+<p><img src="../images/architecture-model.png" style="float: right; padding: 10px"></p>
+<p>Having all your application state in a single model may seem like a daunting design task, but it&apos;s not really that
+different from designing a hierarchical UI layout. If you are used to having a distributed state between different
+stores and components, take some time to sit down and redesign the model as a single hierarchy.</p>
+<p>As the model has to be immutable, it makes sense to build it out of case classes. This provides us with many benefits
+down the line, such as pattern matching and use of the <code>copy</code> method. For illustration purposes we&apos;ll define a simple
+case class hierarchy to represent the application model.</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> Root<span class="token punctuation">(</span>a<span class="token operator">:</span> A<span class="token punctuation">,</span> b<span class="token operator">:</span> B<span class="token punctuation">,</span> c<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">)</span>
+<span class="token keyword">case</span> <span class="token keyword">class</span> A<span class="token punctuation">(</span>d<span class="token operator">:</span> <span class="token builtin">Int</span><span class="token punctuation">,</span> e<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">)</span>
+<span class="token keyword">case</span> <span class="token keyword">class</span> B<span class="token punctuation">(</span>f<span class="token operator">:</span> <span class="token builtin">Boolean</span><span class="token punctuation">,</span> g<span class="token operator">:</span> Option<span class="token punctuation">[</span>D<span class="token punctuation">]</span><span class="token punctuation">)</span>
+<span class="token keyword">case</span> <span class="token keyword">class</span> D<span class="token punctuation">(</span>h<span class="token operator">:</span> Seq<span class="token punctuation">[</span><span class="token builtin">Int</span><span class="token punctuation">]</span><span class="token punctuation">,</span> i<span class="token operator">:</span> <span class="token builtin">Int</span><span class="token punctuation">)</span>
+
+<span class="token keyword">object</span> AppCircuit <span class="token keyword">extends</span> Circuit<span class="token punctuation">[</span>Root<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// provides initial model to the Circuit</span>
+  <span class="token keyword">override</span> <span class="token keyword">def</span> initialModel <span class="token operator">=</span> Root<span class="token punctuation">(</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> <span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Making modifications to an immutable model means making a copy of the model every time something changes. Naturally
+we&apos;ll want to modify only those parts of the hierarchy that we absolutely need to, leaving the rest as it is. These
+changes can be visualized as below: <img src="../images/model-updates.png" alt="Hierarchy"></p>
+<ol>
+<li>We want to change <code>B.f</code> to <code>false</code></li>
+<li>To implement the change, we must also change <code>b</code> and <code>root</code> objects with <br><code>root = root.copy(b = root.b.copy(f = false))</code></li>
+<li>Next we want to change <code>A.e</code> to <code>&quot;normal&quot;</code></li>
+<li>To implement this change, we must also change <code>a</code> and <code>root</code> with <br><code>root = root.copy(a = root.a.copy(e = &quot;normal&quot;))</code></li>
+</ol>
+<p>All the other parts of the model hierarchy stay the same throughout these changes, so your render code can skip
+re-rendering <code>root.b.g</code> for example.</p>
+<h2 id="accessing-the-model">Accessing the Model</h2>
+<p>In Diode your application model is safely tucked inside the Circuit class, without any direct access. To initialize the
+model, override the <code>initialModel</code> function to return your initial model. Instead of directly accessing the model you
+will get <em>indirect</em> access via readers and writers. These are defined as <code>ModelR</code> and <code>ModelRW</code> traits.</p>
+<p>For example if your view needs to render the string <code>e</code> in class <code>A</code>, it doesn&apos;t care where that data comes from, as
+long as it has access to it. Furthermore, since the state changes always create a new root model, we cannot simply give
+the current value and expect that to work in the future. What we need is a chain of functions going from <code>root</code> all the
+way to the piece of data we are interested in. The classes implementing <code>ModelR</code> and <code>ModelRW</code> provide this. To build a
+reader to <code>root.a.e</code> we would write:</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> reader<span class="token operator">:</span> ModelR<span class="token punctuation">[</span>Root<span class="token punctuation">,</span> <span class="token builtin">String</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token keyword">new</span> RootModelR<span class="token punctuation">(</span>root<span class="token punctuation">)</span><span class="token punctuation">.</span>zoom<span class="token punctuation">(</span>_<span class="token punctuation">.</span>a<span class="token punctuation">.</span>e<span class="token punctuation">)</span>
+</code></pre>
+<p>To get the current value from the reader we simply call <code>reader.value</code> or <code>reader()</code>.</p>
+<p>The <code>Circuit</code> provides <code>zoom</code> and <code>zoomRW</code> functions to zoom into the application model, so we can rewrite the previous
+example as:</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> reader<span class="token operator">:</span> ModelR<span class="token punctuation">[</span>Root<span class="token punctuation">,</span> <span class="token builtin">String</span><span class="token punctuation">]</span> <span class="token operator">=</span> AppCircuit<span class="token punctuation">.</span>zoom<span class="token punctuation">(</span>_<span class="token punctuation">.</span>a<span class="token punctuation">.</span>e<span class="token punctuation">)</span>
+</code></pre>
+<p>Note that you don&apos;t need to specify the types for the readers, they are automatically inferred. They are displayed here
+for clarity.</p>
+<h3 id="modelro-versus-modelr">ModelRO versus ModelR</h3>
+<p><code>ModelR[M, S]</code> has a super trait <code>ModelRO[S]</code> which actually defines most of the methods. The difference is that <code>ModelRO</code>
+does not know about the type of the model and can thus be used more freely. The examples in previous chapter could as
+well been written like this:</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> reader<span class="token operator">:</span> ModelRO<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span> <span class="token operator">=</span> AppCircuit<span class="token punctuation">.</span>zoom<span class="token punctuation">(</span>_<span class="token punctuation">.</span>a<span class="token punctuation">.</span>e<span class="token punctuation">)</span>
+</code></pre>
+<p>If you see in your code any instances of <code>ModelR[_, S]</code> you probably should replace it with <code>ModelRO[S]</code>.</p>
+<h3 id="fast-equality-comparison">Fast Equality Comparison</h3>
+<p>An important benefit of an immutable model is the use of <em>reference equality</em> to quickly check if anything has changed.
+There is no need for expensive shallow or deep equality checks to find out a change anywhere in the model. Sometimes,
+however, you need to use regular equality checks, for example with values like <code>Int</code> or <code>Double</code>, or when you build an
+intermediate object to represent multiple values in the model. For this reason Diode&apos;s <code>ModelR</code> provides special <code>===</code>
+and <code>=!=</code> methods that can be used to compare current value of the reader to a previous value, using the correct
+equality check.</p>
+<p>By default all <code>AnyVal</code>s are compared with regular <code>==</code> while all <code>AnyRef</code>s use the <code>eq</code> operator. Additionally there is
+a special marker trait <code>UseValueEq</code> that forces the comparison to use <code>==</code>. This is typically useful for model readers
+that combine multiple values from the model into a single entity (typically a case class). Because these readers always
+create a new instance of the output, reference equality cannot be used.</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> oldStr <span class="token operator">=</span> reader<span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true">// update the model...</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span>reader <span class="token operator">=</span><span class="token operator">!=</span> oldStr<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token comment" spellcheck="true">// the value has changed</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h3 id="option-and-other-containers-in-the-model"><code>Option</code> and Other Containers in the Model</h3>
+<p>When the model contains an <code>Option</code> or another container (for example <a href="../advanced/Pot.html"><code>Pot</code></a> for async data) and
+you want to access the contained data, the reader needs to be constructed a bit differently. A naive approach is to use
+<code>map</code> in the <code>zoom</code> function to map over the container. For example to access the sequence of <code>Int</code>s in <code>D</code> we could use
+something like</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> reader<span class="token operator">:</span> ModelR<span class="token punctuation">[</span>Root<span class="token punctuation">,</span> Option<span class="token punctuation">[</span>Seq<span class="token punctuation">[</span><span class="token builtin">Int</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> AppCircuit<span class="token punctuation">.</span>zoom<span class="token punctuation">(</span>_<span class="token punctuation">.</span>b<span class="token punctuation">.</span>g<span class="token punctuation">.</span>map<span class="token punctuation">(</span>_<span class="token punctuation">.</span>h<span class="token punctuation">)</span><span class="token punctuation">)</span>
+assert<span class="token punctuation">(</span>reader<span class="token punctuation">.</span>value ne reader<span class="token punctuation">.</span>value<span class="token punctuation">)</span>
+</code></pre>
+<p>This works just fine for retrieving the value, but it breaks reference equality as the <code>map</code> function recreates the
+resulting <code>Option</code>. This means that every call to <code>reader.value</code> returns a different instance. To work around this issue
+Diode provides special readers that cache container reference and update it only when the content of the container
+changes. Use <code>map</code>, <code>flatMap</code>, <code>zoomMap</code> and <code>zoomFlatMap</code> to create such readers.</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> reader<span class="token operator">:</span> ModelR<span class="token punctuation">[</span>Root<span class="token punctuation">,</span> Option<span class="token punctuation">[</span>Seq<span class="token punctuation">[</span><span class="token builtin">Int</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> AppCircuit<span class="token punctuation">.</span>zoomMap<span class="token punctuation">(</span>_<span class="token punctuation">.</span>b<span class="token punctuation">.</span>g<span class="token punctuation">)</span><span class="token punctuation">(</span>_<span class="token punctuation">.</span>h<span class="token punctuation">)</span>
+assert<span class="token punctuation">(</span>reader<span class="token punctuation">.</span>value eq reader<span class="token punctuation">.</span>value<span class="token punctuation">)</span>
+</code></pre>
+<p>Containers must support <code>map</code>, <code>flatMap</code> and equality check for the content to be compatible with Diode. In practice
+these readers require a <code>Monad</code> type class to be implicitly available for the container type. Diode provides monads for
+<code>Option</code> and <code>Pot</code>. If you use some other containers, you must provide the monad yourself. The type class interface is
+defined in <code>diode.Monad</code> and the implementation consists of just <code>map</code>, <code>flatMap</code> and <code>isEqual</code> methods.</p>
+<p>Note that the above is only necessary if you want to maintain efficient reference equality checking. If your code
+doesn&apos;t need this, it&apos;s better to just use the naive approach with a plain <code>zoom</code> call.</p>
+<h3 id="complex-access-patterns">Complex Access Patterns</h3>
+<p>We are not limited to traversing the hierarchy to get a reader for just a single value. Since we get to define the
+access function ourselves, we can freely access anything in the model and return a composite.</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> complexReader<span class="token operator">:</span> ModelR<span class="token punctuation">[</span>Root<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token builtin">String</span><span class="token punctuation">,</span> <span class="token builtin">Boolean</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">=</span> 
+  AppCircuit<span class="token punctuation">.</span>zoom<span class="token punctuation">(</span>r <span class="token keyword">=&gt;</span> <span class="token punctuation">(</span>r<span class="token punctuation">.</span>a<span class="token punctuation">.</span>e<span class="token punctuation">,</span> r<span class="token punctuation">.</span>b<span class="token punctuation">.</span>f<span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>Note that a reader like this will not support correct reference equality, because the tuple is recreated every time the
+reader is accessed. You may <code>zip</code> two readers together to form a reader returning a tuple that preserves reference
+equality (the tuple is only updated when its constituents change).</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> zipReader<span class="token operator">:</span> ModelR<span class="token punctuation">[</span>Root<span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token builtin">String</span><span class="token punctuation">,</span> <span class="token builtin">Int</span><span class="token punctuation">)</span><span class="token punctuation">]</span> <span class="token operator">=</span> reader<span class="token punctuation">.</span>zip<span class="token punctuation">(</span>AppCircuit<span class="token punctuation">.</span>zoom<span class="token punctuation">(</span>_<span class="token punctuation">.</span>a<span class="token punctuation">.</span>d<span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>You may also define a custom case class with the <code>UseValueEq</code> marker trait, to combine multiple values from the model.
+This will force the use of normal case class equality check instead of reference equality. Depending on the complexity
+of your case class, the equality check may become inefficient, so you should pay some attention.</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> FromAB<span class="token punctuation">(</span>e<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">,</span> g<span class="token operator">:</span> Option<span class="token punctuation">[</span>D<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token keyword">extends</span> UseValueEq
+
+<span class="token keyword">val</span> abReader<span class="token operator">:</span> ModelR<span class="token punctuation">[</span>Root<span class="token punctuation">,</span> FromAB<span class="token punctuation">]</span> <span class="token operator">=</span> 
+  AppCircuit<span class="token punctuation">.</span>zoom<span class="token punctuation">(</span>r <span class="token keyword">=&gt;</span> FromAB<span class="token punctuation">(</span>r<span class="token punctuation">.</span>a<span class="token punctuation">.</span>e<span class="token punctuation">,</span> r<span class="token punctuation">.</span>b<span class="token punctuation">.</span>g<span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>If you cannot use the marker trait, a second option is to define your custom <code>FastEq</code> typeclass for your reader output
+type. This approach also lets you define a fully custom equality function, in case that is required. Note that due to
+Scala implicit priorities, you need to make sure your custom typeclass has higher priority than the default
+<code>FastEq[AnyRef]</code>, typically by importing it explicitly.</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> ExtData<span class="token punctuation">(</span>age<span class="token operator">:</span> <span class="token builtin">Int</span><span class="token punctuation">,</span> name<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">)</span>
+
+<span class="token keyword">implicit</span> <span class="token keyword">object</span> ExtDataEq <span class="token keyword">extends</span> FastEq<span class="token punctuation">[</span>ExtData<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+  <span class="token keyword">override</span> <span class="token keyword">def</span> eqv<span class="token punctuation">(</span>a<span class="token operator">:</span> ExtData<span class="token punctuation">,</span> b<span class="token operator">:</span> ExtData<span class="token punctuation">)</span><span class="token operator">:</span> <span class="token builtin">Boolean</span> <span class="token operator">=</span> a <span class="token operator">==</span> b
+<span class="token punctuation">}</span>
+
+<span class="token keyword">val</span> extReader<span class="token operator">:</span> ModelR<span class="token punctuation">[</span>Root<span class="token punctuation">,</span> ExtData<span class="token punctuation">]</span> <span class="token operator">=</span>
+  AppCircuit<span class="token punctuation">.</span>zoom<span class="token punctuation">(</span>r <span class="token keyword">=&gt;</span> ExtData<span class="token punctuation">(</span>r<span class="token punctuation">.</span>a<span class="token punctuation">.</span>d<span class="token punctuation">,</span> r<span class="token punctuation">.</span>c<span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>Finally it&apos;s also possible to explicitly supply a <code>FastEq</code> instance to the <code>zoom</code> functions as a curried parameter. This
+might come in handy when you calculate a value from the model but don&apos;t want to wrap it into a case class.</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> valReader<span class="token operator">:</span> ModelR<span class="token punctuation">[</span>Root<span class="token punctuation">,</span> <span class="token builtin">String</span><span class="token punctuation">]</span> <span class="token operator">=</span>
+  AppCircuit<span class="token punctuation">.</span>zoom<span class="token punctuation">(</span>r <span class="token keyword">=&gt;</span> s<span class="token string">&quot;${r.a.d}:${r.a.e}&quot;</span><span class="token punctuation">)</span><span class="token punctuation">(</span>FastEq<span class="token punctuation">.</span>ValueEq<span class="token punctuation">)</span>
+</code></pre>
+<p>These approaches help detaching the application model from the UI hierarchy, as you can keep your data in a sensible
+structure while allowing your UI components to access it in a natural way.</p>
+<h3 id="references-within-the-model">References within the Model</h3>
+<p>The application model being immutable, it makes sense to have a <em>normalized</em> data model where a single piece of data
+occurs only in a single place within the model. For example if your model has <code>ProductGroup</code>s consisting of <code>Product</code>s
+but a product can belong to multiple groups, the group should hold only references to the product data, not the data
+itself.</p>
+<p>In Diode context a reference to a value of type <code>V</code> would be <code>ModelRO[V]</code> but that provides no update mechanism. To
+facilitate easy referencing of other data within the model, Diode provides a <code>RefTo</code> class.</p>
+<pre><code class="lang-scala"><span class="token keyword">class</span> RefTo<span class="token punctuation">[</span>V<span class="token punctuation">]</span><span class="token punctuation">(</span><span class="token keyword">val</span> target<span class="token operator">:</span> ModelRO<span class="token punctuation">[</span>V<span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token keyword">val</span> updated<span class="token operator">:</span> V <span class="token keyword">=&gt;</span> Action<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">def</span> apply<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=</span> target<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>It combines a model reader with a function to generate an update action for this particular reference. Using the Product
+example above, the model would be defined as</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> RootModel<span class="token punctuation">(</span>products<span class="token operator">:</span> Map<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">,</span> Product<span class="token punctuation">]</span><span class="token punctuation">,</span> productGroups<span class="token operator">:</span> Map<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">,</span> ProductGroup<span class="token punctuation">]</span><span class="token punctuation">)</span>
+
+<span class="token keyword">case</span> <span class="token keyword">class</span> Product<span class="token punctuation">(</span>id<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>
+
+<span class="token keyword">case</span> <span class="token keyword">class</span> ProductGroup<span class="token punctuation">(</span>id<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">,</span> products<span class="token operator">:</span> Seq<span class="token punctuation">[</span>RefTo<span class="token punctuation">[</span>Product<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true">// action to update a product</span>
+<span class="token keyword">case</span> <span class="token keyword">class</span> UpdateProduct<span class="token punctuation">(</span>id<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">,</span> newProduct<span class="token operator">:</span> Product<span class="token punctuation">)</span> <span class="token keyword">extends</span> Action
+
+<span class="token keyword">var</span> model <span class="token operator">=</span> RootModel<span class="token punctuation">(</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span>
+<span class="token keyword">val</span> rootReader <span class="token operator">=</span> <span class="token keyword">new</span> RootModelR<span class="token punctuation">(</span>model<span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true">// create a reference to a Product</span>
+<span class="token keyword">def</span> productRef<span class="token punctuation">(</span>id<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">)</span> <span class="token operator">=</span> RefTo<span class="token punctuation">(</span>rootReader<span class="token punctuation">.</span>zoom<span class="token punctuation">(</span>_<span class="token punctuation">.</span>products<span class="token punctuation">(</span>id<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> UpdateProduct<span class="token punctuation">(</span>id<span class="token punctuation">,</span> _<span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>The <code>RefTo</code> paradigm is especially useful with Diode&apos;s <a href="../advanced/PotCollection.html">async collections</a> as you can
+easily reference data that has not yet been loaded into the client, but will be as soon as the reference is accessed.
+References can also be cyclic (which would be impossible in a normal immutable hierarchy), meaning a Product can have a
+reference (or several) back to ProductGroup(s).</p>
+<h2 id="modifications-through-writers">Modifications through Writers</h2>
+<p>The <code>ModelRW</code> trait adds functionality to update the model. In addition to providing a function for reading a value, it
+requires a second function for updating.</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> rwForA<span class="token operator">:</span> ModelRW<span class="token punctuation">[</span>Root<span class="token punctuation">,</span> A<span class="token punctuation">]</span> <span class="token operator">=</span> AppCircuit<span class="token punctuation">.</span>zoomRW<span class="token punctuation">(</span>_<span class="token punctuation">.</span>a<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span>m<span class="token punctuation">,</span> v<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span> m<span class="token punctuation">.</span>copy<span class="token punctuation">(</span>a <span class="token operator">=</span> v<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">val</span> rwForA_e<span class="token operator">:</span> ModelRW<span class="token punctuation">[</span>Root<span class="token punctuation">,</span> <span class="token builtin">String</span><span class="token punctuation">]</span> <span class="token operator">=</span> rwForA<span class="token punctuation">.</span>zoomRW<span class="token punctuation">(</span>_<span class="token punctuation">.</span>e<span class="token punctuation">)</span><span class="token punctuation">(</span><span class="token punctuation">(</span>a<span class="token punctuation">,</span> v<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span> a<span class="token punctuation">.</span>copy<span class="token punctuation">(</span>e <span class="token operator">=</span> v<span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>This time we are defining the writer in two steps to take advantage of the provided function composition. For the common case of 
+accessing a value using <code>_.a.b.c</code> syntax, there is a macro based helper function <code>zoomTo</code>. The above example could be simplified to</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> rwForA_e<span class="token operator">:</span> ModelRW<span class="token punctuation">[</span>Root<span class="token punctuation">,</span> <span class="token builtin">String</span><span class="token punctuation">]</span> <span class="token operator">=</span> AppCircuit<span class="token punctuation">.</span>zoomTo<span class="token punctuation">(</span>_<span class="token punctuation">.</span>a<span class="token punctuation">.</span>e<span class="token punctuation">)</span>
+</code></pre>
+<p>Most of the documentation will use the <code>zoomTo</code> version, but if you need to update something more complicated, like inside a collection,
+ you would need to provide the reader and writer functions separately using <code>zoomRW</code>.</p>
+<p>To update the model (and creating a new model), just call <code>updated</code>.</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> newRoot<span class="token operator">:</span> Root <span class="token operator">=</span> rwForA_e<span class="token punctuation">.</span>updated<span class="token punctuation">(</span><span class="token string">&quot;New value!&quot;</span><span class="token punctuation">)</span>
+</code></pre>
+<p>Since <code>Circuit</code> doesn&apos;t allow us to change the internal model directly, we are just storing a copy for demonstration
+purposes. Only way to make actual changes to the model is to dispatch and handle <a href="Actions.html">actions</a>.</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="./" class="navigation navigation-prev " aria-label="Previous page: Usage">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="Actions.html" class="navigation navigation-next " aria-label="Next page: Actions">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Application Model","level":"1.2.1","depth":2,"next":{"title":"Actions","level":"1.2.2","depth":2,"path":"usage/Actions.md","ref":"usage/Actions.md","articles":[]},"previous":{"title":"Usage","level":"1.2","depth":1,"path":"usage/README.md","ref":"usage/README.md","articles":[{"title":"Application Model","level":"1.2.1","depth":2,"path":"usage/ApplicationModel.md","ref":"usage/ApplicationModel.md","articles":[]},{"title":"Actions","level":"1.2.2","depth":2,"path":"usage/Actions.md","ref":"usage/Actions.md","articles":[]},{"title":"Action Handlers","level":"1.2.3","depth":2,"path":"usage/Handlers.md","ref":"usage/Handlers.md","articles":[]},{"title":"Views","level":"1.2.4","depth":2,"path":"usage/Views.md","ref":"usage/Views.md","articles":[]},{"title":"Async Effects","level":"1.2.5","depth":2,"path":"usage/Effects.md","ref":"usage/Effects.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"3.2.x","theme":"default","variables":{"version":"1.1.5","reactVersion":"142"},"plugins":["editlink","prism","-highlight","github"],"pluginsConfig":{"editlink":{"label":"Edit This Page","multilingual":false,"base":"https://github.com/suzaku-io/diode/tree/master/doc"},"github":{"url":"https://github.com/suzaku-io/diode/"},"prism":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"usage/ApplicationModel.md","mtime":"2017-01-28T10:43:30.000Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2019-05-11T10:59:36.439Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-editlink/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

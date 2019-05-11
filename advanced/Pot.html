@@ -1,0 +1,470 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Async Model Data · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.2">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-prism/prism.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="PotActions.html" />
+    
+    
+    <link rel="prev" href="./" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../usage/">
+            
+                <a href="../usage/">
+            
+                    
+                    Usage
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="../usage/ApplicationModel.html">
+            
+                <a href="../usage/ApplicationModel.html">
+            
+                    
+                    Application Model
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="../usage/Actions.html">
+            
+                <a href="../usage/Actions.html">
+            
+                    
+                    Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.3" data-path="../usage/Handlers.html">
+            
+                <a href="../usage/Handlers.html">
+            
+                    
+                    Action Handlers
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.4" data-path="../usage/Views.html">
+            
+                <a href="../usage/Views.html">
+            
+                    
+                    Views
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.5" data-path="../usage/Effects.html">
+            
+                <a href="../usage/Effects.html">
+            
+                    
+                    Async Effects
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Advanced Topics
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter active" data-level="1.3.1" data-path="Pot.html">
+            
+                <a href="Pot.html">
+            
+                    
+                    Async Model Data
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="PotActions.html">
+            
+                <a href="PotActions.html">
+            
+                    
+                    Stateful Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="PotCollection.html">
+            
+                <a href="PotCollection.html">
+            
+                    
+                    Async Virtual Collections
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="ActionProcessors.html">
+            
+                <a href="ActionProcessors.html">
+            
+                    
+                    Action Processors
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="../UsageWithReact.html">
+            
+                <a href="../UsageWithReact.html">
+            
+                    
+                    Usage with React
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../examples/">
+            
+                <a href="../examples/">
+            
+                    
+                    Examples
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Async Model Data</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="async-model-data">Async Model Data</h1>
+<p>In real applications you quite often have to deal with model data that is asynchronously loaded or updated. Usual approach would be to use <code>Option[A]</code> to
+indicate whether data is there or not, but then you cannot deal with error situations. Using <code>Either[ErrorType, Option[A]]</code> or <code>Try[Option[A]]</code> gives your some
+control over errors, but if you consider refreshing old data and getting an error back, what should the result be? Not to mention knowing how long the async
+operation has been running and notifying the user when it has been delayed for too long. Clearly the existing data containers are not enough for this.</p>
+<h2 id="potential-data">Potential Data</h2>
+<p><img src="../images/pot-states.png" style="float: right; padding: 10px" ;="">
+A <code>Pot[+A]</code> represents <em>potential</em> data that may exist in seven different states as seen in the picture on the right. <code>Pot</code> provides you with the same interface as
+<code>Option</code> or <code>Try</code>, making it very easy to use in your existing application code. Things like <em>for comprehension</em>, <code>getOrElse</code> or even <code>recover</code> are supported.
+Like <code>Option</code>, <code>Pot</code> is immutable and you have to create a new <code>Pot</code> when the state or content changes.</p>
+<p><code>Pot</code> usually starts as an <code>Empty</code> (option <code>None</code>) or <code>Ready</code> (option <code>Some</code>), depending on whether you have the data available or not. You can use the <code>empty</code>
+method to create a correctly typed <code>Empty</code>.</p>
+<pre><code class="lang-scala"><span class="token keyword">var</span> myData <span class="token operator">=</span> Pot<span class="token punctuation">.</span>empty<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span> <span class="token comment" spellcheck="true">// myData is now Empty</span>
+</code></pre>
+<p>When you make an async call to fetch data, change the state to <code>Pending</code> with the help of <code>pending</code> function.</p>
+<pre><code class="lang-scala">myData <span class="token operator">=</span> myData<span class="token punctuation">.</span>pending<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// myData is now Pending</span>
+</code></pre>
+<p>Assuming you get a successful response from the server, you can change the state to <code>Ready</code>.</p>
+<pre><code class="lang-scala">myData <span class="token operator">=</span> myData<span class="token punctuation">.</span>ready<span class="token punctuation">(</span>data<span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// myData is now Ready(data)</span>
+</code></pre>
+<p>In case something went wrong, you can store the exception in the <code>Failed</code> state.</p>
+<pre><code class="lang-scala">myData <span class="token operator">=</span> myData<span class="token punctuation">.</span>fail<span class="token punctuation">(</span>exception<span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// myData is now Failed(exception)</span>
+</code></pre>
+<p>When you are ready to refresh your <code>Ready</code> data, you again call <code>pending</code> but this time it results in a <code>PendingStale</code> indicating that old data is still there to be
+used while new data is fetched.</p>
+<pre><code class="lang-scala">myData <span class="token operator">=</span> myData<span class="token punctuation">.</span>pending<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// myData is now PendingStale(data)</span>
+</code></pre>
+<p>In case the async call gets new results, the state goes to <code>Ready(newData)</code> but if something goes wrong, you&apos;ll end up with <code>FailedStale</code> containing the
+old data.</p>
+<pre><code class="lang-scala">myData <span class="token operator">=</span> myData<span class="token punctuation">.</span>fail<span class="token punctuation">(</span>exception<span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// myData is now FailedStale(data, exception)</span>
+</code></pre>
+<p>If the data you are trying to fetch does not exist, you can use <code>Unavailable</code> to indicate that.</p>
+<pre><code class="lang-scala">myData <span class="token operator">=</span> myData<span class="token punctuation">.</span>unavailable<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// myData is now Unavailable</span>
+</code></pre>
+<h3 id="usage">Usage</h3>
+<p><code>Pot</code> exposes its state via following functions.</p>
+<pre><code class="lang-scala"><span class="token keyword">def</span> isEmpty<span class="token operator">:</span> <span class="token builtin">Boolean</span>
+<span class="token keyword">def</span> nonEmpty <span class="token operator">=</span> <span class="token operator">!</span>isEmpty
+<span class="token keyword">def</span> isPending<span class="token operator">:</span> <span class="token builtin">Boolean</span>
+<span class="token keyword">def</span> isStale<span class="token operator">:</span> <span class="token builtin">Boolean</span>
+<span class="token keyword">def</span> isFailed<span class="token operator">:</span> <span class="token builtin">Boolean</span>
+<span class="token keyword">def</span> isReady<span class="token operator">:</span> <span class="token builtin">Boolean</span>
+<span class="token keyword">def</span> isUnavailable<span class="token operator">:</span> <span class="token builtin">Boolean</span>
+<span class="token keyword">def</span> state<span class="token operator">:</span> PotState
+</code></pre>
+<p>You can query specific state via <code>isX</code> functions, or use <code>state</code> for matching. Note that <code>isEmpty</code> means there is no data in the <code>Pot</code>, so states <code>Unavailable</code>,
+<code>Pending</code> and <code>Failed</code>, in addition to <code>Empty</code>, all return <code>true</code>.</p>
+<p>Otherwise a <code>Pot</code> works like an <code>Option</code> (<code>Empty</code>, <code>Unavailable</code>, <code>Pending</code> and <code>Failed</code> work like <code>None</code>).</p>
+<h3 id="pending-time">Pending Time</h3>
+<p>The pending states of <code>Pot</code> store a time stamp when created. You can access this through <code>startTime</code>, or you can directly get the duration of the operation
+with <code>duration(currentTime)</code>. This is useful in an user interface, where you&apos;ll want to show an indicator if the operation is taking too long. If
+an operation fails and you retry it, the <code>startTime</code> will remain the same, giving you the total duration of the retried operations.</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="./" class="navigation navigation-prev " aria-label="Previous page: Advanced Topics">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="PotActions.html" class="navigation navigation-next " aria-label="Next page: Stateful Actions">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Async Model Data","level":"1.3.1","depth":2,"next":{"title":"Stateful Actions","level":"1.3.2","depth":2,"path":"advanced/PotActions.md","ref":"advanced/PotActions.md","articles":[]},"previous":{"title":"Advanced Topics","level":"1.3","depth":1,"path":"advanced/README.md","ref":"advanced/README.md","articles":[{"title":"Async Model Data","level":"1.3.1","depth":2,"path":"advanced/Pot.md","ref":"advanced/Pot.md","articles":[]},{"title":"Stateful Actions","level":"1.3.2","depth":2,"path":"advanced/PotActions.md","ref":"advanced/PotActions.md","articles":[]},{"title":"Async Virtual Collections","level":"1.3.3","depth":2,"path":"advanced/PotCollection.md","ref":"advanced/PotCollection.md","articles":[]},{"title":"Action Processors","level":"1.3.4","depth":2,"path":"advanced/ActionProcessors.md","ref":"advanced/ActionProcessors.md","articles":[]}]},"dir":"ltr"},"config":{"gitbook":"3.2.x","theme":"default","variables":{"version":"1.1.5","reactVersion":"142"},"plugins":["editlink","prism","-highlight","github"],"pluginsConfig":{"editlink":{"label":"Edit This Page","multilingual":false,"base":"https://github.com/suzaku-io/diode/tree/master/doc"},"github":{"url":"https://github.com/suzaku-io/diode/"},"prism":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"advanced/Pot.md","mtime":"2016-01-17T21:44:27.000Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2019-05-11T10:59:36.439Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-editlink/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

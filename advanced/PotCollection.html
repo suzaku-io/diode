@@ -1,0 +1,535 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Async Virtual Collections · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.2">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-prism/prism.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="ActionProcessors.html" />
+    
+    
+    <link rel="prev" href="PotActions.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="../usage/">
+            
+                <a href="../usage/">
+            
+                    
+                    Usage
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="../usage/ApplicationModel.html">
+            
+                <a href="../usage/ApplicationModel.html">
+            
+                    
+                    Application Model
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="../usage/Actions.html">
+            
+                <a href="../usage/Actions.html">
+            
+                    
+                    Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.3" data-path="../usage/Handlers.html">
+            
+                <a href="../usage/Handlers.html">
+            
+                    
+                    Action Handlers
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.4" data-path="../usage/Views.html">
+            
+                <a href="../usage/Views.html">
+            
+                    
+                    Views
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.5" data-path="../usage/Effects.html">
+            
+                <a href="../usage/Effects.html">
+            
+                    
+                    Async Effects
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Advanced Topics
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="Pot.html">
+            
+                <a href="Pot.html">
+            
+                    
+                    Async Model Data
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="PotActions.html">
+            
+                <a href="PotActions.html">
+            
+                    
+                    Stateful Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.3.3" data-path="PotCollection.html">
+            
+                <a href="PotCollection.html">
+            
+                    
+                    Async Virtual Collections
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="ActionProcessors.html">
+            
+                <a href="ActionProcessors.html">
+            
+                    
+                    Action Processors
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="../UsageWithReact.html">
+            
+                <a href="../UsageWithReact.html">
+            
+                    
+                    Usage with React
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../examples/">
+            
+                <a href="../examples/">
+            
+                    
+                    Examples
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Async Virtual Collections</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="async-virtual-collections">Async Virtual Collections</h1>
+<blockquote>
+<p>Note this is a <em>Work In Progress</em> feature</p>
+</blockquote>
+<p>In most applications the UI shows only a small fraction of the data residing on the server. For example in GitHub you have organizations that have repositories
+that have issues that consist of events. The data can be viewed as a large, <em>directional graph</em> or a hierarchy. At any point of time, the UI requires just a
+small subset of this graph to be able to display the data correctly.</p>
+<p>Making explicit calls for data is both tedious and bad for performance, because the client is doing no caching whatsoever. Adding caching makes requests even
+more tedious and also error prone. Systems like <a href="https://facebook.github.io/react/blog/2015/05/01/graphql-introduction.html" target="_blank">GraphQL</a> and 
+<a href="https://netflix.github.io/falcor/starter/what-is-falcor.html" target="_blank">Falcor</a> work around these problems by presenting the data as <em>virtual collections</em>.</p>
+<p>As we already have the application model represented as an immutable hierarchy, wouldn&apos;t it be nice to automatically represent data on the server in the model
+itself?</p>
+<h2 id="pot-collections">Pot Collections</h2>
+<p>Diode defines a <code>PotCollection[K, V]</code> trait which is implemented in <code>PotMap</code> and <code>PotVector</code>. These represent virtual collections where the data is fetched
+asynchronously when needed. Collections do not handle fetching themselves, but require an implementation of the <code>Fetch[K]</code> trait to be passed in the
+constructor.</p>
+<p><code>PotCollection</code> works much like a normal immutable Scala collection as you can <code>get</code> values, <code>remove</code> them and get an <code>updated</code> collection with new values. In
+addition to these basic features there are also methods for <code>refresh</code>ing the content of selected values. Note that <code>PotCollection</code> does not implement any of
+the Scala collection traits, so they are not compatible with native collections as such. For example <code>get</code> returns a <code>Pot[V]</code> instead of an <code>Option[Pot[V]]</code> as
+a normal collection would.</p>
+<p>The values in <code>PotCollection</code> are always of type <code>Pot[V]</code>, giving you the multi-state functionality you are already familiar with. If your application is
+already using <code>Pot</code> values, you can easily plug in <code>PotCollection</code>s without much effort.</p>
+<h3 id="usage">Usage</h3>
+<pre><code class="lang-scala"><span class="token keyword">def</span> renderUser<span class="token punctuation">(</span>userId<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">,</span> users<span class="token operator">:</span> PotMap<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">,</span> User<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+  users<span class="token punctuation">(</span>userId<span class="token punctuation">)</span><span class="token punctuation">.</span>map <span class="token punctuation">{</span> user <span class="token keyword">=&gt;</span>
+    div<span class="token punctuation">(</span>span<span class="token punctuation">(</span>cls <span class="token operator">:</span><span class="token operator">=</span> <span class="token string">&quot;name&quot;</span><span class="token punctuation">,</span> user<span class="token punctuation">.</span>name<span class="token punctuation">)</span><span class="token punctuation">,</span> img<span class="token punctuation">(</span>cls <span class="token operator">:</span><span class="token operator">=</span> <span class="token string">&quot;profile&quot;</span><span class="token punctuation">,</span> src <span class="token operator">:</span><span class="token operator">=</span> user<span class="token punctuation">.</span>picUrl<span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span> getOrElse div<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>In this example function the <code>users</code> collection is a <code>PotMap</code> using <code>String</code> as a key. We simply get the value out of the collection by using <code>apply(key)</code> and
+use <code>map</code> to transform it into a Scalatags element. In case there is no value (at the moment), an empty <code>div</code> is returned.</p>
+<p>Assuming the <code>userId</code> does not exist in the <code>PotMap</code>, the call to <code>apply</code> (or <code>get</code>) will result in a call to fetch its content. As this is an asynchronous
+call (typically dispatching an appropriate action), we will not get the value right away but will return a <code>Pending</code> instead. When the fetch is completed, the
+<code>PotMap</code> is updated with the new value, which is returned in the next call to <code>apply</code>. As with <code>Pot</code>s in general, a model update does not automatically trigger
+a view rendering, so you need to use a listener to track model changes.</p>
+<h3 id="fetch-actions">Fetch Actions</h3>
+<p>As with a regular <code>Pot</code> it makes sense to use <code>AsyncAction</code> to handle the details of fetching data for a <code>PotCollection</code>. <code>AsyncAction</code> provides handlers for
+both <code>PotMap</code> and <code>PotVector</code>, to update values given a set of keys.</p>
+<pre><code class="lang-scala"><span class="token keyword">def</span> mapHandler<span class="token punctuation">[</span>K<span class="token punctuation">,</span> V<span class="token punctuation">,</span> A <span class="token operator">&lt;</span><span class="token operator">:</span> Traversable<span class="token punctuation">[</span><span class="token punctuation">(</span>K<span class="token punctuation">,</span> Pot<span class="token punctuation">[</span>V<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">,</span> M<span class="token punctuation">,</span> P <span class="token operator">&lt;</span><span class="token operator">:</span> AsyncAction<span class="token punctuation">[</span>A<span class="token punctuation">,</span> P<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">(</span>keys<span class="token operator">:</span> Set<span class="token punctuation">[</span>K<span class="token punctuation">]</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token keyword">implicit</span> ec<span class="token operator">:</span> ExecutionContext<span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+  require<span class="token punctuation">(</span>keys<span class="token punctuation">.</span>nonEmpty<span class="token punctuation">)</span>
+  <span class="token punctuation">(</span>action<span class="token operator">:</span> AsyncAction<span class="token punctuation">[</span>A<span class="token punctuation">,</span> P<span class="token punctuation">]</span><span class="token punctuation">,</span> handler<span class="token operator">:</span> ActionHandler<span class="token punctuation">[</span>M<span class="token punctuation">,</span> PotMap<span class="token punctuation">[</span>K<span class="token punctuation">,</span> V<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span> updateEffect<span class="token operator">:</span> Effect<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span> <span class="token punctuation">{</span>
+    <span class="token keyword">import</span> PotState<span class="token punctuation">.</span>_
+    <span class="token keyword">import</span> handler<span class="token punctuation">.</span>_
+    <span class="token comment" spellcheck="true">// updates/adds only those values whose key is in the `keys` set</span>
+    <span class="token keyword">def</span> updateInCollection<span class="token punctuation">(</span>f<span class="token operator">:</span> Pot<span class="token punctuation">[</span>V<span class="token punctuation">]</span> <span class="token keyword">=&gt;</span> Pot<span class="token punctuation">[</span>V<span class="token punctuation">]</span><span class="token punctuation">,</span> default<span class="token operator">:</span> Pot<span class="token punctuation">[</span>V<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">:</span> PotMap<span class="token punctuation">[</span>K<span class="token punctuation">,</span> V<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">{</span>
+      <span class="token comment" spellcheck="true">// update existing values</span>
+      value<span class="token punctuation">.</span>map <span class="token punctuation">{</span> <span class="token punctuation">(</span>k<span class="token punctuation">,</span> v<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>keys<span class="token punctuation">.</span>contains<span class="token punctuation">(</span>k<span class="token punctuation">)</span><span class="token punctuation">)</span>
+          f<span class="token punctuation">(</span>v<span class="token punctuation">)</span>
+        <span class="token keyword">else</span>
+          v
+      <span class="token punctuation">}</span> <span class="token operator">++</span> <span class="token punctuation">(</span>keys <span class="token operator">--</span> value<span class="token punctuation">.</span>keySet<span class="token punctuation">)</span><span class="token punctuation">.</span>map<span class="token punctuation">(</span>k <span class="token keyword">=&gt;</span> k <span class="token operator">-</span><span class="token operator">&gt;</span> default<span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// add new ones</span>
+    <span class="token punctuation">}</span>
+    action<span class="token punctuation">.</span>state <span class="token keyword">match</span> <span class="token punctuation">{</span>
+      <span class="token keyword">case</span> PotEmpty <span class="token keyword">=&gt;</span>
+        updated<span class="token punctuation">(</span>updateInCollection<span class="token punctuation">(</span>_<span class="token punctuation">.</span>pending<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> Pending<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> updateEffect<span class="token punctuation">)</span>
+      <span class="token keyword">case</span> PotPending <span class="token keyword">=&gt;</span>
+        noChange
+      <span class="token keyword">case</span> PotUnavailable <span class="token keyword">=&gt;</span>
+        noChange
+      <span class="token keyword">case</span> PotReady <span class="token keyword">=&gt;</span>
+        updated<span class="token punctuation">(</span>value<span class="token punctuation">.</span>updated<span class="token punctuation">(</span>action<span class="token punctuation">.</span>result<span class="token punctuation">.</span>get<span class="token punctuation">)</span><span class="token punctuation">)</span>
+      <span class="token keyword">case</span> PotFailed <span class="token keyword">=&gt;</span>
+        <span class="token keyword">val</span> ex <span class="token operator">=</span> action<span class="token punctuation">.</span>result<span class="token punctuation">.</span>failed<span class="token punctuation">.</span>get
+        updated<span class="token punctuation">(</span>updateInCollection<span class="token punctuation">(</span>_<span class="token punctuation">.</span>fail<span class="token punctuation">(</span>ex<span class="token punctuation">)</span><span class="token punctuation">,</span> Failed<span class="token punctuation">(</span>ex<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>It works quite similarly to the regular <code>AsyncAction.handler</code> but instead of updating the whole collection, only a subset of values in the collection are
+updated, based on the set of given <code>keys</code>. The <code>updateEffect</code> must update values for all the <code>keys</code>, otherwise some of them will be left in <code>Pending</code> state.
+It&apos;s ok to have multiple simultaneous updates running for the same <code>PotCollection</code> but you should make sure they do not use overlapping key sets.</p>
+<p>An example fetch implementation could be like following:</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> User<span class="token punctuation">(</span>id<span class="token operator">:</span><span class="token builtin">String</span><span class="token punctuation">,</span> name<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">)</span>
+
+<span class="token comment" spellcheck="true">// define a AsyncAction for updating users</span>
+<span class="token keyword">case</span> <span class="token keyword">class</span> UpdateUsers<span class="token punctuation">(</span>
+  keys<span class="token operator">:</span> Set<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  state<span class="token operator">:</span> PotState <span class="token operator">=</span> PotState<span class="token punctuation">.</span>PotEmpty<span class="token punctuation">,</span>
+  result<span class="token operator">:</span> Try<span class="token punctuation">[</span>Map<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">,</span> Pot<span class="token punctuation">[</span>User<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token operator">=</span> Failure<span class="token punctuation">(</span><span class="token keyword">new</span> AsyncAction<span class="token punctuation">.</span>PendingException<span class="token punctuation">)</span>
+<span class="token punctuation">)</span> <span class="token keyword">extends</span> AsyncAction<span class="token punctuation">[</span>Map<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">,</span> Pot<span class="token punctuation">[</span>User<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">,</span> UpdateUsers<span class="token punctuation">]</span> <span class="token punctuation">{</span>
+  <span class="token keyword">def</span> next<span class="token punctuation">(</span>newState<span class="token operator">:</span> PotState<span class="token punctuation">,</span> newValue<span class="token operator">:</span> Try<span class="token punctuation">[</span>Map<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">,</span> Pot<span class="token punctuation">[</span>User<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">=</span>
+    UpdateUsers<span class="token punctuation">(</span>keys<span class="token punctuation">,</span> newState<span class="token punctuation">,</span> newValue<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">// an implementation of Fetch for users</span>
+<span class="token keyword">class</span> UserFetch<span class="token punctuation">(</span>dispatch<span class="token operator">:</span> Dispatcher<span class="token punctuation">)</span> <span class="token keyword">extends</span> Fetch<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span> <span class="token punctuation">{</span>
+  <span class="token keyword">override</span> <span class="token keyword">def</span> fetch<span class="token punctuation">(</span>key<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token builtin">Unit</span> <span class="token operator">=</span>
+    dispatch<span class="token punctuation">(</span>UpdateUsers<span class="token punctuation">(</span>keys <span class="token operator">=</span> Set<span class="token punctuation">(</span>key<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token keyword">override</span> <span class="token keyword">def</span> fetch<span class="token punctuation">(</span>keys<span class="token operator">:</span> Traversable<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">:</span> <span class="token builtin">Unit</span> <span class="token operator">=</span>
+    dispatch<span class="token punctuation">(</span>UpdateUsers<span class="token punctuation">(</span>keys <span class="token operator">=</span> Set<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">++</span> keys<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment" spellcheck="true">// function to load a set of users based on keys</span>
+<span class="token keyword">def</span> loadUsers<span class="token punctuation">(</span>keys<span class="token operator">:</span> Set<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token operator">:</span> Future<span class="token punctuation">[</span>Map<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">,</span> Pot<span class="token punctuation">[</span>User<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">]</span>
+
+<span class="token comment" spellcheck="true">// handle the action</span>
+<span class="token keyword">override</span> <span class="token keyword">def</span> handle <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token keyword">case</span> action<span class="token operator">:</span> UpdateUsers <span class="token keyword">=&gt;</span>
+    <span class="token keyword">val</span> updateEffect <span class="token operator">=</span> action<span class="token punctuation">.</span>effect<span class="token punctuation">(</span>loadUsers<span class="token punctuation">(</span>action<span class="token punctuation">.</span>keys<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">(</span>identity<span class="token punctuation">)</span>
+    action<span class="token punctuation">.</span>handleWith<span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> updateEffect<span class="token punctuation">)</span><span class="token punctuation">(</span>AsyncAction<span class="token punctuation">.</span>mapHandler<span class="token punctuation">(</span>action<span class="token punctuation">.</span>keys<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<h2 id="pot-streams">Pot Streams</h2>
+<p>Similar to <code>PotCollection</code> but with a slightly different API, Diode provides a <code>PotStream</code> for handling streaming data. Its use cases include things like chat
+room messages, monitoring events or infinite scrollers. Unlike <code>PotMap</code> or <code>PotVector</code> that allow more or less random access to the remote data, a <code>PotStream</code>
+always consists of consecutive entries with unique identifiers. The values stored in a <code>PotStream</code> are not automatically <code>Pot[V]</code>s but direct values because
+<code>PotStream</code> does not allow access to entries that are not currently present. You may of course choose to store <code>Pot[V]</code> if you wish to do so.</p>
+<p>Each value in <code>PotStream</code> is wrapped in a <code>StreamValue</code> case class that provides indices to previous and next entries in the stream.</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> StreamValue<span class="token punctuation">[</span>K<span class="token punctuation">,</span> V<span class="token punctuation">]</span><span class="token punctuation">(</span>key<span class="token operator">:</span> K<span class="token punctuation">,</span> value<span class="token operator">:</span> Pot<span class="token punctuation">[</span>V<span class="token punctuation">]</span><span class="token punctuation">,</span> stream<span class="token operator">:</span> PotStream<span class="token punctuation">[</span>K<span class="token punctuation">,</span> V<span class="token punctuation">]</span><span class="token punctuation">,</span> prevKey<span class="token operator">:</span> Option<span class="token punctuation">[</span>K<span class="token punctuation">]</span><span class="token punctuation">,</span> nextKey<span class="token operator">:</span> Option<span class="token punctuation">[</span>K<span class="token punctuation">]</span><span class="token punctuation">)</span>
+</code></pre>
+<p>You can call <code>get(key)</code> to get a reference to a <code>StreamValue</code> that you can use to navigate up and down the stream with <code>next</code> and <code>prev</code> methods. If you need
+to iterate over all present entries in the stream, use <code>iterator</code> to get an instance of <code>Iterator[(K, V)]</code></p>
+<p>To update data in a <code>PotStream</code> use <code>update</code> (only for existing entries), <code>append</code> or <code>prepend</code>. In a typical scenario the client is not directly adding
+new data to the stream but is requesting updates from the server, or updates are automatically delivered over WebSocket or so. The client can, however, initiate
+updates by calling <code>refresh</code>, <code>refreshNext</code> or <code>refreshPrev</code> methods.</p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="PotActions.html" class="navigation navigation-prev " aria-label="Previous page: Stateful Actions">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="ActionProcessors.html" class="navigation navigation-next " aria-label="Next page: Action Processors">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Async Virtual Collections","level":"1.3.3","depth":2,"next":{"title":"Action Processors","level":"1.3.4","depth":2,"path":"advanced/ActionProcessors.md","ref":"advanced/ActionProcessors.md","articles":[]},"previous":{"title":"Stateful Actions","level":"1.3.2","depth":2,"path":"advanced/PotActions.md","ref":"advanced/PotActions.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"3.2.x","theme":"default","variables":{"version":"1.1.5","reactVersion":"142"},"plugins":["editlink","prism","-highlight","github"],"pluginsConfig":{"editlink":{"label":"Edit This Page","multilingual":false,"base":"https://github.com/suzaku-io/diode/tree/master/doc"},"github":{"url":"https://github.com/suzaku-io/diode/"},"prism":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"advanced/PotCollection.md","mtime":"2016-01-17T21:44:27.000Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2019-05-11T10:59:36.439Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-editlink/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

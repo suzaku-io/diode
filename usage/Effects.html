@@ -1,0 +1,480 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Async Effects · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.2">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-prism/prism.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="../advanced/" />
+    
+    
+    <link rel="prev" href="Views.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Usage
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="ApplicationModel.html">
+            
+                <a href="ApplicationModel.html">
+            
+                    
+                    Application Model
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="Actions.html">
+            
+                <a href="Actions.html">
+            
+                    
+                    Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.3" data-path="Handlers.html">
+            
+                <a href="Handlers.html">
+            
+                    
+                    Action Handlers
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.4" data-path="Views.html">
+            
+                <a href="Views.html">
+            
+                    
+                    Views
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.2.5" data-path="Effects.html">
+            
+                <a href="Effects.html">
+            
+                    
+                    Async Effects
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="../advanced/">
+            
+                <a href="../advanced/">
+            
+                    
+                    Advanced Topics
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="../advanced/Pot.html">
+            
+                <a href="../advanced/Pot.html">
+            
+                    
+                    Async Model Data
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="../advanced/PotActions.html">
+            
+                <a href="../advanced/PotActions.html">
+            
+                    
+                    Stateful Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="../advanced/PotCollection.html">
+            
+                <a href="../advanced/PotCollection.html">
+            
+                    
+                    Async Virtual Collections
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="../advanced/ActionProcessors.html">
+            
+                <a href="../advanced/ActionProcessors.html">
+            
+                    
+                    Action Processors
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="../UsageWithReact.html">
+            
+                <a href="../UsageWithReact.html">
+            
+                    
+                    Usage with React
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../examples/">
+            
+                <a href="../examples/">
+            
+                    
+                    Examples
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Async Effects</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="async-effects">Async Effects</h1>
+<p><img src="../images/architecture-effect.png" style="float: right; padding: 10px">
+Action handlers in Diode are <em>pure functions</em>, meaning they can just do computation based on the action and the current
+model. Side effects, such as making a request to the server, are not allowed. This restriction is mainly to make testing
+of handlers easier, when they behave in a predictable fashion.</p>
+<p>So how do you then perform async requests in a Diode application? In Redux this is solved by placing the async calls
+into <em>action creators</em>, functions that return actions. While this keeps action handlers pure, it makes the application
+design fragmented. In Diode we follow in the footsteps of Elm by wrapping any side effects into <code>Effect</code>s and returning
+them from the action handler with the updated model.</p>
+<h2 id="what-is-an-effect">What is an Effect?</h2>
+<p>In an Effect we <em>describe</em> a computation instead of directly <em>executing</em> it. It&apos;s quite similar to the <code>IO</code> concept in
+Scalaz/Haskell, containing a function that returns a <code>Future[AnyRef]</code>.</p>
+<p>The action returned by the <code>Future</code> is automatically dispatched by the Circuit. If your effect doesn&apos;t need anything
+dispatched, return a <code>NoAction</code>. The same type checking rules apply to Effects as to normal action dispatching, so the type returned by your effect must have
+a valid <code>ActionType</code> type class implicitly available.</p>
+<h3 id="using-effects">Using Effects</h3>
+<p>To create an effect you need a function that runs something asynchronously, for example performing an Ajax call.</p>
+<pre><code class="lang-scala"><span class="token keyword">import</span> org<span class="token punctuation">.</span>scalajs<span class="token punctuation">.</span>dom<span class="token punctuation">.</span>ext<span class="token punctuation">.</span>Ajax
+
+<span class="token keyword">case</span> <span class="token keyword">class</span> NewMessages<span class="token punctuation">(</span>msgs<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">)</span> <span class="token keyword">extends</span> Action
+
+<span class="token keyword">def</span> loadMessagesEffect<span class="token punctuation">(</span>user<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">)</span> <span class="token operator">=</span> 
+  Effect<span class="token punctuation">(</span>Ajax<span class="token punctuation">.</span>get<span class="token punctuation">(</span>s<span class="token string">&quot;/user/messages?id=$user&quot;</span><span class="token punctuation">)</span><span class="token punctuation">.</span>map<span class="token punctuation">(</span>r <span class="token keyword">=&gt;</span> NewMessages<span class="token punctuation">(</span>r<span class="token punctuation">.</span>responseText<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+<p>Here the <code>loadMessagesEffect</code> doesn&apos;t actually execute the Ajax call immediately, but just provides an effect to do so.
+Once the <code>Ajax</code> future does complete, the result is mapped into a <code>NewMessages</code> action.</p>
+<p>To return the effects alongside the new model, use one of the helper functions provided by <code>ActionHandler</code>.</p>
+<pre><code class="lang-scala"><span class="token keyword">case</span> <span class="token keyword">class</span> Messages<span class="token punctuation">(</span>msgs<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">,</span> loadTime<span class="token operator">:</span> <span class="token builtin">Int</span><span class="token punctuation">)</span>
+
+<span class="token keyword">val</span> messageHandler <span class="token operator">=</span> <span class="token keyword">new</span> ActionHandler<span class="token punctuation">(</span>zoomTo<span class="token punctuation">(</span>_<span class="token punctuation">.</span>messages<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">override</span> <span class="token keyword">def</span> handle <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token keyword">case</span> LoadMessages<span class="token punctuation">(</span>user<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+      updated<span class="token punctuation">(</span>value<span class="token punctuation">.</span>copy<span class="token punctuation">(</span>loadTime <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> loadMessagesEffect<span class="token punctuation">(</span>user<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">case</span> NewMessages<span class="token punctuation">(</span>msgs<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+      updated<span class="token punctuation">(</span>Messages<span class="token punctuation">(</span>msgs<span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>If you have no state change, use <code>effectOnly</code> instead of <code>updated</code>.</p>
+<h3 id="combining-effects">Combining effects</h3>
+<p>If you want to combine multiple effects into one, join them with the <code>&gt;&gt;</code>, <code>&lt;&lt;</code> and <code>+</code> operators.</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> serialAB <span class="token operator">=</span> Effect<span class="token punctuation">(</span>a<span class="token punctuation">)</span> <span class="token operator">&gt;&gt;</span> Effect<span class="token punctuation">(</span>b<span class="token punctuation">)</span>  <span class="token comment" spellcheck="true">// b is run after a completes</span>
+<span class="token keyword">val</span> serialBA <span class="token operator">=</span> Effect<span class="token punctuation">(</span>a<span class="token punctuation">)</span> <span class="token operator">&lt;&lt;</span> Effect<span class="token punctuation">(</span>b<span class="token punctuation">)</span>  <span class="token comment" spellcheck="true">// a is run after b completes</span>
+<span class="token keyword">val</span> parallelAB <span class="token operator">=</span> Effect<span class="token punctuation">(</span>a<span class="token punctuation">)</span> <span class="token operator">+</span> Effect<span class="token punctuation">(</span>b<span class="token punctuation">)</span> <span class="token comment" spellcheck="true">// a and b are run in parallel</span>
+</code></pre>
+<p>For example we might want to get periodic notifications (using <code>after</code>) while the messages are being loaded, to update
+the UI accordingly.</p>
+<pre><code class="lang-scala">    <span class="token keyword">case</span> LoadMessages<span class="token punctuation">(</span>user<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+      updated<span class="token punctuation">(</span>value<span class="token punctuation">.</span>copy<span class="token punctuation">(</span>loadTime <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">,</span> 
+        loadMessagesEffect<span class="token punctuation">(</span>user<span class="token punctuation">)</span> <span class="token operator">+</span> Effect<span class="token punctuation">.</span>action<span class="token punctuation">(</span>StillLoading<span class="token punctuation">)</span><span class="token punctuation">.</span>after<span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">.</span>millis<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">case</span> NewMessages<span class="token punctuation">(</span>msgs<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+      updated<span class="token punctuation">(</span>Messages<span class="token punctuation">(</span>msgs<span class="token punctuation">,</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token keyword">case</span> StillLoading <span class="token keyword">=&gt;</span>
+      <span class="token keyword">if</span><span class="token punctuation">(</span>value<span class="token punctuation">.</span>loadTime <span class="token operator">!=</span> <span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
+        updated<span class="token punctuation">(</span>value<span class="token punctuation">.</span>copy<span class="token punctuation">(</span>loadTime <span class="token operator">=</span> value<span class="token punctuation">.</span>loadTime <span class="token operator">+</span> <span class="token number">500</span><span class="token punctuation">)</span><span class="token punctuation">,</span>  
+          Effect<span class="token punctuation">.</span>action<span class="token punctuation">(</span>StillLoading<span class="token punctuation">)</span><span class="token punctuation">.</span>after<span class="token punctuation">(</span><span class="token number">500</span><span class="token punctuation">.</span>millis<span class="token punctuation">)</span><span class="token punctuation">)</span> 
+      <span class="token keyword">else</span>
+        noChange
+</code></pre>
+<p>Note how we need to update model when handling <code>StillLoading</code> because otherwise no views would be informed about the
+change.</p>
+<p>For a more elaborate multi-state action management, take a look at <a href="../advanced/PotActions.html"><code>PotActions</code></a></p>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="Views.html" class="navigation navigation-prev " aria-label="Previous page: Views">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="../advanced/" class="navigation navigation-next " aria-label="Next page: Advanced Topics">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Async Effects","level":"1.2.5","depth":2,"next":{"title":"Advanced Topics","level":"1.3","depth":1,"path":"advanced/README.md","ref":"advanced/README.md","articles":[{"title":"Async Model Data","level":"1.3.1","depth":2,"path":"advanced/Pot.md","ref":"advanced/Pot.md","articles":[]},{"title":"Stateful Actions","level":"1.3.2","depth":2,"path":"advanced/PotActions.md","ref":"advanced/PotActions.md","articles":[]},{"title":"Async Virtual Collections","level":"1.3.3","depth":2,"path":"advanced/PotCollection.md","ref":"advanced/PotCollection.md","articles":[]},{"title":"Action Processors","level":"1.3.4","depth":2,"path":"advanced/ActionProcessors.md","ref":"advanced/ActionProcessors.md","articles":[]}]},"previous":{"title":"Views","level":"1.2.4","depth":2,"path":"usage/Views.md","ref":"usage/Views.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"3.2.x","theme":"default","variables":{"version":"1.1.5","reactVersion":"142"},"plugins":["editlink","prism","-highlight","github"],"pluginsConfig":{"editlink":{"label":"Edit This Page","multilingual":false,"base":"https://github.com/suzaku-io/diode/tree/master/doc"},"github":{"url":"https://github.com/suzaku-io/diode/"},"prism":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"usage/Effects.md","mtime":"2017-01-28T10:43:30.000Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2019-05-11T10:59:36.439Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-editlink/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+

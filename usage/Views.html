@@ -1,0 +1,508 @@
+
+<!DOCTYPE HTML>
+<html lang="" >
+    <head>
+        <meta charset="UTF-8">
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <title>Views · GitBook</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="description" content="">
+        <meta name="generator" content="GitBook 3.2.2">
+        
+        
+        
+    
+    <link rel="stylesheet" href="../gitbook/style.css">
+
+    
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-prism/prism.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-search/search.css">
+                
+            
+                
+                <link rel="stylesheet" href="../gitbook/gitbook-plugin-fontsettings/website.css">
+                
+            
+        
+
+    
+
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+        
+    
+    
+    <meta name="HandheldFriendly" content="true"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <link rel="apple-touch-icon-precomposed" sizes="152x152" href="../gitbook/images/apple-touch-icon-precomposed-152.png">
+    <link rel="shortcut icon" href="../gitbook/images/favicon.ico" type="image/x-icon">
+
+    
+    <link rel="next" href="Effects.html" />
+    
+    
+    <link rel="prev" href="Handlers.html" />
+    
+
+    </head>
+    <body>
+        
+<div class="book">
+    <div class="book-summary">
+        
+            
+<div id="book-search-input" role="search">
+    <input type="text" placeholder="Type to search" />
+</div>
+
+            
+                <nav role="navigation">
+                
+
+
+<ul class="summary">
+    
+    
+
+    
+
+    
+        
+        
+    
+        <li class="chapter " data-level="1.1" data-path="../">
+            
+                <a href="../">
+            
+                    
+                    Introduction
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2" data-path="./">
+            
+                <a href="./">
+            
+                    
+                    Usage
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.2.1" data-path="ApplicationModel.html">
+            
+                <a href="ApplicationModel.html">
+            
+                    
+                    Application Model
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.2" data-path="Actions.html">
+            
+                <a href="Actions.html">
+            
+                    
+                    Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.3" data-path="Handlers.html">
+            
+                <a href="Handlers.html">
+            
+                    
+                    Action Handlers
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter active" data-level="1.2.4" data-path="Views.html">
+            
+                <a href="Views.html">
+            
+                    
+                    Views
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.2.5" data-path="Effects.html">
+            
+                <a href="Effects.html">
+            
+                    
+                    Async Effects
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3" data-path="../advanced/">
+            
+                <a href="../advanced/">
+            
+                    
+                    Advanced Topics
+            
+                </a>
+            
+
+            
+            <ul class="articles">
+                
+    
+        <li class="chapter " data-level="1.3.1" data-path="../advanced/Pot.html">
+            
+                <a href="../advanced/Pot.html">
+            
+                    
+                    Async Model Data
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.2" data-path="../advanced/PotActions.html">
+            
+                <a href="../advanced/PotActions.html">
+            
+                    
+                    Stateful Actions
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.3" data-path="../advanced/PotCollection.html">
+            
+                <a href="../advanced/PotCollection.html">
+            
+                    
+                    Async Virtual Collections
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.3.4" data-path="../advanced/ActionProcessors.html">
+            
+                <a href="../advanced/ActionProcessors.html">
+            
+                    
+                    Action Processors
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+            </ul>
+            
+        </li>
+    
+        <li class="chapter " data-level="1.4" data-path="../UsageWithReact.html">
+            
+                <a href="../UsageWithReact.html">
+            
+                    
+                    Usage with React
+            
+                </a>
+            
+
+            
+        </li>
+    
+        <li class="chapter " data-level="1.5" data-path="../examples/">
+            
+                <a href="../examples/">
+            
+                    
+                    Examples
+            
+                </a>
+            
+
+            
+        </li>
+    
+
+    
+
+    <li class="divider"></li>
+
+    <li>
+        <a href="https://www.gitbook.com" target="blank" class="gitbook-link">
+            Published with GitBook
+        </a>
+    </li>
+</ul>
+
+
+                </nav>
+            
+        
+    </div>
+
+    <div class="book-body">
+        
+            <div class="body-inner">
+                
+                    
+
+<div class="book-header" role="navigation">
+    
+
+    <!-- Title -->
+    <h1>
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <a href=".." >Views</a>
+    </h1>
+</div>
+
+
+
+
+                    <div class="page-wrapper" tabindex="-1" role="main">
+                        <div class="page-inner">
+                            
+<div id="book-search-results">
+    <div class="search-noresults">
+    
+                                <section class="normal markdown-section">
+                                
+                                <h1 id="views">Views</h1>
+<p><img src="../images/architecture-view.png" style="float: right; padding: 10px"></p>
+<p>In Diode a <em>view</em> is a component that renders data from a model and reacts to model updates. It doesn&apos;t necessarily have
+to be a visual component (although it typically is); you could also make one to automatically store changed model data
+into local storage.</p>
+<h2 id="building-a-view">Building a View</h2>
+<p>A simple view needs only a <em>reader</em> to access model data, and a <em>dispatcher</em> to dispatch actions.</p>
+<pre><code class="lang-scala"><span class="token keyword">class</span> CounterView<span class="token punctuation">(</span>counter<span class="token operator">:</span> ModelRO<span class="token punctuation">[</span><span class="token builtin">Int</span><span class="token punctuation">]</span><span class="token punctuation">,</span> dispatch<span class="token operator">:</span> Dispatcher<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">def</span> render <span class="token operator">=</span> <span class="token punctuation">{</span>
+    div<span class="token punctuation">(</span>
+      h3<span class="token punctuation">(</span><span class="token string">&quot;Counter&quot;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      p<span class="token punctuation">(</span><span class="token string">&quot;Value = &quot;</span><span class="token punctuation">,</span> b<span class="token punctuation">(</span>counter<span class="token punctuation">.</span>value<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      button<span class="token punctuation">(</span>onclick <span class="token operator">:</span><span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">=&gt;</span> dispatch<span class="token punctuation">(</span>Increase<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">&quot;Increase&quot;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      button<span class="token punctuation">(</span>onclick <span class="token operator">:</span><span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">=&gt;</span> dispatch<span class="token punctuation">(</span>Decrease<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">&quot;Decrease&quot;</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+      button<span class="token punctuation">(</span>onclick <span class="token operator">:</span><span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">=&gt;</span> dispatch<span class="token punctuation">(</span>Reset<span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token string">&quot;Reset&quot;</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>Using a <code>ModelR</code> instead of the actual value means we don&apos;t have to recreate the view every time the model is updated.
+We can create the view once in the beginning and use it forever.</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> counter <span class="token operator">=</span> <span class="token keyword">new</span> CounterView<span class="token punctuation">(</span>AppCircuit<span class="token punctuation">.</span>zoom<span class="token punctuation">(</span>_<span class="token punctuation">.</span>counter<span class="token punctuation">)</span><span class="token punctuation">,</span> AppCircuit<span class="token punctuation">)</span>
+</code></pre>
+<p>For our directory tree we need a more complex view that supports the recursive nature of the data.</p>
+<pre><code class="lang-scala"><span class="token keyword">class</span> TreeView<span class="token punctuation">(</span>root<span class="token operator">:</span> ModelRO<span class="token punctuation">[</span>FileNode<span class="token punctuation">]</span><span class="token punctuation">,</span> parent<span class="token operator">:</span> Seq<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span><span class="token punctuation">,</span> 
+               selection<span class="token operator">:</span> Seq<span class="token punctuation">[</span><span class="token builtin">String</span><span class="token punctuation">]</span><span class="token punctuation">,</span> dispatcher<span class="token operator">:</span> Dispatcher<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">val</span> id <span class="token operator">=</span> root<span class="token punctuation">.</span>value<span class="token punctuation">.</span>id
+  <span class="token keyword">val</span> path <span class="token operator">=</span> parent <span class="token operator">:</span><span class="token operator">+</span> id
+  <span class="token keyword">val</span> childSeq <span class="token operator">=</span> build
+
+  <span class="token comment" spellcheck="true">// recursively build the tree view</span>
+  <span class="token keyword">def</span> build <span class="token operator">=</span> <span class="token punctuation">{</span>
+    root<span class="token punctuation">.</span>value<span class="token punctuation">.</span>children<span class="token punctuation">.</span>zipWithIndex<span class="token punctuation">.</span>map <span class="token punctuation">{</span> <span class="token keyword">case</span> <span class="token punctuation">(</span>c<span class="token punctuation">,</span> idx<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+      <span class="token keyword">new</span> TreeView<span class="token punctuation">(</span>root<span class="token punctuation">.</span>zoom<span class="token punctuation">(</span>_<span class="token punctuation">.</span>children<span class="token punctuation">(</span>idx<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">,</span> path<span class="token punctuation">,</span> selection<span class="token punctuation">,</span> dispatcher<span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+</code></pre>
+<p>When creating a <code>TreeView</code>, it recursively creates a hierarchy of <code>TreeView</code> components in the <code>build</code> method. Each view
+gets its own reader and an updated path to indicate its relative position in the tree.</p>
+<pre><code class="lang-scala">  <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+  <span class="token keyword">def</span> render<span class="token operator">:</span> Frag <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token keyword">val</span> isSelected <span class="token operator">=</span> <span class="token keyword">if</span><span class="token punctuation">(</span>selection<span class="token punctuation">.</span>nonEmpty <span class="token operator">&amp;&amp;</span> selection<span class="token punctuation">.</span>last <span class="token operator">==</span> id<span class="token punctuation">)</span> <span class="token string">&quot;active&quot;</span> <span class="token keyword">else</span> <span class="token string">&quot;&quot;</span>
+
+    <span class="token keyword">def</span> renderName<span class="token punctuation">(</span>name<span class="token operator">:</span> <span class="token builtin">String</span><span class="token punctuation">)</span> <span class="token operator">=</span>
+      a<span class="token punctuation">(</span>href <span class="token operator">:</span><span class="token operator">=</span> <span class="token string">&quot;#&quot;</span><span class="token punctuation">,</span> cls <span class="token operator">:</span><span class="token operator">=</span> isSelected<span class="token punctuation">,</span> onclick <span class="token operator">:</span><span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">=&gt;</span> dispatcher<span class="token punctuation">(</span>Select<span class="token punctuation">(</span>path<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token punctuation">,</span> name<span class="token punctuation">)</span>
+
+    root<span class="token punctuation">.</span>value <span class="token keyword">match</span> <span class="token punctuation">{</span>
+      <span class="token keyword">case</span> Directory<span class="token punctuation">(</span>id<span class="token punctuation">,</span> name<span class="token punctuation">,</span> children<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+        li<span class="token punctuation">(</span>cls <span class="token operator">:</span><span class="token operator">=</span> s<span class="token string">&quot;directory&quot;</span><span class="token punctuation">,</span> renderName<span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">,</span>
+          ul<span class="token punctuation">(</span>childSeq<span class="token punctuation">.</span>map<span class="token punctuation">(</span>_<span class="token punctuation">.</span>render<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        <span class="token punctuation">)</span>
+      <span class="token keyword">case</span> File<span class="token punctuation">(</span>id<span class="token punctuation">,</span> name<span class="token punctuation">)</span> <span class="token keyword">=&gt;</span>
+        li<span class="token punctuation">(</span>cls <span class="token operator">:</span><span class="token operator">=</span> s<span class="token string">&quot;file&quot;</span><span class="token punctuation">,</span> renderName<span class="token punctuation">(</span>name<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>In the render method the name of the node is rendered as a clickable element that dispatches a <code>Select</code> action when
+clicked. Currently selected node is highlighted. If the node is a directory, its children are recursively rendered.</p>
+<h2 id="listening-to-changes">Listening to Changes</h2>
+<p>Views should update when the model changes. To get notified, subscribe to changes using
+<code>Circuit.subscribe(cursor)(listener)</code>. The call returns an unsubscribing function you can later call to stop receiving
+notifications.</p>
+<pre><code class="lang-scala"><span class="token keyword">val</span> root <span class="token operator">=</span> dom<span class="token punctuation">.</span>document<span class="token punctuation">.</span>getElementById<span class="token punctuation">(</span><span class="token string">&quot;root&quot;</span><span class="token punctuation">)</span>
+<span class="token keyword">val</span> unsubscribe <span class="token operator">=</span> AppCircuit<span class="token punctuation">.</span>subscribe<span class="token punctuation">(</span>AppCircuit<span class="token punctuation">.</span>zoom<span class="token punctuation">(</span>_<span class="token punctuation">.</span>tree<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">(</span>tree <span class="token keyword">=&gt;</span> render<span class="token punctuation">(</span>root<span class="token punctuation">,</span> tree<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> render<span class="token punctuation">(</span>root<span class="token operator">:</span> dom<span class="token punctuation">.</span>Element<span class="token punctuation">,</span> tree<span class="token operator">:</span> ModelRO<span class="token punctuation">[</span>Tree<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> <span class="token punctuation">}</span>
+</code></pre>
+<p>Listeners are called when the model pointed by the cursor changes, even if it would have no effect in the part of the
+model your view is interested in. Therefore it makes sense to check if a real change has happened, before doing
+expensive re-computations.</p>
+<pre><code class="lang-scala"><span class="token comment" spellcheck="true">// rebuild the tree view if the model has changed</span>
+<span class="token keyword">val</span> dirRoot<span class="token operator">:</span> ModelRO<span class="token punctuation">[</span>FileNode<span class="token punctuation">]</span> <span class="token operator">=</span> tree<span class="token punctuation">.</span>zoom<span class="token punctuation">(</span>_<span class="token punctuation">.</span>root<span class="token punctuation">)</span>
+<span class="token keyword">if</span> <span class="token punctuation">(</span>dirRoot <span class="token operator">=</span><span class="token operator">!=</span> currentModel<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  currentModel <span class="token operator">=</span> dirRoot<span class="token punctuation">.</span>value
+  treeView <span class="token operator">=</span> <span class="token keyword">new</span> TreeView<span class="token punctuation">(</span>dirRoot<span class="token punctuation">,</span> Seq<span class="token punctuation">.</span>empty<span class="token punctuation">,</span> tree<span class="token punctuation">.</span>zoom<span class="token punctuation">(</span>_<span class="token punctuation">.</span>selected<span class="token punctuation">)</span><span class="token punctuation">,</span> AppCircuit<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+</code></pre>
+<p>If only <code>selected</code> is changed, we don&apos;t need to rebuild the tree as its structure has stayed the same. We do, however,
+need to re-render the tree to reflect this change.</p>
+<p>Quite often you need to listen to changes in a component that doesn&apos;t need to know about the application model or its Circuit.
+In these cases you can use currying to pass a function that already contains the cursor to your model. To make this more convenient,
+Diode defines a <code>Subscriber[A]</code> type which is an alias for <code>(ModelRO[A] =&gt; Unit) =&gt; () =&gt; Unit</code>. For example:</p>
+<pre><code class="lang-scala"><span class="token keyword">class</span> MyComponent<span class="token punctuation">(</span>subscriber<span class="token operator">:</span> Subscriber<span class="token punctuation">[</span>Tree<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">val</span> unsubscribe <span class="token operator">=</span> subscriber<span class="token punctuation">(</span>myListener<span class="token punctuation">)</span> 
+  <span class="token keyword">def</span> myListener<span class="token punctuation">(</span>tree<span class="token operator">:</span> ModelRO<span class="token punctuation">[</span>Tree<span class="token punctuation">]</span><span class="token punctuation">)</span> <span class="token operator">=</span> <span class="token punctuation">{</span> <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span> <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+
+<span class="token keyword">val</span> component <span class="token operator">=</span> <span class="token keyword">new</span> MyComponent<span class="token punctuation">(</span>AppCircuit<span class="token punctuation">.</span>subscribe<span class="token punctuation">(</span>AppCircuit<span class="token punctuation">.</span>zoom<span class="token punctuation">(</span>_<span class="token punctuation">.</span>tree<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+</code></pre>
+
+                                
+                                </section>
+                            
+    </div>
+    <div class="search-results">
+        <div class="has-results">
+            
+            <h1 class="search-results-title"><span class='search-results-count'></span> results matching "<span class='search-query'></span>"</h1>
+            <ul class="search-results-list"></ul>
+            
+        </div>
+        <div class="no-results">
+            
+            <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+            
+        </div>
+    </div>
+</div>
+
+                        </div>
+                    </div>
+                
+            </div>
+
+            
+                
+                <a href="Handlers.html" class="navigation navigation-prev " aria-label="Previous page: Action Handlers">
+                    <i class="fa fa-angle-left"></i>
+                </a>
+                
+                
+                <a href="Effects.html" class="navigation navigation-next " aria-label="Next page: Async Effects">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+                
+            
+        
+    </div>
+
+    <script>
+        var gitbook = gitbook || [];
+        gitbook.push(function() {
+            gitbook.page.hasChanged({"page":{"title":"Views","level":"1.2.4","depth":2,"next":{"title":"Async Effects","level":"1.2.5","depth":2,"path":"usage/Effects.md","ref":"usage/Effects.md","articles":[]},"previous":{"title":"Action Handlers","level":"1.2.3","depth":2,"path":"usage/Handlers.md","ref":"usage/Handlers.md","articles":[]},"dir":"ltr"},"config":{"gitbook":"3.2.x","theme":"default","variables":{"version":"1.1.5","reactVersion":"142"},"plugins":["editlink","prism","-highlight","github"],"pluginsConfig":{"editlink":{"label":"Edit This Page","multilingual":false,"base":"https://github.com/suzaku-io/diode/tree/master/doc"},"github":{"url":"https://github.com/suzaku-io/diode/"},"prism":{},"search":{},"lunr":{"maxIndexSize":1000000,"ignoreSpecialCharacters":false},"sharing":{"facebook":true,"twitter":true,"google":false,"weibo":false,"instapaper":false,"vk":false,"all":["facebook","google","twitter","weibo","instapaper"]},"fontsettings":{"theme":"white","family":"sans","size":2},"theme-default":{"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"},"showLevel":false}},"structure":{"langs":"LANGS.md","readme":"README.md","glossary":"GLOSSARY.md","summary":"SUMMARY.md"},"pdf":{"pageNumbers":true,"fontSize":12,"fontFamily":"Arial","paperSize":"a4","chapterMark":"pagebreak","pageBreaksBefore":"/","margin":{"right":62,"left":62,"top":56,"bottom":56}},"styles":{"website":"styles/website.css","pdf":"styles/pdf.css","epub":"styles/epub.css","mobi":"styles/mobi.css","ebook":"styles/ebook.css","print":"styles/print.css"}},"file":{"path":"usage/Views.md","mtime":"2017-01-25T22:29:33.000Z","type":"markdown"},"gitbook":{"version":"3.2.2","time":"2019-05-11T10:59:36.439Z"},"basePath":"..","book":{"language":""}});
+        });
+    </script>
+</div>
+
+        
+    <script src="../gitbook/gitbook.js"></script>
+    <script src="../gitbook/theme.js"></script>
+    
+        
+        <script src="../gitbook/gitbook-plugin-editlink/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-github/plugin.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search-engine.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-search/search.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/lunr.min.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-lunr/search-lunr.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-sharing/buttons.js"></script>
+        
+    
+        
+        <script src="../gitbook/gitbook-plugin-fontsettings/fontsettings.js"></script>
+        
+    
+
+    </body>
+</html>
+
