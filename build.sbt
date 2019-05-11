@@ -4,13 +4,13 @@ import com.typesafe.sbt.pgp.PgpKeys._
 // shadow sbt-scalajs' crossProject and CrossType from Scala.js 0.6.x
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
-crossScalaVersions := Seq("2.11.12", "2.12.8")
 
 ThisBuild / scalafmtOnCompile := true
 
 val commonSettings = Seq(
   organization := "io.suzaku",
   version := Version.library,
+  crossScalaVersions := Seq("2.11.12", "2.12.8"),
   scalaVersion := "2.12.8",
   scalacOptions := Seq(
     "-deprecation",
