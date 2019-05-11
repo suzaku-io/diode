@@ -24,13 +24,13 @@ Full documentation [available here](https://diode.suzaku.io).
 Add following dependency declaration to your Scala project.
 
 ```scala
-"io.suzaku" %% "diode" % "1.1.4"
+"io.suzaku" %% "diode" % "1.1.5"
 ```
 
 In a Scala.js project the dependency looks like this.
 
 ```scala
-"io.suzaku" %%% "diode" % "1.1.4"
+"io.suzaku" %%% "diode" % "1.1.5"
 ```
 
 <img align="right" src="doc/images/architecture.png">

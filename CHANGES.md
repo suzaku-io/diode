@@ -1,5 +1,9 @@
 # Changes
 
+## 1.1.5
+- Upgrade to Scala 2.12.8 and Scala.js 0.6.27
+- Update diode-react to scalajs-react 1.4.2
+
 ## 1.1.4
 - Upgrade to Scala 2.12.6 and Scala.js 0.6.22
 - Update diode-react to scalajs-react 1.3.1
@@ -162,4 +166,3 @@ Another change was the addition of an optional `key` to the component created in
 
 ## 0.1.0
 - Initial version.
-

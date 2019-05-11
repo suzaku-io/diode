@@ -35,7 +35,7 @@ val commonSettings = Seq(
   Compile / doc / scalacOptions -= "-Xfatal-warnings",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %%% "utest" % "0.6.6" % "test"
+    "com.lihaoyi" %%% "utest" % "0.6.7" % "test"
   )
 )
 
@@ -155,7 +155,7 @@ lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
   )
   .jsSettings(
     libraryDependencies ++= Seq(
-      "org.scala-js" %%% "scalajs-dom" % "0.9.6"
+      "org.scala-js" %%% "scalajs-dom" % "0.9.7"
     ),
     scalacOptions ++= sourceMapSetting.value
   )
