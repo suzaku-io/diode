@@ -43,7 +43,8 @@ object PotCollectionTests extends TestSuite {
             assert(fetcher.lastFetch == "test2")
           }
           .flatMap { _ =>
-            assert(m1.get(Seq("test1", "test2", "test3")).values.map(_.state) == Seq(PotReady, PotPending, PotPending))
+            val x = m1.get(Seq("test1", "test2", "test3")).values.map(_.state).toSeq
+            assert(x == Seq(PotReady, PotPending, PotPending))
             runAfterImpl.runAfter(10) {
               assert(fetcher.lastFetch == Seq("test3", "test2"))
             }

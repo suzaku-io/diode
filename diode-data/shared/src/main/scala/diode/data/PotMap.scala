@@ -69,18 +69,19 @@ class PotMap[K, V](
 
   def get(keys: Traversable[K]): Map[K, Pot[V]] = {
     var toFetch = List.empty[K]
-    val values: Map[K, Pot[V]] = keys.map { key =>
-      elems.get(key) match {
-        case Some(elem) if elem.state == PotState.PotEmpty =>
-          toFetch ::= key
-          (key, Pending().asInstanceOf[Pot[V]])
-        case Some(elem) =>
-          (key, elem)
-        case None =>
-          toFetch ::= key
-          (key, Pending().asInstanceOf[Pot[V]])
-      }
-    }(collection.breakOut)
+    val values: Map[K, Pot[V]] =
+      keys.map { key =>
+        elems.get(key) match {
+          case Some(elem) if elem.state == PotState.PotEmpty =>
+            toFetch ::= key
+            (key, Pending().asInstanceOf[Pot[V]])
+          case Some(elem) =>
+            (key, elem)
+          case None =>
+            toFetch ::= key
+            (key, Pending().asInstanceOf[Pot[V]])
+        }
+      }.toMap
 
     if (toFetch.nonEmpty) {
       refresh(toFetch)
