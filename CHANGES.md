@@ -1,5 +1,11 @@
 # Changes
 
+## 1.1.6
+- Cross-Build for Scala 2.12.8 (all projects) and 2.13.0 (for 'core' and 'data' projects only)
+- Drops support for Scala 2.11.x because dependencies no longer support it.
+- Some small impl changes to support 2.13.0 
+- Bump dependencies to versions that support 2.13.0
+
 ## 1.1.5
 - Upgrade to Scala 2.12.8 and Scala.js 0.6.27
 - Update diode-react to scalajs-react 1.4.2
