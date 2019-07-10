@@ -175,7 +175,10 @@ lazy val diodeReact = project
   .enablePlugins(ScalaJSPlugin)
 
 lazy val root = preventPublication(project.in(file(".")))
-  .settings(commonSettings: _*)
+  .settings(
+    commonSettings,
+    crossScalaVersions := Nil,
+  )
   .aggregate(
     diodeJS,
     diodeJVM,
