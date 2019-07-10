@@ -180,7 +180,6 @@ lazy val diodeReact = project
 lazy val root = preventPublication(project.in(file(".")))
   .settings(
     commonSettings
-//    crossScalaVersions := Nil,
   )
   .aggregate(
     diodeJS,
