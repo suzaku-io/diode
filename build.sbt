@@ -10,7 +10,7 @@ val commonSettings = Seq(
   organization := "io.suzaku",
   version := Version.library,
   crossScalaVersions := Seq("2.12.8"),
-  scalaVersion := "2.12.8",
+  scalaVersion in ThisBuild := "2.12.8",
   scalacOptions := Seq(
     "-deprecation",
     "-encoding",
@@ -19,10 +19,11 @@ val commonSettings = Seq(
     "-unchecked",
     "-language:experimental.macros",
     "-language:existentials",
+    "-Xfatal-warnings",
     "-Xlint",
     "-Ywarn-dead-code",
     "-Ywarn-numeric-widen",
-    "-Ywarn-value-discard",
+    "-Ywarn-value-discard"
   ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
     case Some((2, 12)) => Seq("-Xlint:-unused")
     case _             => Nil
@@ -31,9 +32,9 @@ val commonSettings = Seq(
   Compile / doc / scalacOptions -= "-Xfatal-warnings",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %%% "utest" % "0.7.1" % "test",
+    "com.lihaoyi"            %%% "utest"                  % "0.7.1" % "test",
     "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.1"
-  ),
+  )
 )
 
 val publishSettings = Seq(
@@ -119,9 +120,7 @@ lazy val diodeData = crossProject(JSPlatform, JVMPlatform)
   .in(file("diode-data"))
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
-  .settings(
-    name := "diode-data",
-    crossScalaVersions += "2.13.0")
+  .settings(name := "diode-data", crossScalaVersions += "2.13.0")
   .jsSettings(scalacOptions ++= sourceMapSetting.value)
   .jvmSettings()
   .dependsOn(diodeCore)
@@ -135,7 +134,11 @@ lazy val diode = crossProject(JSPlatform, JVMPlatform)
   .in(file("diode"))
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
-  .settings(name := "diode")
+  .settings(
+    name := "diode",
+    crossScalaVersions += "2.13.0",
+    test := {}
+  )
   .dependsOn(diodeCore, diodeData)
 
 lazy val diodeJS = diode.js
@@ -176,8 +179,8 @@ lazy val diodeReact = project
 
 lazy val root = preventPublication(project.in(file(".")))
   .settings(
-    commonSettings,
-    crossScalaVersions := Nil,
+    commonSettings
+//    crossScalaVersions := Nil,
   )
   .aggregate(
     diodeJS,
