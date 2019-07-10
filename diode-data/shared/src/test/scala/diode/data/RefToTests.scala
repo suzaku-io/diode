@@ -14,16 +14,16 @@ object RefToTests extends TestSuite {
   case class Employee(role: String, user: RefTo[Pot[User]])
 
   class TestFetcher[K] extends Fetch[K] {
-    var lastFetch: Any                             = _
-    override def fetch(key: K): Unit               = lastFetch = key
-    override def fetch(start: K, end: K): Unit     = lastFetch = (start, end)
-    override def fetch(keys: Traversable[K]): Unit = lastFetch = keys
+    var lastFetch: Any                          = _
+    override def fetch(key: K): Unit            = lastFetch = key
+    override def fetch(start: K, end: K): Unit  = lastFetch = (start, end)
+    override def fetch(keys: Iterable[K]): Unit = lastFetch = keys
   }
 
   case class RefAction(s: String) extends Action
 
   def tests = TestSuite {
-    'refToMap - {
+    "refToMap" - {
       val fetcher = new TestFetcher[String]
       val root    = Model(PotMap(fetcher, Map("ceoID" -> Ready(User("Ms. CEO")))), Seq())
       val modelRW = new RootModelRW(root)
@@ -35,7 +35,7 @@ object RefToTests extends TestSuite {
         m.employees.head.user.updated(Ready(User("Ms. Kathy CEO"))) == RefAction(
           "Update ceoID to Ready(User(Ms. Kathy CEO))"))
     }
-    'refToVector - {
+    "refToVector" - {
       val fetcher = new TestFetcher[Int]
       val root    = ModelV(PotVector(fetcher, 5, Vector(Ready(User("Ms. CEO")))), Seq())
       val modelRW = new RootModelRW(root)
@@ -47,7 +47,7 @@ object RefToTests extends TestSuite {
       assert(
         m.employees.head.user.updated(Ready(User("Ms. Kathy CEO"))) == RefAction("Update 0 to Ready(User(Ms. Kathy CEO))"))
     }
-    'refToStream - {
+    "refToStream" - {
       val fetcher = new TestFetcher[String]
       val root    = ModelS(PotStream(fetcher, Seq("ceoID" -> Ready(User("Ms. CEO")))), Seq())
       val modelRW = new RootModelRW(root)

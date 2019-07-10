@@ -12,7 +12,7 @@ object RetryTests extends TestSuite {
   import AnyAction._
 
   def tests = TestSuite {
-    'Immediate - {
+    "Immediate" - {
       val policy = Retry.Immediate(3)
       val effect = (retryPolicy: RetryPolicy) => Effect(Future("42"))
       val r      = policy.retry(new Exception, effect)
@@ -22,7 +22,7 @@ object RetryTests extends TestSuite {
           assert(newEffect == effect)
       }
     }
-    'Backoff - {
+    "Backoff" - {
       val policy = Retry.Backoff(3, 200.millis)
       val effect = (retryPolicy: RetryPolicy) => Effect(Future("42"))
       val r      = policy.retry(new Exception, effect)

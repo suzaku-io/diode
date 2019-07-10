@@ -179,7 +179,7 @@ class PotStream[K, V](
   def map(f: (K, V) => V): PotStream[K, V] =
     new PotStream(fetcher, elems.map { case (k, sv) => k -> sv.copy(value = f(k, sv.value)) }, headKeyOption, lastKeyOption)
 
-  def seq: Traversable[(K, V)] = {
+  def seq: Iterable[(K, V)] = {
     var res = List.empty[(K, V)]
     var key = lastKeyOption
     while (key.isDefined) {

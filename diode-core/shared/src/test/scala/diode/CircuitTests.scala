@@ -62,51 +62,51 @@ object CircuitTests extends TestSuite {
     implicit val ec = ExecutionContext.global
     def circuit     = new AppCircuit
 
-    'Dispatch - {
-      'Action - {
+    "Dispatch" - {
+      "Action" - {
         val c = circuit
         c.dispatch(SetS("New"))
         assert(c.model.s == "New")
       }
-      'NoAction - {
+      "NoAction" - {
         val c = circuit
         c.dispatch(NoAction)
         assert(c.model.s == "Testing")
       }
-      'Unknown - {
+      "Unknown" - {
         val c = circuit
         c.dispatch("Unknown")
         assert(c.model.s == "Testing")
         assert(c.lastError.contains("not handled"))
       }
-      'ActionBatch - {
+      "ActionBatch" - {
         val c = circuit
         c.dispatch(ActionBatch(SetS("First"), SetD(Data(43, false))))
         assert(c.model.s == "First")
         assert(c.model.data.i == 43)
         assert(c.model.data.b == false)
       }
-      'NoHandler - {
+      "NoHandler" - {
         val c = circuit
         case class TestMissing(i: Int)
 
         c.dispatch(TestMissing)
         assert(c.lastError.isEmpty == false)
       }
-      'ErrorInHandler - {
+      "ErrorInHandler" - {
         val c = circuit
         c.dispatch(ThrowAction(new IllegalArgumentException("Oh noes!")))
         assert(c.lastFatal._2.isInstanceOf[IllegalArgumentException])
       }
     }
-    'Zooming - {
-      'read - {
+    "Zooming" - {
+      "read" - {
         val c          = circuit
         val dataReader = c.zoom(_.data)
         assert(dataReader().i == 42)
         assert(dataReader().b == true)
       }
-      'write - {
+      "write" - {
         val c          = circuit
         val dataWriter = c.zoomRW(_.data)((m, v) => m.copy(data = v))
         val m          = dataWriter.updated(Data(43, false))
@@ -114,7 +114,7 @@ object CircuitTests extends TestSuite {
         assert(m.data.i == 43)
         assert(m.data.b == false)
       }
-      'lens - {
+      "lens" - {
         val c          = circuit
         val dataWriter = c.zoomTo(_.data.i)
         val m          = dataWriter.updated(43)
@@ -122,8 +122,8 @@ object CircuitTests extends TestSuite {
         assert(m.data.i == 43)
       }
     }
-    'Listener - {
-      'Normal - {
+    "Listener" - {
+      "Normal" - {
         val c             = circuit
         var state: Model  = null
         var callbackCount = 0
@@ -143,7 +143,7 @@ object CircuitTests extends TestSuite {
         c.dispatch(SetS("Deaf"))
         assert(state.s == "Listen4")
       }
-      'Cursor - {
+      "Cursor" - {
         val c             = circuit
         var state: Model  = null
         var state2: Model = null
@@ -169,7 +169,7 @@ object CircuitTests extends TestSuite {
         assert(state2.data.i == 42)
         assert(callbackCount == 2)
       }
-      'Silent - {
+      "Silent" - {
         val c             = circuit
         var state: Model  = null
         var callbackCount = 0
@@ -184,7 +184,7 @@ object CircuitTests extends TestSuite {
         assert(callbackCount == 0)
         unsubscribe()
       }
-      'NestedSubscribe - {
+      "NestedSubscribe" - {
         val c                        = circuit
         var state1: Model            = null
         var state2: Model            = null
@@ -235,7 +235,7 @@ object CircuitTests extends TestSuite {
         assert(state2.s == "Listen2")
         assert(callback2Count == 2)
       }
-      'NestedUnsubscribe - {
+      "NestedUnsubscribe" - {
         val c                        = circuit
         var state1: Model            = null
         var state2: Model            = null
@@ -289,7 +289,7 @@ object CircuitTests extends TestSuite {
         assert(state2.s == state2Snapshot.s)
         assert(callback2Count == callback2CountSnapshot)
       }
-      'ZippedSubscribe - {
+      "ZippedSubscribe" - {
 
         val c                         = circuit
         var state1: (String, Boolean) = null
@@ -333,8 +333,8 @@ object CircuitTests extends TestSuite {
 
       }
     }
-    'Effects - {
-      'Run - {
+    "Effects" - {
+      "Run" - {
         val c         = circuit
         var effectRun = 0
         val effect    = SetEffect("Effect", () => { effectRun += 1; Future.successful(None) })
@@ -342,7 +342,7 @@ object CircuitTests extends TestSuite {
         assert(c.model.s == "Effect")
         assert(effectRun == 2)
       }
-      'EffectOnly - {
+      "EffectOnly" - {
         val c         = circuit
         var effectRun = 0
         val effect    = SetEffectOnly(() => { effectRun += 1; Future.successful(None) })
@@ -350,8 +350,8 @@ object CircuitTests extends TestSuite {
         assert(effectRun == 1)
       }
     }
-    'Processor - {
-      'ModAction - {
+    "Processor" - {
+      "ModAction" - {
         val c = circuit
         val p = new ActionProcessor[Model] {
           override def process(dispatcher: Dispatcher,
@@ -372,7 +372,7 @@ object CircuitTests extends TestSuite {
         c.dispatch("Test2")
         assert(c.model.s == "Test")
       }
-      'Filter - {
+      "Filter" - {
         val c = circuit
         val p = new ActionProcessor[Model] {
           override def process(dispatcher: Dispatcher,
@@ -390,7 +390,7 @@ object CircuitTests extends TestSuite {
         c.dispatch(SetS("Test"))
         assert(c.model.s == "Testing")
       }
-      'LogState - {
+      "LogState" - {
         val c   = circuit
         var log = "log"
         val p = new ActionProcessor[Model] {
@@ -410,7 +410,7 @@ object CircuitTests extends TestSuite {
         c.dispatch(SetS("Test"))
         assert(log == "logTest")
       }
-      'Delay - {
+      "Delay" - {
         val c = circuit
         class AP extends ActionProcessor[Model] {
           val pending = mutable.Queue.empty[(Any, Dispatcher)]
@@ -440,7 +440,7 @@ object CircuitTests extends TestSuite {
         assert(c.model.s == "Test")
       }
     }
-    'FoldHandler - {
+    "FoldHandler" - {
       val c         = circuit
       val origModel = c.model
       val h1 = new ActionHandler[Model, Int](c.zoomRW(_.data.i)((m, t) => m.copy(data = m.data.copy(i = t)))) {
@@ -460,7 +460,7 @@ object CircuitTests extends TestSuite {
       val res = fh(c.model, SetS("test"))
       assert(res.contains(ModelUpdate(origModel.copy(s = "TestingTESTTEST", data = Data(43, true)))))
     }
-    'NestedDispatch - {
+    "NestedDispatch" - {
       val c = circuit
       // dispatch in a listener
       c.subscribe(c.zoom(_.s))(r => c.dispatch(SetD(Data(3, false))))

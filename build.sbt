@@ -30,7 +30,10 @@ val commonSettings = Seq(
   Compile / scalacOptions -= "-Ywarn-value-discard",
   Compile / doc / scalacOptions -= "-Xfatal-warnings",
   testFrameworks += new TestFramework("utest.runner.Framework"),
-  libraryDependencies ++= Seq("com.lihaoyi" %%% "utest" % "0.7.1" % "test")
+  libraryDependencies ++= Seq(
+    "com.lihaoyi" %%% "utest" % "0.7.1" % "test",
+    "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.1"
+  ),
 )
 
 val publishSettings = Seq(

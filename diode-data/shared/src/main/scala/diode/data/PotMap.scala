@@ -10,10 +10,10 @@ class PotMap[K, V](
   override def updated(key: K, value: Pot[V]): PotMap[K, V] =
     new PotMap(fetcher, elems + (key -> value))
 
-  override def updated(kvs: Traversable[(K, Pot[V])]) =
+  override def updated(kvs: Iterable[(K, Pot[V])]) =
     new PotMap(fetcher, elems ++ kvs)
 
-  override def updated(start: K, values: Traversable[Pot[V]])(implicit num: Numeric[K]): PotMap[K, V] = {
+  override def updated(start: K, values: Iterable[Pot[V]])(implicit num: Numeric[K]): PotMap[K, V] = {
     if (values.isEmpty)
       this
     else {
@@ -24,7 +24,7 @@ class PotMap[K, V](
     }
   }
 
-  override def seq: Traversable[(K, Pot[V])] = elems
+  override def seq: Iterable[(K, Pot[V])] = elems
 
   override def iterator: Iterator[(K, Pot[V])] = elems.iterator
 
@@ -36,7 +36,7 @@ class PotMap[K, V](
     runAfterImpl.runAfter(0)(fetcher.fetch(key))
   }
 
-  override def refresh(keys: Traversable[K]): Unit = {
+  override def refresh(keys: Iterable[K]): Unit = {
     // perform fetch asynchronously
     runAfterImpl.runAfter(0)(fetcher.fetch(keys))
   }
@@ -63,11 +63,11 @@ class PotMap[K, V](
 
   def +(kv: (K, Pot[V])): PotMap[K, V] = updated(kv._1, kv._2)
 
-  def ++(xs: Traversable[(K, Pot[V])]) = updated(xs)
+  def ++(xs: Iterable[(K, Pot[V])]) = updated(xs)
 
   def -(key: K) = remove(key)
 
-  def get(keys: Traversable[K]): Map[K, Pot[V]] = {
+  def get(keys: Iterable[K]): Map[K, Pot[V]] = {
     var toFetch = List.empty[K]
     val values: Map[K, Pot[V]] =
       keys.map { key =>

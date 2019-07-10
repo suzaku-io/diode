@@ -62,16 +62,16 @@ object PotActionTests extends TestSuite {
   val fetcher = new Fetch[String] {
     override def fetch(key: String): Unit                = ()
     override def fetch(start: String, end: String): Unit = ()
-    override def fetch(keys: Traversable[String]): Unit  = ()
+    override def fetch(keys: Iterable[String]): Unit     = ()
   }
 
   def tests = TestSuite {
-    'PotAction - {
-      'CreateEmpty - {
+    "PotAction" - {
+      "CreateEmpty" - {
         val ta = TestAction()
         assert(ta.potResult.isEmpty)
       }
-      'Stages - {
+      "Stages" - {
         val ta = TestAction()
         val p  = ta.pending
         assert(p.potResult.isPending)
@@ -84,17 +84,17 @@ object PotActionTests extends TestSuite {
         assert(r.state == PotReady)
         assert(r.potResult.get == "Ready!")
       }
-      'Effect - {
+      "Effect" - {
         val ta        = TestAction()
         var completed = false
         val eff       = ta.effect(Future { completed = !completed; 42 })(_.toString)
 
         eff.toFuture.map { action =>
           assert(action.potResult == Ready("42"))
-          assert(completed == true)
+          assert(completed)
         }
       }
-      'EffectFail - {
+      "EffectFail" - {
         val ta = TestAction()
         val eff =
           ta.effect(Future { if (true) throw new Exception("Oh no!") else 42 })(_.toString,
@@ -106,12 +106,12 @@ object PotActionTests extends TestSuite {
       }
     }
 
-    'PotActionHandler - {
+    "PotActionHandler" - {
       val model       = Model(Ready("41"))
       val modelRW     = new RootModelRW(model)
       val handler     = new TestHandler(modelRW.zoomRW(_.s)((m, v) => m.copy(s = v)))
       val handlerFail = new TestFailHandler(modelRW.zoomRW(_.s)((m, v) => m.copy(s = v)))
-      'PotEmptyOK - {
+      "PotEmptyOK" - {
         val nextAction = handler.handleAction(model, TestAction()) match {
           case Some(ModelUpdateEffect(newModel, effects)) =>
             assert(newModel.s.isPending)
@@ -127,7 +127,7 @@ object PotActionTests extends TestSuite {
           case _ => assert(false)
         }
       }
-      'PotEmptyFail - {
+      "PotEmptyFail" - {
         val nextAction = handlerFail.handleAction(model, TestAction()) match {
           case Some(ModelUpdateEffect(newModel, effects)) =>
             assert(newModel.s.isPending)
@@ -143,7 +143,7 @@ object PotActionTests extends TestSuite {
           case _ => assert(false)
         }
       }
-      'PotFailed - {
+      "PotFailed" - {
         handler.handleAction(model, TestAction(Failed(new Exception("Oh no!")))) match {
           case Some(ModelUpdate(newModel)) =>
             assert(newModel.s.isFailed)
@@ -151,7 +151,7 @@ object PotActionTests extends TestSuite {
           case _ => assert(false)
         }
       }
-      'PotFailedRetry - {
+      "PotFailedRetry" - {
         val model       = Model(PendingStale("41"))
         val modelRW     = new RootModelRW(model)
         val handlerFail = new TestFailHandler(modelRW.zoomRW(_.s)((m, v) => m.copy(s = v)))
@@ -170,11 +170,11 @@ object PotActionTests extends TestSuite {
         }
       }
     }
-    'CollectionHandler - {
+    "CollectionHandler" - {
       val model   = CollModel(PotMap[String, String](fetcher))
       val modelRW = new RootModelRW(model)
       val handler = new TestCollHandler(modelRW.zoomRW(_.c)((m, v) => m.copy(c = v)), Set("A"))
-      'empty - {
+      "empty" - {
         val nextAction = handler.handleAction(model, TestCollAction()) match {
           case Some(ModelUpdateEffect(newModel, effects)) =>
             assert(newModel.c("A").isPending)
