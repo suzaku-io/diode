@@ -33,7 +33,7 @@ In a Scala.js project the dependency looks like this.
 "io.suzaku" %%% "diode" % "1.1.6"
 ```
 
-Starting with version "1.1.6" diode supports only scala 2.12 and 2.13. If you need 2.11 support use version "1.1.5"
+Starting with version "1.1.6" diode has dropped support for Scala 2.11. If you need 2.11 support use version "1.1.5"
 
 <img align="right" src="doc/images/architecture.png">
 
