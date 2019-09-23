@@ -3,6 +3,7 @@ scala:
 - 2.11.11
 - 2.12.8
 sudo: false
+dist: trusty
 jdk:
 - oraclejdk8
 node_js:
