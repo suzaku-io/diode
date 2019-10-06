@@ -13,7 +13,7 @@ trait Fetch[K] {
   /**
     * Start fetching a set of values
     */
-  def fetch(keys: Traversable[K]): Unit
+  def fetch(keys: Iterable[K]): Unit
 
   /**
     * Start fetching a range of values from `start` to `end`
@@ -41,9 +41,9 @@ trait Fetch[K] {
 trait PotCollection[K, V] {
   def updated(key: K, value: Pot[V]): PotCollection[K, V]
 
-  def updated(start: K, values: Traversable[Pot[V]])(implicit num: Numeric[K]): PotCollection[K, V]
+  def updated(start: K, values: Iterable[Pot[V]])(implicit num: Numeric[K]): PotCollection[K, V]
 
-  def updated(kvs: Traversable[(K, Pot[V])]): PotCollection[K, V]
+  def updated(kvs: Iterable[(K, Pot[V])]): PotCollection[K, V]
 
   def updated(coll: PotCollection[K, V]): PotCollection[K, V] = updated(coll.seq)
 
@@ -53,13 +53,13 @@ trait PotCollection[K, V] {
 
   def get(key: K): Pot[V]
 
-  def seq: Traversable[(K, Pot[V])]
+  def seq: Iterable[(K, Pot[V])]
 
   def iterator: Iterator[(K, Pot[V])]
 
   def refresh(key: K): Unit
 
-  def refresh(keys: Traversable[K]): Unit
+  def refresh(keys: Iterable[K]): Unit
 
   def clear: PotCollection[K, V]
 

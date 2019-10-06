@@ -167,7 +167,7 @@ object AsyncAction {
     * @param keys Set of keys to update.
     * @return The handler function
     */
-  def mapHandler[K, V, A <: Traversable[(K, Pot[V])], M, P <: AsyncAction[A, P]](keys: Set[K]) = {
+  def mapHandler[K, V, A <: Iterable[(K, Pot[V])], M, P <: AsyncAction[A, P]](keys: Set[K]) = {
     require(keys.nonEmpty, "AsyncAction:mapHandler - The set of keys to update can't be empty")
     (action: AsyncAction[A, P], handler: ActionHandler[M, PotMap[K, V]], updateEffect: Effect) =>
       {
@@ -205,7 +205,7 @@ object AsyncAction {
     * @param indices Set of indices to update
     * @return The handler function
     */
-  def vectorHandler[V, A <: Traversable[(Int, Pot[V])], M, P <: AsyncAction[A, P]](indices: Set[Int]) = {
+  def vectorHandler[V, A <: Iterable[(Int, Pot[V])], M, P <: AsyncAction[A, P]](indices: Set[Int]) = {
     require(indices.nonEmpty, "AsyncAction:vectorHandler - The set of indices to update can't be empty")
     (action: AsyncAction[A, P], handler: ActionHandler[M, PotVector[V]], updateEffect: Effect) =>
       {
@@ -252,7 +252,7 @@ object AsyncActionRetriable {
     * @param keys Set of keys to update.
     * @return The handler function
     */
-  def mapHandler[K, V, A <: Traversable[(K, Pot[V])], M, P <: AsyncActionRetriable[A, P]](keys: Set[K]) = {
+  def mapHandler[K, V, A <: Iterable[(K, Pot[V])], M, P <: AsyncActionRetriable[A, P]](keys: Set[K]) = {
     require(keys.nonEmpty, "AsyncActionRetriable:mapHandler - The set of keys to update can't be empty")
     (action: AsyncActionRetriable[A, P], handler: ActionHandler[M, PotMap[K, V]], updateEffect: RetryPolicy => Effect) =>
       {
@@ -294,7 +294,7 @@ object AsyncActionRetriable {
     * @param indices Set of indices to update
     * @return The handler function
     */
-  def vectorHandler[V, A <: Traversable[(Int, Pot[V])], M, P <: AsyncActionRetriable[A, P]](indices: Set[Int]) = {
+  def vectorHandler[V, A <: Iterable[(Int, Pot[V])], M, P <: AsyncActionRetriable[A, P]](indices: Set[Int]) = {
     require(indices.nonEmpty, "AsyncActionRetriable:vectorHandler - The set of indices to update can't be empty")
     (action: AsyncActionRetriable[A, P], handler: ActionHandler[M, PotVector[V]], updateEffect: RetryPolicy => Effect) =>
       {

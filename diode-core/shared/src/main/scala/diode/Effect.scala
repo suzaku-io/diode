@@ -2,7 +2,6 @@ package diode
 
 import diode.util.RunAfter
 
-import scala.collection.generic.CanBuildFrom
 import scala.concurrent._
 import scala.concurrent.duration.FiniteDuration
 import scala.language.implicitConversions
@@ -145,9 +144,9 @@ class EffectSeq(head: Effect, tail: Seq[Effect], ec: ExecutionContext) extends E
   * @param head First effect to be run.
   * @param tail Rest of the effects.
   */
-class EffectSet(head: Effect, tail: Set[Effect], ec: ExecutionContext) extends EffectBase(ec) {
-  private def executeWith[A](f: Effect => Future[A]): Future[Set[A]] =
-    Future.traverse(tail + head)(f(_))(implicitly[CanBuildFrom[Set[Effect], A, Set[A]]], ec)
+class EffectSet(val head: Effect, val tail: Set[Effect], ec: ExecutionContext)
+    extends EffectBase(ec)
+    with EffectSetExecutionOps {
 
   override def run(dispatch: Any => Unit) =
     executeWith(_.run(dispatch)).map(_ => ())(ec)

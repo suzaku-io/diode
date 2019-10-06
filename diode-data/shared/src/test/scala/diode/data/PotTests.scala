@@ -4,8 +4,8 @@ import utest._
 
 object PotTests extends TestSuite {
   def tests = TestSuite {
-    'Pot - {
-      'mapVariants - {
+    "Pot" - {
+      "mapVariants" - {
         val p = Pot.empty[String]
         assert(p.map(_.length) == Empty)
         assert(p.ready("test").map(_.length) == Ready(4))
@@ -16,7 +16,7 @@ object PotTests extends TestSuite {
         val ps = p.ready("test").pending(50).map(_.length)
         assert(ps.contains(4) && ps.isPending)
       }
-      'flatMapVariants - {
+      "flatMapVariants" - {
         val p = Pot.empty[String]
         assert(p.flatMap(s => Ready(s.length)) == Empty)
         assert(p.ready("test").flatMap(s => Ready(s.length)) == Ready(4))
@@ -27,12 +27,12 @@ object PotTests extends TestSuite {
         val ps = p.ready("test").pending(50).flatMap(s => Ready(s.length))
         assert(ps.contains(4) && ps.isPending)
       }
-      'fromOption - {
+      "fromOption" - {
         assert(Pot.fromOption(Some("a")) == Ready("a"))
         val none: Option[String] = None
         assert(Pot.fromOption(none) == Empty)
       }
-      'startTime - {
+      "startTime" - {
         val empty      = Pot.empty[String]
         val startTime0 = Pot.currentTime - 1L
         val pend       = empty.pending(startTime0)

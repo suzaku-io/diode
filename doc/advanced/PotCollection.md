@@ -51,7 +51,7 @@ As with a regular `Pot` it makes sense to use `AsyncAction` to handle the detail
 both `PotMap` and `PotVector`, to update values given a set of keys.
 
 ```scala
-def mapHandler[K, V, A <: Traversable[(K, Pot[V])], M, P <: AsyncAction[A, P]](keys: Set[K])
+def mapHandler[K, V, A <: Iterable[(K, Pot[V])], M, P <: AsyncAction[A, P]](keys: Set[K])
   (implicit ec: ExecutionContext) = {
   require(keys.nonEmpty)
   (action: AsyncAction[A, P], handler: ActionHandler[M, PotMap[K, V]], updateEffect: Effect) => {
@@ -107,7 +107,7 @@ case class UpdateUsers(
 class UserFetch(dispatch: Dispatcher) extends Fetch[String] {
   override def fetch(key: String): Unit =
     dispatch(UpdateUsers(keys = Set(key)))
-  override def fetch(keys: Traversable[String]): Unit =
+  override def fetch(keys: Iterable[String]): Unit =
     dispatch(UpdateUsers(keys = Set() ++ keys))
 }
 

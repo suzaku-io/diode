@@ -10,15 +10,15 @@ import scala.util._
 object PotCollectionTests extends TestSuite {
 
   class TestFetcher[K] extends Fetch[K] {
-    var lastFetch: Any                             = _
-    override def fetch(key: K): Unit               = lastFetch = key
-    override def fetch(start: K, end: K): Unit     = lastFetch = (start, end)
-    override def fetch(keys: Traversable[K]): Unit = lastFetch = keys
+    var lastFetch: Any                          = _
+    override def fetch(key: K): Unit            = lastFetch = key
+    override def fetch(start: K, end: K): Unit  = lastFetch = (start, end)
+    override def fetch(keys: Iterable[K]): Unit = lastFetch = keys
   }
 
   def tests = TestSuite {
-    'PotMap - {
-      'update - {
+    "PotMap" - {
+      "update" - {
         val fetcher = new TestFetcher[String]
         val m       = PotMap[String, String](fetcher)
         val m1      = m + ("test" -> Ready("Yeaa"))
@@ -33,7 +33,7 @@ object PotCollectionTests extends TestSuite {
         assert(m3.get("test4") == Ready("4"))
         assert(m3.get("test5") == Ready("5"))
       }
-      'get - {
+      "get" - {
         val fetcher = new TestFetcher[String]
         val m       = PotMap[String, String](fetcher)
         val m1      = m + ("test1" -> Ready("Yeaa"))
@@ -43,15 +43,16 @@ object PotCollectionTests extends TestSuite {
             assert(fetcher.lastFetch == "test2")
           }
           .flatMap { _ =>
-            assert(m1.get(Seq("test1", "test2", "test3")).values.map(_.state) == Seq(PotReady, PotPending, PotPending))
+            val x = m1.get(Seq("test1", "test2", "test3")).values.map(_.state).toSeq
+            assert(x == Seq(PotReady, PotPending, PotPending))
             runAfterImpl.runAfter(10) {
               assert(fetcher.lastFetch == Seq("test3", "test2"))
             }
           }
       }
     }
-    'PotVector - {
-      'update - {
+    "PotVector" - {
+      "update" - {
         val fetcher = new TestFetcher[Int]
         val v       = PotVector[String](fetcher, 10)
         val v1      = v.updated(0, Ready("0"))
@@ -63,7 +64,7 @@ object PotCollectionTests extends TestSuite {
         assert(v2(1).isPending)
         assert(v2(9) == Ready("9"))
       }
-      'iterator - {
+      "iterator" - {
         val fetcher = new TestFetcher[Int]
         val v       = PotVector[String](fetcher, 10)
         val it0     = v.iterator
@@ -77,8 +78,8 @@ object PotCollectionTests extends TestSuite {
         assert(!it.hasNext)
       }
     }
-    'PotStream - {
-      'append - {
+    "PotStream" - {
+      "append" - {
         val fetcher = new TestFetcher[String]
         val ps      = PotStream[String, String](fetcher)
         val ps1     = ps.append(Seq("1" -> "test1"))
@@ -97,7 +98,7 @@ object PotCollectionTests extends TestSuite {
         assert(ps3.elems("4").nextKey.isEmpty)
         assert(ps3.elems("4").prevKey.contains("3"))
       }
-      'prepend - {
+      "prepend" - {
         val fetcher = new TestFetcher[String]
         val ps      = PotStream[String, String](fetcher)
         val ps1     = ps.prepend(Seq("1" -> "test1"))
@@ -117,7 +118,7 @@ object PotCollectionTests extends TestSuite {
         assert(ps3.elems("4").prevKey.isEmpty)
         assert(ps3.elems("4").nextKey.contains("3"))
       }
-      'remove - {
+      "remove" - {
         val fetcher = new TestFetcher[String]
         val ps      = PotStream(fetcher, Seq("1" -> "test1", "2" -> "test2", "3" -> "test3", "4" -> "test4"))
         val ps1     = ps.remove("2")
@@ -131,7 +132,7 @@ object PotCollectionTests extends TestSuite {
         assert(!ps3.contains("1"))
         assert(ps3.headOption.isEmpty)
       }
-      'seq - {
+      "seq" - {
         val fetcher = new TestFetcher[String]
         val ps      = PotStream[String, String](fetcher)
         val seq0    = ps.seq
@@ -142,7 +143,7 @@ object PotCollectionTests extends TestSuite {
         assert(seq.head._1 == "1")
         assert(seq.last._1 == "4")
       }
-      'iterator - {
+      "iterator" - {
         val fetcher = new TestFetcher[String]
         val ps      = PotStream[String, String](fetcher)
         val it0     = ps.iterator
@@ -164,7 +165,7 @@ object PotCollectionTests extends TestSuite {
         assert(!it.hasNext)
         intercept[NoSuchElementException](it.next())
       }
-      'map - {
+      "map" - {
         val fetcher = new TestFetcher[String]
         val ps      = PotStream(fetcher, Seq("1" -> "test1", "2" -> "test2", "3" -> "test3", "4" -> "test4"))
         val ps1     = ps.map((k, v) => if (k != "4") v + "x" else v)
@@ -174,7 +175,7 @@ object PotCollectionTests extends TestSuite {
         assert(!ps1("4").endsWith("x"))
       }
     }
-    'VerifyDocs - {
+    "VerifyDocs" - {
       case class User(id: String, name: String)
 
       // define a AsyncAction for updating users
@@ -192,7 +193,7 @@ object PotCollectionTests extends TestSuite {
       class UserFetch(dispatch: Dispatcher) extends Fetch[String] {
         override def fetch(key: String): Unit =
           dispatch(UpdateUsers(keys = Set(key)))
-        override def fetch(keys: Traversable[String]): Unit =
+        override def fetch(keys: Iterable[String]): Unit =
           dispatch(UpdateUsers(keys = Set() ++ keys))
       }
 

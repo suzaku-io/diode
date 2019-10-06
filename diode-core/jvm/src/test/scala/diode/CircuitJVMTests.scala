@@ -44,7 +44,7 @@ object CircuitJVMTests extends TestSuite {
   def tests = TestSuite {
     def circuit = new TestCircuit
 
-    'ParallelActions - {
+    "ParallelActions" - {
       val c = circuit
 
       // run 1000 concurrent actions
@@ -68,7 +68,7 @@ object CircuitJVMTests extends TestSuite {
       Await.ready(Future.sequence(futures), 1000.millis)
       assert(c.model.list.size < 10)
     }
-    'SerialEffects - {
+    "SerialEffects" - {
       val c = circuit
 
       // run 1000 serial effects actions
@@ -81,7 +81,7 @@ object CircuitJVMTests extends TestSuite {
       assert(c.model.list.size == 1000)
       assert(c.model.list == Vector.range(0, 1000))
     }
-    'ParallelEffects - {
+    "ParallelEffects" - {
       val c = circuit
 
       // run 1000 serial effects actions
@@ -94,14 +94,14 @@ object CircuitJVMTests extends TestSuite {
       assert(c.model.list.size == 1000)
       assert(c.model.list != Vector.range(0, 1000))
     }
-    'SequenceActions - {
+    "SequenceActions" - {
       val c       = circuit
       val actions = for (i <- 0 until 1000) yield Append(i)
       c.dispatch(ActionBatch(actions: _*))
       assert(c.model.list.size == 1000)
       assert(c.model.list == Vector.range(0, 1000))
     }
-    'SequenceActionEffects - {
+    "SequenceActionEffects" - {
       val c       = circuit
       val actions = for (i <- 0 until 1000) yield RunEffects(Seq(() => Future(Append(i))))
       c.dispatch(ActionBatch(actions: _*))
@@ -110,7 +110,7 @@ object CircuitJVMTests extends TestSuite {
       assert(c.model.list.size == 1000)
       assert(c.model.list != Vector.range(0, 1000))
     }
-    'ParallelSubscribe - {
+    "ParallelSubscribe" - {
       val c = circuit
       class Listen {
         var called                                       = false

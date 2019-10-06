@@ -27,7 +27,7 @@ object ModelRWTests extends TestSuite {
   }
 
   def tests = TestSuite {
-    'eq - {
+    "eq" - {
       var m  = ComplexModel(A(999, "string"), B(Seq(1.0f, 2.0f, 3.0f), 3.0f), C(42, "c", Some(A(998, "A"))))
       val mr = new RootModelR(m)
       // use ref eq for "A"
@@ -59,7 +59,7 @@ object ModelRWTests extends TestSuite {
       // use custom FastEq
       assert(r5 === oldPT)
     }
-    'zip - {
+    "zip" - {
       var m  = Model(A(42, "test"), B(Seq(1, 2, 3), 4))
       val mr = new RootModelR(m)
       val r1 = mr.zoom(_.a)
@@ -106,8 +106,8 @@ object ModelRWTests extends TestSuite {
       assert(z1 === ((r1.value, r4.value)))
 
     }
-    'map - {
-      'equality - {
+    "map" - {
+      "equality" - {
         var m  = ModelOpt(1.0f, Some(C(4242, "some", Some(A(66, "deep")))))
         val mr = new RootModelR(m)
         val cr = mr.zoom(_.c)
@@ -133,7 +133,7 @@ object ModelRWTests extends TestSuite {
         // string s did change
         assert(rmv1 ne rm1.value)
       }
-      'flatMap - {
+      "flatMap" - {
         var m   = ModelOpt(1.0f, Some(C(4242, "some", Some(A(66, "deep")))))
         val mr  = new RootModelR(m)
         val cr  = mr.zoomFlatMap(_.c)(_.o)
@@ -146,7 +146,7 @@ object ModelRWTests extends TestSuite {
         m = m.copy(c = m.c.map(c => c.copy(o = c.o.map(_.copy(s = "deeper")))))
         assert(v1 ne crs.value)
       }
-      'docExample - {
+      "docExample" - {
         // just making sure the code in docs compiles :)
         case class Root(a: A, b: B, c: String)
         case class A(d: Int, e: String)
@@ -158,34 +158,34 @@ object ModelRWTests extends TestSuite {
           override protected def initialModel: Root                        = root
           override protected def actionHandler: AppCircuit.HandlerFunction = ???
         }
-        'ex1 - {
+        "ex1" - {
           val _: ModelR[Root, String] = new RootModelR(root).zoom(_.a.e)
         }
-        'ex2 - {
+        "ex2" - {
           val _: ModelR[Root, String] = AppCircuit.zoom(_.a.e)
         }
-        'ex3 - {
+        "ex3" - {
           val reader: ModelR[Root, Option[Seq[Int]]] = AppCircuit.zoom(_.b.g.map(_.h))
           assert(reader.value ne reader.value)
         }
-        'ex4 - {
+        "ex4" - {
           val reader: ModelR[Root, Option[Seq[Int]]] = AppCircuit.zoomMap(_.b.g)(_.h)
           assert(reader.value eq reader.value)
         }
-        'ex5 - {
+        "ex5" - {
           val _: ModelR[Root, (String, Boolean)] = AppCircuit.zoom(r => (r.a.e, r.b.f))
         }
-        'ex6 - {
+        "ex6" - {
           val reader: ModelR[Root, String]   = AppCircuit.zoom(_.a.e)
           val _: ModelR[Root, (String, Int)] = reader.zip(AppCircuit.zoom(_.a.d))
         }
-        'ex7 - {
+        "ex7" - {
           case class FromAB(e: String, g: Option[D]) extends UseValueEq
           val abReader: ModelR[Root, FromAB] =
             AppCircuit.zoom(r => FromAB(r.a.e, r.b.g))
           assert(abReader === FromAB("42", Some(D(Seq(42, 42, 42), 43))))
         }
-        'ex8 - {
+        "ex8" - {
           case class ExtData(age: Int, name: String)
 
           implicit object extDataEq extends FastEq[ExtData] {
@@ -204,7 +204,7 @@ object ModelRWTests extends TestSuite {
         }
       }
     }
-    'mapRW - {
+    "mapRW" - {
       val m   = ModelOpt(1.0f, Some(C(4242, "some", Some(A(66, "deep")))))
       val mrw = new RootModelRW(m)
       val crw = mrw.zoomFlatMapRW(_.c)(_.o)((m, o) => m.copy(c = m.c.map(c => c.copy(o = o))))
@@ -214,7 +214,7 @@ object ModelRWTests extends TestSuite {
       val m2 = crw.updated(Some(A(42, "new")))
       assert(m2.c.flatMap(_.o.map(_.s)).contains("new"))
     }
-    'zoomRW - {
+    "zoomRW" - {
       val m      = A(1, "old")
       val mrw    = new RootModelRW(m)
       val zoomRW = mrw.zoomRW(_.i)((m, v) => m.copy(i = v))
@@ -222,7 +222,7 @@ object ModelRWTests extends TestSuite {
       assert(r.i == 2)
       assert(r.s == "new")
     }
-    'zoomTo - {
+    "zoomTo" - {
       val m      = A(1, "old")
       val mrw    = new RootModelRW(m)
       val zoomRW = mrw.zoomTo(_.i)
@@ -230,7 +230,7 @@ object ModelRWTests extends TestSuite {
       assert(r.i == 2)
       assert(r.s == "new")
     }
-    'zoomToLong - {
+    "zoomToLong" - {
       val m   = Model(A(1, "old"), B(Seq(1.0f), 5.0f))
       val mrw = new RootModelRW(m)
       // val zoomRW = mrw.zoomRW(_.a)((m, v) => m.copy(a = v)).zoomRW(_.i)((m, v) ? m.copy(i = v))

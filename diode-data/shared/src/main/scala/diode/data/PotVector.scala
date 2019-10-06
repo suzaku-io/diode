@@ -35,7 +35,7 @@ class PotVector[V](
     new PotVector(fetcher, length, newElems)
   }
 
-  override def updated(kvs: Traversable[(Int, Pot[V])]) = {
+  override def updated(kvs: Iterable[(Int, Pot[V])]) = {
     val (minIdx, maxIdx) = kvs.foldLeft((Int.MaxValue, Int.MinValue)) {
       case ((min, max), (idx, _)) =>
         (math.min(min, idx), math.max(max, idx))
@@ -52,7 +52,7 @@ class PotVector[V](
     new PotVector(fetcher, length, newElems)
   }
 
-  override def updated(start: Int, values: Traversable[Pot[V]])(implicit num: Numeric[Int]): PotVector[V] = {
+  override def updated(start: Int, values: Iterable[Pot[V]])(implicit num: Numeric[Int]): PotVector[V] = {
     val end = start + values.size
     if (start < 0 || end >= length)
       throw new IndexOutOfBoundsException
@@ -74,7 +74,7 @@ class PotVector[V](
     new PotVector(fetcher, length, newElems)
   }
 
-  override def seq: Traversable[(Int, Pot[V])] = {
+  override def seq: Iterable[(Int, Pot[V])] = {
     var out = List.empty[(Int, Pot[V])]
     // iterate in reverse order to get the output list in correct order
     for (idx <- elems.indices.reverse) {
@@ -117,7 +117,7 @@ class PotVector[V](
     runAfterImpl.runAfter(0)(fetcher.fetch(idx))
   }
 
-  override def refresh(indices: Traversable[Int]): Unit = {
+  override def refresh(indices: Iterable[Int]): Unit = {
     if (indices.exists(idx => idx < 0 || idx >= length))
       throw new IndexOutOfBoundsException
     // perform fetch asynchronously
