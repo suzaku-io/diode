@@ -100,7 +100,7 @@ trait ReactConnector[M <: AnyRef] { circuit: Circuit[M] =>
     class Backend(t: BackendScope[ReactConnectProps[S], S]) {
       private var unsubscribe = Option.empty[() => Unit]
 
-      def willMount = {
+      def didMount = {
         // subscribe to model changes
         Callback {
           unsubscribe = Some(circuit.subscribe(modelReader.asInstanceOf[ModelR[M, S]])(changeHandler))
@@ -128,7 +128,7 @@ trait ReactConnector[M <: AnyRef] { circuit: Circuit[M] =>
       .builder[ReactConnectProps[S]]("DiodeWrapper")
       .initialState(modelReader())
       .renderBackend[Backend]
-      .componentWillMount(_.backend.willMount)
+      .componentDidMount(_.backend.didMount)
       .componentWillUnmount(_.backend.willUnmount)
       .shouldComponentUpdatePure(scope => (scope.currentState ne scope.nextState) || (scope.currentProps ne scope.nextProps))
       .build

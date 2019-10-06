@@ -2,6 +2,7 @@ language: scala
 scala:
 - 2.13.0
 sudo: false
+dist: trusty
 jdk:
 - oraclejdk8
 node_js:
