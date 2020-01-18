@@ -2,8 +2,6 @@ package diode
 
 import diode.macros.GenLens
 
-import scala.language.higherKinds
-
 /**
   * A read-only version of ModelR that doesn't know about the root model.
   *

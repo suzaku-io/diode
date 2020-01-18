@@ -1,7 +1,5 @@
 package diode
 
-import scala.language.higherKinds
-
 /**
   * Defines a Diode specific Monad for traversing models with `Option`s etc.
   */

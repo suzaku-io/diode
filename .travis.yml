@@ -8,7 +8,8 @@ node_js:
 - 8
 - oraclejdk8
 script:
-- sbt +test
+- SCALAJS_VERSION="0.6.31" sbt +test
+- SCALAJS_VERSION="1.0.0-RC2" sbt +test
 # Tricks to avoid unnecessary cache updates, from
 # http://www.scala-sbt.org/0.13/docs/Travis-CI-with-sbt.html
 - find $HOME/.sbt -name "*.lock" | xargs rm

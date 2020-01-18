@@ -4,7 +4,6 @@ import diode.macros.GenLens
 
 import scala.annotation.implicitNotFound
 import scala.collection.immutable.Queue
-import scala.language.higherKinds
 
 /**
   * The `ActionType` type class is used to verify that only valid actions are dispatched. An implicit instance of
