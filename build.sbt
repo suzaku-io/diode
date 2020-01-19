@@ -9,8 +9,8 @@ ThisBuild / scalafmtOnCompile := true
 val commonSettings = Seq(
   organization := "io.suzaku",
   version := Version.library,
-  crossScalaVersions := Seq("2.12.8"),
-  scalaVersion in ThisBuild := "2.12.8",
+  crossScalaVersions := Seq("2.12.10"),
+  scalaVersion in ThisBuild := "2.12.10",
   scalacOptions := Seq(
     "-deprecation",
     "-encoding",
@@ -25,14 +25,14 @@ val commonSettings = Seq(
     "-Ywarn-numeric-widen",
     "-Ywarn-value-discard"
   ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, 12)) => Seq("-Xlint:-unused")
+    case Some((2, 12)) => Seq("-Xlint:-unused", "-language:higherKinds")
     case _             => Nil
   }),
   Compile / scalacOptions -= "-Ywarn-value-discard",
   Compile / doc / scalacOptions -= "-Xfatal-warnings",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
-    "com.lihaoyi"            %%% "utest"                  % "0.7.1" % "test",
+    "com.lihaoyi"            %%% "utest"                  % "0.7.3" % "test",
     "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.1"
   )
 )
@@ -104,7 +104,7 @@ lazy val diodeCore = crossProject(JSPlatform, JVMPlatform)
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
   .settings(
-    crossScalaVersions += "2.13.0",
+    crossScalaVersions += "2.13.1",
     name := "diode-core",
     libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
   )
@@ -120,7 +120,7 @@ lazy val diodeData = crossProject(JSPlatform, JVMPlatform)
   .in(file("diode-data"))
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
-  .settings(name := "diode-data", crossScalaVersions += "2.13.0")
+  .settings(name := "diode-data", crossScalaVersions += "2.13.1")
   .jsSettings(scalacOptions ++= sourceMapSetting.value)
   .jvmSettings()
   .dependsOn(diodeCore)
@@ -136,7 +136,7 @@ lazy val diode = crossProject(JSPlatform, JVMPlatform)
   .settings(publishSettings: _*)
   .settings(
     name := "diode",
-    crossScalaVersions += "2.13.0",
+    crossScalaVersions += "2.13.1",
     test := {}
   )
   .dependsOn(diodeCore, diodeData)
@@ -152,10 +152,10 @@ lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
   .settings(publishSettings: _*)
   .settings(
     name := "diode-devtools",
-    crossScalaVersions += "2.13.0"
+    crossScalaVersions += "2.13.1"
   )
   .jsSettings(
-    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "0.9.7"),
+    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "0.9.8"),
     scalacOptions ++= sourceMapSetting.value
   )
   .jvmSettings()
@@ -180,18 +180,22 @@ lazy val diodeReact = project
   .dependsOn(diodeJS)
   .enablePlugins(ScalaJSPlugin)
 
+val coreProjects = Seq[ProjectReference](
+  diodeJS,
+  diodeJVM,
+  diodeCoreJS,
+  diodeCoreJVM,
+  diodeDataJS,
+  diodeDataJVM,
+  diodeDevToolsJS,
+  diodeDevToolsJVM
+)
+
+val projects: Seq[ProjectReference] =
+  if (scalaJSVersion.startsWith("0.6")) coreProjects ++ diodeReact.referenced else coreProjects
+
 lazy val root = preventPublication(project.in(file(".")))
   .settings(
     commonSettings
   )
-  .aggregate(
-    diodeJS,
-    diodeJVM,
-    diodeCoreJS,
-    diodeCoreJVM,
-    diodeDataJS,
-    diodeDataJVM,
-    diodeReact,
-    diodeDevToolsJS,
-    diodeDevToolsJVM
-  )
+  .aggregate(projects: _*)

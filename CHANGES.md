@@ -1,5 +1,13 @@
 # Changes
 
+## 1.1.7
+- Allow cross-building for any ScalaJS version - default is 1.0.0-RC2
+- The build uses the `SCALAJS_VERSION` environment variable to get the scala.js plugin version for the build
+- The diode-react sub-project is now only built for 0.6.x builds
+- Bump scala cross versions to 2.12.10 and 2.13.1
+- Adjust for change where higher kinds are directly supported in 2.13.1
+
+
 ## 1.1.6
 - Cross-Build for Scala 2.12.8 (all projects) and 2.13.0 (for 'core', 'devtools', and 'data' projects only)
 - Drops support for Scala 2.11.x because dependencies no longer support it.
