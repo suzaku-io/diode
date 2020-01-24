@@ -9,8 +9,8 @@ ThisBuild / scalafmtOnCompile := true
 val commonSettings = Seq(
   organization := "io.suzaku",
   version := Version.library,
-  crossScalaVersions := Seq("2.12.10"),
-  scalaVersion in ThisBuild := "2.12.10",
+  crossScalaVersions := Seq("2.12.10", "2.13.1"),
+  scalaVersion in ThisBuild := "2.13.1",
   scalacOptions := Seq(
     "-deprecation",
     "-encoding",
@@ -104,7 +104,6 @@ lazy val diodeCore = crossProject(JSPlatform, JVMPlatform)
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
   .settings(
-    crossScalaVersions += "2.13.1",
     name := "diode-core",
     libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
   )
@@ -120,7 +119,7 @@ lazy val diodeData = crossProject(JSPlatform, JVMPlatform)
   .in(file("diode-data"))
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
-  .settings(name := "diode-data", crossScalaVersions += "2.13.1")
+  .settings(name := "diode-data")
   .jsSettings(scalacOptions ++= sourceMapSetting.value)
   .jvmSettings()
   .dependsOn(diodeCore)
@@ -136,7 +135,6 @@ lazy val diode = crossProject(JSPlatform, JVMPlatform)
   .settings(publishSettings: _*)
   .settings(
     name := "diode",
-    crossScalaVersions += "2.13.1",
     test := {}
   )
   .dependsOn(diodeCore, diodeData)
@@ -152,7 +150,6 @@ lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
   .settings(publishSettings: _*)
   .settings(
     name := "diode-devtools",
-    crossScalaVersions += "2.13.1"
   )
   .jsSettings(
     libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "0.9.8"),
@@ -191,8 +188,20 @@ val coreProjects = Seq[ProjectReference](
   diodeDevToolsJVM
 )
 
+val allProjects = Seq[ProjectReference](
+  diodeJS,
+  diodeJVM,
+  diodeCoreJS,
+  diodeCoreJVM,
+  diodeDataJS,
+  diodeDataJVM,
+  diodeDevToolsJS,
+  diodeDevToolsJVM,
+  diodeReact
+)
+
 val projects: Seq[ProjectReference] =
-  if (scalaJSVersion.startsWith("0.6")) coreProjects ++ diodeReact.referenced else coreProjects
+  if (scalaJSVersion.startsWith("0.6")) allProjects else coreProjects
 
 lazy val root = preventPublication(project.in(file(".")))
   .settings(
