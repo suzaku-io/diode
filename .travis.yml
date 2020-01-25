@@ -1,6 +1,6 @@
 language: scala
 scala:
-- 2.13.0
+- 2.13.1
 sudo: false
 dist: trusty
 jdk:
