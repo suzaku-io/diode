@@ -24,13 +24,13 @@ Full documentation [available here](https://diode.suzaku.io).
 Add following dependency declaration to your Scala project.
 
 ```scala
-"io.suzaku" %% "diode" % "1.1.7"
+"io.suzaku" %% "diode" % "1.1.8"
 ```
 
 In a Scala.js project the dependency looks like this.
 
 ```scala
-"io.suzaku" %%% "diode" % "1.1.7"
+"io.suzaku" %%% "diode" % "1.1.8"
 ```
 
 Starting with version "1.1.6" diode has dropped support for Scala 2.11. If you need 2.11 support use version "1.1.5"
