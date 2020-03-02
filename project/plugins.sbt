@@ -1,5 +1,4 @@
-val scalaJSVersion =
-  Option(System.getenv("SCALAJS_VERSION")).getOrElse("1.0.0-RC2")
+val scalaJSVersion = sys.env.getOrElse("SCALAJS_VERSION", "1.0.0")
 
 addSbtPlugin("org.scala-js" % "sbt-scalajs" % scalaJSVersion)
 

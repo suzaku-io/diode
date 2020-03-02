@@ -1,5 +1,9 @@
 # Changes
 
+
+## 1.1.8
+- update build/dependencies to support SJS 1.0.0
+
 ## 1.1.7
 - Allow cross-building for any ScalaJS version - default is 1.0.0-RC2
 - The build uses the `SCALAJS_VERSION` environment variable to get the scala.js plugin version for the build

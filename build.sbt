@@ -1,6 +1,6 @@
-import sbt._
-import Keys._
 import com.typesafe.sbt.pgp.PgpKeys._
+import sbt.Keys._
+import sbt._
 // shadow sbt-scalajs' crossProject and CrossType from Scala.js 0.6.x
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
@@ -32,8 +32,8 @@ val commonSettings = Seq(
   Compile / doc / scalacOptions -= "-Xfatal-warnings",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
-    "com.lihaoyi"            %%% "utest"                  % "0.7.3" % "test",
-    "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.1"
+    "com.lihaoyi"            %%% "utest"                  % "0.7.4" % "test",
+    "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.4"
   )
 )
 
@@ -149,10 +149,10 @@ lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
   .settings(
-    name := "diode-devtools",
+    name := "diode-devtools"
   )
   .jsSettings(
-    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "0.9.8"),
+    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "1.0.0"),
     scalacOptions ++= sourceMapSetting.value
   )
   .jvmSettings()
@@ -162,7 +162,7 @@ lazy val diodeDevToolsJS = diodeDevtools.js
 
 lazy val diodeDevToolsJVM = diodeDevtools.jvm
 
-lazy val diodeReact = project
+lazy val diodeReact: Project = project
   .in(file("diode-react"))
   .settings(commonSettings: _*)
   .settings(publishSettings: _*)
@@ -177,7 +177,7 @@ lazy val diodeReact = project
   .dependsOn(diodeJS)
   .enablePlugins(ScalaJSPlugin)
 
-val coreProjects = Seq[ProjectReference](
+lazy val coreProjects = Seq[ProjectReference](
   diodeJS,
   diodeJVM,
   diodeCoreJS,
@@ -188,19 +188,9 @@ val coreProjects = Seq[ProjectReference](
   diodeDevToolsJVM
 )
 
-val allProjects = Seq[ProjectReference](
-  diodeJS,
-  diodeJVM,
-  diodeCoreJS,
-  diodeCoreJVM,
-  diodeDataJS,
-  diodeDataJVM,
-  diodeDevToolsJS,
-  diodeDevToolsJVM,
-  diodeReact
-)
+lazy val allProjects = coreProjects :+ diodeReact.project
 
-val projects: Seq[ProjectReference] =
+lazy val projects: Seq[ProjectReference] =
   if (scalaJSVersion.startsWith("0.6")) allProjects else coreProjects
 
 lazy val root = preventPublication(project.in(file(".")))
