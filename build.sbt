@@ -1,4 +1,3 @@
-import com.typesafe.sbt.pgp.PgpKeys._
 import sbt.Keys._
 import sbt._
 // shadow sbt-scalajs' crossProject and CrossType from Scala.js 0.6.x
@@ -39,41 +38,25 @@ val commonSettings = Seq(
   )
 )
 
-val publishSettings = Seq(
-  scmInfo := Some(
-    ScmInfo(
-      url("https://github.com/suzaku-io/diode"),
-      "scm:git:git@github.com:suzaku-io/diode.git",
-      Some("scm:git:git@github.com:suzaku-io/diode.git")
-    )
-  ),
-  publishMavenStyle := true,
-  Test / publishArtifact := false,
-  pomExtra :=
-    <url>https://github.com/suzaku-io/diode</url>
-      <licenses>
-        <license>
-          <name>Apache 2.0 license</name>
-          <url>http://www.opensource.org/licenses/Apache-2.0</url>
-        </license>
-      </licenses>
-      <developers>
-        <developer>
-          <id>ochrons</id>
-          <name>Otto Chrons</name>
-          <url>https://github.com/ochrons</url>
-        </developer>
-      </developers>,
-  pomIncludeRepository := { _ =>
-    false
-  },
-  publishTo := {
-    val nexus = "https://oss.sonatype.org/"
-    if (isSnapshot.value)
-      Some("snapshots" at nexus + "content/repositories/snapshots")
-    else
-      Some("releases" at nexus + "service/local/staging/deploy/maven2")
-  }
+inThisBuild(
+  List(
+    homepage := Some(url("https://github.com/suzaku-io/diode")),
+    licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
+    developers := List(
+      Developer("ochrons",
+                "Otto Chrons",
+                "",
+                url("https://github.com/ochrons"))
+    ),
+    scmInfo := Some(
+      ScmInfo(
+        url("https://github.com/suzaku-io/diode"),
+        "scm:git:git@github.com:suzaku-io/diode.git",
+        Some("scm:git:git@github.com:suzaku-io/diode.git")
+      )
+    ),
+    Test / publishArtifact := false
+  )
 )
 
 val sourceMapSetting =
@@ -91,8 +74,6 @@ def preventPublication(p: Project) =
   p.settings(
     publish := (()),
     publishLocal := (()),
-    publishSigned := (()),
-    publishLocalSigned := (()),
     publishArtifact := false,
     publishTo := Some(
       Resolver.file("Unused transient repository", target.value / "fakepublish")
@@ -104,7 +85,6 @@ lazy val diodeCore = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("diode-core"))
   .settings(commonSettings: _*)
-  .settings(publishSettings: _*)
   .settings(
     name := "diode-core",
     libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
@@ -120,7 +100,6 @@ lazy val diodeData = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("diode-data"))
   .settings(commonSettings: _*)
-  .settings(publishSettings: _*)
   .settings(name := "diode-data")
   .jsSettings(scalacOptions ++= sourceMapSetting.value)
   .jvmSettings()
@@ -134,7 +113,6 @@ lazy val diode = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("diode"))
   .settings(commonSettings: _*)
-  .settings(publishSettings: _*)
   .settings(
     name := "diode",
     test := {}
@@ -149,7 +127,6 @@ lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("diode-devtools"))
   .settings(commonSettings: _*)
-  .settings(publishSettings: _*)
   .settings(
     name := "diode-devtools"
   )
@@ -167,7 +144,6 @@ lazy val diodeDevToolsJVM = diodeDevtools.jvm
 lazy val diodeReact: Project = project
   .in(file("diode-react"))
   .settings(commonSettings: _*)
-  .settings(publishSettings: _*)
   .settings(
     name := "diode-react",
     version := s"${Version.library}.${Version.sjsReact.filterNot(_ == '.')}",
