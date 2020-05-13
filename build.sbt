@@ -7,9 +7,10 @@ ThisBuild / scalafmtOnCompile := true
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
+val customScalaJSVersion = Option(System.getenv("SCALAJS_VERSION"))
+
 val commonSettings = Seq(
   organization := "io.suzaku",
-  version := Version.library,
   crossScalaVersions := Seq("2.12.11", "2.13.2"),
   scalaVersion in ThisBuild := "2.13.2",
   scalacOptions := Seq(
@@ -90,7 +91,9 @@ lazy val diodeCore = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
   )
   .jsSettings(scalacOptions ++= sourceMapSetting.value)
-  .jvmSettings()
+  .jvmSettings(
+    skip.in(publish) := customScalaJSVersion.isDefined
+  )
 
 lazy val diodeCoreJS = diodeCore.js
 
@@ -102,7 +105,9 @@ lazy val diodeData = crossProject(JSPlatform, JVMPlatform)
   .settings(commonSettings: _*)
   .settings(name := "diode-data")
   .jsSettings(scalacOptions ++= sourceMapSetting.value)
-  .jvmSettings()
+  .jvmSettings(
+    skip.in(publish) := customScalaJSVersion.isDefined
+  )
   .dependsOn(diodeCore)
 
 lazy val diodeDataJS = diodeData.js
@@ -116,6 +121,9 @@ lazy val diode = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "diode",
     test := {}
+  )
+  .jvmSettings(
+    skip.in(publish) := customScalaJSVersion.isDefined
   )
   .dependsOn(diodeCore, diodeData)
 
@@ -134,7 +142,9 @@ lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "1.0.0"),
     scalacOptions ++= sourceMapSetting.value
   )
-  .jvmSettings()
+  .jvmSettings(
+    skip.in(publish) := customScalaJSVersion.isDefined
+  )
   .dependsOn(diodeCore)
 
 lazy val diodeDevToolsJS = diodeDevtools.js
@@ -146,7 +156,7 @@ lazy val diodeReact: Project = project
   .settings(commonSettings: _*)
   .settings(
     name := "diode-react",
-    version := s"${Version.library}.${Version.sjsReact.filterNot(_ == '.')}",
+    version := s"${version.value}.${Version.sjsReact.filterNot(_ == '.')}",
     libraryDependencies ++= Seq(
       "com.github.japgolly.scalajs-react" %%% "core" % Version.sjsReact
     ),
