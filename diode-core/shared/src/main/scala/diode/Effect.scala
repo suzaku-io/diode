@@ -171,7 +171,7 @@ object Effect {
   type EffectF[A] = () => Future[A]
 
   def apply[A: ActionType](f: => Future[A])(implicit ec: ExecutionContext): EffectSingle[A] =
-    new EffectSingle(f _, ec)
+    new EffectSingle(() => f, ec)
 
   /**
     * Converts a lazy action value into an effect. Typically used in combination with other effects or

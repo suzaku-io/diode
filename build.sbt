@@ -6,11 +6,13 @@ import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
 
 ThisBuild / scalafmtOnCompile := true
 
+Global / onChangedBuildSource := ReloadOnSourceChanges
+
 val commonSettings = Seq(
   organization := "io.suzaku",
   version := Version.library,
-  crossScalaVersions := Seq("2.12.10", "2.13.1"),
-  scalaVersion in ThisBuild := "2.13.1",
+  crossScalaVersions := Seq("2.12.11", "2.13.2"),
+  scalaVersion in ThisBuild := "2.13.2",
   scalacOptions := Seq(
     "-deprecation",
     "-encoding",
@@ -33,7 +35,7 @@ val commonSettings = Seq(
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
     "com.lihaoyi"            %%% "utest"                  % "0.7.4" % "test",
-    "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.4"
+    "org.scala-lang.modules" %% "scala-collection-compat" % "2.1.6"
   )
 )
 
