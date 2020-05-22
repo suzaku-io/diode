@@ -188,10 +188,7 @@ lazy val coreProjects = Seq[ProjectReference](
   diodeDevToolsJVM
 )
 
-lazy val allProjects = coreProjects :+ diodeReact.project
-
-lazy val projects: Seq[ProjectReference] =
-  if (scalaJSVersion.startsWith("0.6")) allProjects else coreProjects
+lazy val projects: Seq[ProjectReference] = coreProjects :+ diodeReact.project
 
 lazy val root = preventPublication(project.in(file(".")))
   .settings(
