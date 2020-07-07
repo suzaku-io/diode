@@ -95,10 +95,6 @@ lazy val diodeCore = crossProject(JSPlatform, JVMPlatform)
     skip.in(publish) := customScalaJSVersion.isDefined
   )
 
-lazy val diodeCoreJS = diodeCore.js
-
-lazy val diodeCoreJVM = diodeCore.jvm
-
 lazy val diodeData = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("diode-data"))
@@ -109,10 +105,6 @@ lazy val diodeData = crossProject(JSPlatform, JVMPlatform)
     skip.in(publish) := customScalaJSVersion.isDefined
   )
   .dependsOn(diodeCore)
-
-lazy val diodeDataJS = diodeData.js
-
-lazy val diodeDataJVM = diodeData.jvm
 
 lazy val diode = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
@@ -126,10 +118,6 @@ lazy val diode = crossProject(JSPlatform, JVMPlatform)
     skip.in(publish) := customScalaJSVersion.isDefined
   )
   .dependsOn(diodeCore, diodeData)
-
-lazy val diodeJS = diode.js
-
-lazy val diodeJVM = diode.jvm
 
 lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
@@ -147,39 +135,33 @@ lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
   )
   .dependsOn(diodeCore)
 
-lazy val diodeDevToolsJS = diodeDevtools.js
-
-lazy val diodeDevToolsJVM = diodeDevtools.jvm
-
 lazy val diodeReact: Project = project
+  .enablePlugins(ScalaJSPlugin)
   .in(file("diode-react"))
   .settings(commonSettings: _*)
   .settings(
     name := "diode-react",
-    version := s"${version.value}.${Version.sjsReact.filterNot(_ == '.')}",
     libraryDependencies ++= Seq(
       "com.github.japgolly.scalajs-react" %%% "core" % Version.sjsReact
     ),
     scalacOptions ++= sourceMapSetting.value
   )
-  .dependsOn(diodeJS)
-  .enablePlugins(ScalaJSPlugin)
+  .dependsOn(diode.js)
 
 lazy val coreProjects = Seq[ProjectReference](
-  diodeJS,
-  diodeJVM,
-  diodeCoreJS,
-  diodeCoreJVM,
-  diodeDataJS,
-  diodeDataJVM,
-  diodeDevToolsJS,
-  diodeDevToolsJVM
+  diode.js,
+  diode.jvm,
+  diodeCore.js,
+  diodeCore.jvm,
+  diodeData.js,
+  diodeData.jvm,
+  diodeDevtools.js,
+  diodeDevtools.jvm,
+  diodeReact
 )
-
-lazy val projects: Seq[ProjectReference] = coreProjects :+ diodeReact.project
 
 lazy val root = preventPublication(project.in(file(".")))
   .settings(
     commonSettings
   )
-  .aggregate(projects: _*)
+  .aggregate(coreProjects: _*)
