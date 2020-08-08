@@ -127,7 +127,7 @@ lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
     name := "diode-devtools"
   )
   .jsSettings(
-    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "1.0.0"),
+    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "1.1.0"),
     scalacOptions ++= sourceMapSetting.value
   )
   .jvmSettings(
