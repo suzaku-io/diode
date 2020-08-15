@@ -1,3 +1,3 @@
 object Version {
-  val sjsReact = "1.7.4"
+  val sjsReact = "1.7.5"
 }
