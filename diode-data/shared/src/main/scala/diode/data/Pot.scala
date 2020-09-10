@@ -331,10 +331,7 @@ object Pot {
     override def isEqual[A](fa1: Pot[A], fa2: Pot[A])(eqF: (A, A) => Boolean): Boolean = {
       if (fa1.nonEmpty && fa2.nonEmpty)
         eqF(fa1.get, fa2.get)
-      else if (fa1 == fa2)
-        true
-      else
-        false
+      else fa1 == fa2
     }
   }
 
