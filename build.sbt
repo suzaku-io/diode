@@ -35,7 +35,7 @@ val commonSettings = Seq(
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
     "com.lihaoyi"            %%% "utest"                  % "0.7.5" % "test",
-    "org.scala-lang.modules" %% "scala-collection-compat" % "2.2.0"
+    "org.scala-lang.modules" %% "scala-collection-compat" % "2.3.0"
   )
 )
 
