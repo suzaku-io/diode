@@ -7,12 +7,14 @@ ThisBuild / scalafmtOnCompile := true
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
+skip in publish := true
+
 val customScalaJSVersion = Option(System.getenv("SCALAJS_VERSION"))
 
 val commonSettings = Seq(
   organization := "io.suzaku",
-  crossScalaVersions := Seq("2.12.11", "2.13.2"),
-  scalaVersion in ThisBuild := "2.13.2",
+  crossScalaVersions := Seq("2.12.11", "2.13.4"),
+  scalaVersion in ThisBuild := "2.13.4",
   scalacOptions := Seq(
     "-deprecation",
     "-encoding",
@@ -69,17 +71,6 @@ val sourceMapSetting =
         val g = "https://raw.githubusercontent.com/suzaku-io/diode"
         s"-P:scalajs:mapSourceURI:$a->$g/v${version.value}/${name.value}/"
       })
-  )
-
-def preventPublication(p: Project) =
-  p.settings(
-    publish := (()),
-    publishLocal := (()),
-    publishArtifact := false,
-    publishTo := Some(
-      Resolver.file("Unused transient repository", target.value / "fakepublish")
-    ),
-    packagedArtifacts := Map.empty
   )
 
 lazy val diodeCore = crossProject(JSPlatform, JVMPlatform)
@@ -142,26 +133,9 @@ lazy val diodeReact: Project = project
   .settings(
     name := "diode-react",
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "core" % Version.sjsReact
+      "com.github.japgolly.scalajs-react" %%% "core" % "1.7.7"
     ),
     scalacOptions ++= sourceMapSetting.value
   )
   .dependsOn(diode.js)
 
-lazy val coreProjects = Seq[ProjectReference](
-  diode.js,
-  diode.jvm,
-  diodeCore.js,
-  diodeCore.jvm,
-  diodeData.js,
-  diodeData.jvm,
-  diodeDevtools.js,
-  diodeDevtools.jvm,
-  diodeReact
-)
-
-lazy val root = preventPublication(project.in(file(".")))
-  .settings(
-    commonSettings
-  )
-  .aggregate(coreProjects: _*)

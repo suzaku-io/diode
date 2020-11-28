@@ -22,7 +22,7 @@ object RunAfter {
     * A `RunAfter` implementation that never runs the given function
     */
   object infinity extends RunAfter {
-    override def runAfter[A](delay: FiniteDuration)(f: => A): Future[A] = Promise[A].future
+    override def runAfter[A](delay: FiniteDuration)(f: => A): Future[A] = Promise[A]().future
   }
 
   /**
