@@ -28,3 +28,6 @@ _examples
 node_modules
 .metals
 .bloop
+.bsp/
+project/project/
+project/metals.sbt
