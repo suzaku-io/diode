@@ -13,8 +13,8 @@ val customScalaJSVersion = Option(System.getenv("SCALAJS_VERSION"))
 
 val commonSettings = Seq(
   organization := "io.suzaku",
-  crossScalaVersions := Seq("2.12.11", "2.13.4"),
-  scalaVersion in ThisBuild := "2.13.4",
+  crossScalaVersions := Seq("2.12.11", "2.13.5"),
+  scalaVersion in ThisBuild := "2.13.5",
   scalacOptions := Seq(
     "-deprecation",
     "-encoding",
