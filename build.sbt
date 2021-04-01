@@ -36,8 +36,8 @@ val commonSettings = Seq(
   Compile / doc / scalacOptions -= "-Xfatal-warnings",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
-    "com.lihaoyi"            %%% "utest"                  % "0.7.7" % "test",
-    "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.3"
+    "com.lihaoyi"            %%% "utest"                  % "0.7.8" % "test",
+    "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.2"
   )
 )
 
