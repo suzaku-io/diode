@@ -15,7 +15,7 @@ jobs:
       - name: Setup Scala
         uses: olafurpg/setup-scala@v10
       - name: Checking your code format
-        run: csbt scalafmtCheck
+        run: sbt scalafmtCheck
       - name: Cache dependencies
         uses: actions/cache@v2.1.5
         with:
@@ -30,5 +30,4 @@ jobs:
           restore-keys: ${{ runner.os }}-sbt-
       - name: Run tests
         run: |
-          csbt +test
-          SCALAJS_VERSION=0.6.33 csbt clean +test
+          sbt +test

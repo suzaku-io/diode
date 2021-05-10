@@ -7,14 +7,12 @@ ThisBuild / scalafmtOnCompile := true
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-skip in publish := true
-
-val customScalaJSVersion = Option(System.getenv("SCALAJS_VERSION"))
+publish / skip := true
 
 val commonSettings = Seq(
   organization := "io.suzaku",
-  crossScalaVersions := Seq("2.12.13", "2.13.4"),
-  scalaVersion in ThisBuild := "2.13.4",
+  crossScalaVersions := Seq("2.12.13", "2.13.5"),
+  ThisBuild / scalaVersion := "2.13.5",
   scalacOptions := Seq(
     "-deprecation",
     "-encoding",
@@ -82,9 +80,6 @@ lazy val diodeCore = crossProject(JSPlatform, JVMPlatform)
     libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
   )
   .jsSettings(scalacOptions ++= sourceMapSetting.value)
-  .jvmSettings(
-    skip.in(publish) := customScalaJSVersion.isDefined
-  )
 
 lazy val diodeData = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
@@ -92,9 +87,6 @@ lazy val diodeData = crossProject(JSPlatform, JVMPlatform)
   .settings(commonSettings: _*)
   .settings(name := "diode-data")
   .jsSettings(scalacOptions ++= sourceMapSetting.value)
-  .jvmSettings(
-    skip.in(publish) := customScalaJSVersion.isDefined
-  )
   .dependsOn(diodeCore)
 
 lazy val diode = crossProject(JSPlatform, JVMPlatform)
@@ -104,9 +96,6 @@ lazy val diode = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "diode",
     test := {}
-  )
-  .jvmSettings(
-    skip.in(publish) := customScalaJSVersion.isDefined
   )
   .dependsOn(diodeCore, diodeData)
 
@@ -120,9 +109,6 @@ lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
   .jsSettings(
     libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "1.1.0"),
     scalacOptions ++= sourceMapSetting.value
-  )
-  .jvmSettings(
-    skip.in(publish) := customScalaJSVersion.isDefined
   )
   .dependsOn(diodeCore)
 
