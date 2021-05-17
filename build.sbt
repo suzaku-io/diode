@@ -11,8 +11,8 @@ publish / skip := true
 
 val commonSettings = Seq(
   organization := "io.suzaku",
-  crossScalaVersions := Seq("2.12.13", "2.13.5"),
-  ThisBuild / scalaVersion := "2.13.5",
+  crossScalaVersions := Seq("2.12.13", "2.13.6"),
+  ThisBuild / scalaVersion := "2.13.6",
   scalacOptions := Seq(
     "-deprecation",
     "-encoding",
