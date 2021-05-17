@@ -11,8 +11,8 @@ publish / skip := true
 
 val commonSettings = Seq(
   organization := "io.suzaku",
-  crossScalaVersions := Seq("2.12.13", "2.13.5"),
-  ThisBuild / scalaVersion := "2.13.5",
+  crossScalaVersions := Seq("2.12.13", "2.13.6"),
+  ThisBuild / scalaVersion := "2.13.6",
   scalacOptions := Seq(
     "-deprecation",
     "-encoding",
@@ -34,8 +34,8 @@ val commonSettings = Seq(
   Compile / doc / scalacOptions -= "-Xfatal-warnings",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
-    "com.lihaoyi"            %%% "utest"                  % "0.7.9" % "test",
-    "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.4"
+    "com.lihaoyi"            %%% "utest"                  % "0.7.10" % "test",
+    "org.scala-lang.modules" %% "scala-collection-compat" % "2.4.2"
   )
 )
 
