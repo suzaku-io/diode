@@ -2,12 +2,15 @@ import sbt.Keys._
 import sbt._
 // shadow sbt-scalajs' crossProject and CrossType from Scala.js 0.6.x
 import sbtcrossproject.CrossPlugin.autoImport.{crossProject, CrossType}
+import Util._
 
 ThisBuild / scalafmtOnCompile := true
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
 publish / skip := true
+
+val scala3Version = "3.0.2"
 
 val commonSettings = Seq(
   organization := "io.suzaku",
@@ -18,25 +21,41 @@ val commonSettings = Seq(
     "-encoding",
     "UTF-8",
     "-feature",
-    "-unchecked",
-    "-language:experimental.macros",
-    "-language:existentials",
-    "-Xfatal-warnings",
-    "-Xlint",
-    "-Ywarn-dead-code",
-    "-Ywarn-numeric-widen",
-    "-Ywarn-value-discard"
-  ) ++ (CrossVersion.partialVersion(scalaVersion.value) match {
-    case Some((2, 12)) => Seq("-Xlint:-unused", "-language:higherKinds")
-    case _             => Nil
-  }),
-  Compile / scalacOptions -= "-Ywarn-value-discard",
-  Compile / doc / scalacOptions -= "-Xfatal-warnings",
+    "-unchecked"
+  ),
+  scalacOptions ++= scalaVerDependentSeq {
+    case (2, _) => Seq(
+      "-Xlint",
+      "-Ywarn-dead-code",
+      "-Ywarn-numeric-widen",
+      "-Ywarn-value-discard",
+      "-language:experimental.macros",
+      "-language:existentials"
+    )
+  }.value,
+  scalacOptions ++= scalaVerDependentSeq {
+    case (2, 12) => Seq(
+      "-Xfatal-warnings",
+      "-Xlint:-unused",
+      "-language:higherKinds"
+    )
+    case (2, 13) => Seq("-Werror")
+    case (3, _) => Seq("-Xfatal-warnings")
+  }.value,
+  Compile / scalacOptions -= scalaVerDependent {
+    case (2, _) => "-Ywarn-value-discard"
+  }.value,
+  Compile / doc / scalacOptions -= scalaVerDependent {
+    case (2, 12) | (3, _) => "-Xfatal-warnings"
+    case (2, 13) => "-Werror"
+  }.value,
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
-    "com.lihaoyi"            %%% "utest"                  % "0.7.10" % "test",
-    "org.scala-lang.modules" %% "scala-collection-compat" % "2.5.0"
-  )
+    "com.lihaoyi" %%% "utest" % "0.7.10" % "test"
+  ),
+  libraryDependencies += scalaVerDependent {
+    case (2, _) => "org.scala-lang.modules" %% "scala-collection-compat" % "2.5.0"
+  }.value
 )
 
 inThisBuild(
@@ -60,16 +79,25 @@ inThisBuild(
   )
 )
 
-val sourceMapSetting =
-  Def.setting(
-    if (isSnapshot.value) Seq.empty
-    else
-      Seq({
-        val a = baseDirectory.value.toURI.toString.replaceFirst("[^/]+/?$", "")
-        val g = "https://raw.githubusercontent.com/suzaku-io/diode"
-        s"-P:scalajs:mapSourceURI:$a->$g/v${version.value}/${name.value}/"
-      })
-  )
+val sourceMapSetting: Def.Initialize[Option[String]] = Def.settingDyn(
+  if (isSnapshot.value) Def.setting(None)
+  else {
+    val a = baseDirectory.value.toURI.toString.replaceFirst("[^/]+/?$", "")
+    val g = "https://raw.githubusercontent.com/suzaku-io/diode"
+    val uri = s"$a->$g/v${version.value}/${name.value}/"
+    scalaVerDependent {
+      case (2, _) => s"-P:scalajs:mapSourceURI:$uri"
+      case (3, _) => s"-scalajs:mapSourceURI:$uri"
+    }
+  }
+)
+
+val commonJsSettings = Seq(
+  scalacOptions += sourceMapSetting.value,
+  scalacOptions += scalaVerDependent {
+    case (3, _) => "-scalajs"
+  }.value
+)
 
 lazy val diodeCore = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
@@ -77,16 +105,25 @@ lazy val diodeCore = crossProject(JSPlatform, JVMPlatform)
   .settings(commonSettings: _*)
   .settings(
     name := "diode-core",
-    libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
+    crossScalaVersions += scala3Version,
+    libraryDependencies += Def.settingDyn {
+      val scalaVer = scalaVersion.value
+      scalaVerDependent {
+        case (2, _) => "org.scala-lang" % "scala-reflect" % scalaVer % "provided"
+      }
+    }.value
   )
-  .jsSettings(scalacOptions ++= sourceMapSetting.value)
+  .jsSettings(commonJsSettings: _*)
 
 lazy val diodeData = crossProject(JSPlatform, JVMPlatform)
   .crossType(CrossType.Full)
   .in(file("diode-data"))
   .settings(commonSettings: _*)
-  .settings(name := "diode-data")
-  .jsSettings(scalacOptions ++= sourceMapSetting.value)
+  .settings(
+    name := "diode-data",
+    crossScalaVersions += scala3Version
+  )
+  .jsSettings(commonJsSettings: _*)
   .dependsOn(diodeCore)
 
 lazy val diode = crossProject(JSPlatform, JVMPlatform)
@@ -106,9 +143,9 @@ lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
   .settings(
     name := "diode-devtools"
   )
+  .jsSettings(commonJsSettings: _*)
   .jsSettings(
-    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "1.1.0"),
-    scalacOptions ++= sourceMapSetting.value
+    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "1.1.0")
   )
   .dependsOn(diodeCore)
 
@@ -116,12 +153,11 @@ lazy val diodeReact: Project = project
   .enablePlugins(ScalaJSPlugin)
   .in(file("diode-react"))
   .settings(commonSettings: _*)
+  .settings(commonJsSettings: _*)
   .settings(
     name := "diode-react",
     libraryDependencies ++= Seq(
       "com.github.japgolly.scalajs-react" %%% "core" % "1.7.7"
-    ),
-    scalacOptions ++= sourceMapSetting.value
+    )
   )
   .dependsOn(diode.js)
-

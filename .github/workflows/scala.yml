@@ -15,7 +15,7 @@ jobs:
       - name: Setup Scala
         uses: olafurpg/setup-scala@v13
       - name: Checking your code format
-        run: sbt scalafmtCheck
+        run: sbt +scalafmtCheck
       - name: Cache dependencies
         uses: actions/cache@v2.1.6
         with:

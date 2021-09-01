@@ -10,7 +10,7 @@ class PotMap[K, V](
   override def updated(key: K, value: Pot[V]): PotMap[K, V] =
     new PotMap(fetcher, elems + (key -> value))
 
-  override def updated(kvs: Iterable[(K, Pot[V])]) =
+  override def updated(kvs: Iterable[(K, Pot[V])]): PotMap[K, V] =
     new PotMap(fetcher, elems ++ kvs)
 
   override def updated(start: K, values: Iterable[Pot[V]])(implicit num: Numeric[K]): PotMap[K, V] = {
@@ -28,7 +28,7 @@ class PotMap[K, V](
 
   override def iterator: Iterator[(K, Pot[V])] = elems.iterator
 
-  override def remove(key: K) =
+  override def remove(key: K): PotMap[K, V] =
     new PotMap(fetcher, elems - key)
 
   override def refresh(key: K): Unit = {
@@ -57,7 +57,7 @@ class PotMap[K, V](
     }
   }
 
-  override def map(f: (K, Pot[V]) => Pot[V]) = {
+  override def map(f: (K, Pot[V]) => Pot[V]): PotMap[K, V] = {
     new PotMap(fetcher, elems.map(kv => (kv._1, f(kv._1, kv._2))))
   }
 
