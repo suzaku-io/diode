@@ -15,7 +15,8 @@ trait RetryPolicy {
   /**
     * Checks if retry should be attempted.
     *
-    * @param reason Reason for failure leading to this retry. Used for filtering.
+    * @param reason
+    *   Reason for failure leading to this retry. Used for filtering.
     * @return
     */
   def canRetry(reason: Throwable): Boolean
@@ -23,8 +24,10 @@ trait RetryPolicy {
   /**
     * Retries an effect. Returns `Left` if retry is not possible and `Right[(RetryPolicy, Effects)]` if it is.
     *
-    * @param reason Reason for failure leading to this retry. Used for filtering.
-    * @param effectProvider Effect to be retried.
+    * @param reason
+    *   Reason for failure leading to this retry. Used for filtering.
+    * @param effectProvider
+    *   Effect to be retried.
     * @return
     */
   def retry[T <: AnyRef](reason: Throwable, effectProvider: RetryPolicy => Effect): Either[Throwable, (RetryPolicy, Effect)]
@@ -47,8 +50,10 @@ object Retry {
   /**
     * Retries a max of `retriesLeft` times immediately following a failure.
     *
-    * @param retriesLeft Number of retries
-    * @param filter A filter to check if the cause of failure should prevent retrying.
+    * @param retriesLeft
+    *   Number of retries
+    * @param filter
+    *   A filter to check if the cause of failure should prevent retrying.
     */
   case class Immediate(retriesLeft: Int, filter: Throwable => Boolean = always) extends RetryPolicy {
     override def canRetry(reason: Throwable) =
@@ -67,10 +72,14 @@ object Retry {
   /**
     * Provides an exponential backoff algorithm for retrying.
     *
-    * @param retriesLeft Number of retries
-    * @param delay Delay after failure before trying again. Grows on each retry to `prevDelay * exp`
-    * @param exp Exponential growth factor for delay. Default is 2.0 leading to delay doubling on every retry.
-    * @param filter A filter to check if the cause of failure should prevent retrying.
+    * @param retriesLeft
+    *   Number of retries
+    * @param delay
+    *   Delay after failure before trying again. Grows on each retry to `prevDelay * exp`
+    * @param exp
+    *   Exponential growth factor for delay. Default is 2.0 leading to delay doubling on every retry.
+    * @param filter
+    *   A filter to check if the cause of failure should prevent retrying.
     */
   case class Backoff(
       retriesLeft: Int,

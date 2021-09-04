@@ -210,7 +210,7 @@ object PotCollectionTests extends TestSuite {
             action.handleWith(this, updateEffect)(AsyncAction.mapHandler(action.keys))
         }
       }
-     */
+       */
     }
   }
 }

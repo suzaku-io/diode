@@ -7,8 +7,7 @@ import japgolly.scalajs.react.vdom.VdomElement
 import scala.scalajs.js
 
 /**
-  * Wraps a model reader, dispatcher and React connector to be passed to React components
-  * in props.
+  * Wraps a model reader, dispatcher and React connector to be passed to React components in props.
   */
 case class ModelProxy[S](modelReader: ModelRO[S], theDispatch: Any => Unit, connector: ReactConnector[_ <: AnyRef]) {
   def value = modelReader()
@@ -42,21 +41,28 @@ trait ReactConnector[M <: AnyRef] { circuit: Circuit[M] =>
   /**
     * Wraps a React component by providing it an instance of ModelProxy for easy access to the model and dispatcher.
     *
-    * @param zoomFunc Function to retrieve relevant piece from the model
-    * @param compB    Function that creates the wrapped component
-    * @return The component returned by `compB`
+    * @param zoomFunc
+    *   Function to retrieve relevant piece from the model
+    * @param compB
+    *   Function that creates the wrapped component
+    * @return
+    *   The component returned by `compB`
     */
-  def wrap[S <: AnyRef, C](zoomFunc: M => S)(compB: ModelProxy[S] => C)(implicit ev: C => VdomElement,
-                                                                        feq: FastEq[_ >: S]): C = {
+  def wrap[S <: AnyRef, C](
+      zoomFunc: M => S
+  )(compB: ModelProxy[S] => C)(implicit ev: C => VdomElement, feq: FastEq[_ >: S]): C = {
     wrap(circuit.zoom(zoomFunc))(compB)
   }
 
   /**
     * Wraps a React component by providing it an instance of ModelProxy for easy access to the model and dispatcher.
     *
-    * @param modelReader A reader that returns the piece of model we are interested in
-    * @param compB       Function that creates the wrapped component
-    * @return The component returned by `compB`
+    * @param modelReader
+    *   A reader that returns the piece of model we are interested in
+    * @param compB
+    *   Function that creates the wrapped component
+    * @return
+    *   The component returned by `compB`
     */
   def wrap[S <: AnyRef, C](modelReader: ModelRO[S])(compB: ModelProxy[S] => C)(implicit ev: C => VdomElement): C = {
     implicit object aType extends ActionType[Any]
@@ -65,35 +71,43 @@ trait ReactConnector[M <: AnyRef] { circuit: Circuit[M] =>
   }
 
   /**
-    * Connects a React component into the Circuit by wrapping it in another component that listens to
-    * relevant state changes and updates the wrapped component as needed.
+    * Connects a React component into the Circuit by wrapping it in another component that listens to relevant state changes
+    * and updates the wrapped component as needed.
     *
-    * @param zoomFunc Function to retrieve relevant piece from the model
-    * @param key      Specifies a unique React key for this component.
-    * @return A ReactConnectProxy
+    * @param zoomFunc
+    *   Function to retrieve relevant piece from the model
+    * @param key
+    *   Specifies a unique React key for this component.
+    * @return
+    *   A ReactConnectProxy
     */
   def connect[S <: AnyRef](zoomFunc: M => S, key: js.Any)(implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
     connect(circuit.zoom(zoomFunc), key)
   }
 
   /**
-    * Connects a React component into the Circuit by wrapping it in another component that listens to
-    * relevant state changes and updates the wrapped component as needed.
+    * Connects a React component into the Circuit by wrapping it in another component that listens to relevant state changes
+    * and updates the wrapped component as needed.
     *
-    * @param zoomFunc Function to retrieve relevant piece from the model
-    * @return A ReactConnectProxy
+    * @param zoomFunc
+    *   Function to retrieve relevant piece from the model
+    * @return
+    *   A ReactConnectProxy
     */
   def connect[S <: AnyRef](zoomFunc: M => S)(implicit feq: FastEq[_ >: S]): ReactConnectProxy[S] = {
     connect(circuit.zoom(zoomFunc))
   }
 
   /**
-    * Connects a React component into the Circuit by wrapping it in another component that listens to
-    * relevant state changes and updates the wrapped component as needed.
+    * Connects a React component into the Circuit by wrapping it in another component that listens to relevant state changes
+    * and updates the wrapped component as needed.
     *
-    * @param modelReader A reader that returns the piece of model we are interested in
-    * @param key         Optional parameter specifying a unique React key for this component.
-    * @return A ReactConnectProxy
+    * @param modelReader
+    *   A reader that returns the piece of model we are interested in
+    * @param key
+    *   Optional parameter specifying a unique React key for this component.
+    * @return
+    *   A ReactConnectProxy
     */
   def connect[S <: AnyRef](modelReader: ModelRO[S], key: js.UndefOr[js.Any] = js.undefined): ReactConnectProxy[S] = {
 

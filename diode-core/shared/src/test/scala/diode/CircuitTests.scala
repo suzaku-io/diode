@@ -357,7 +357,8 @@ object CircuitTests extends TestSuite {
           override def process(dispatcher: Dispatcher,
                                action: Any,
                                next: Any => ActionResult[Model],
-                               currentModel: Model) = {
+                               currentModel: Model
+          ) = {
             next(action match {
               case s: String =>
                 SetS(s)
@@ -378,7 +379,8 @@ object CircuitTests extends TestSuite {
           override def process(dispatcher: Dispatcher,
                                action: Any,
                                next: Any => ActionResult[Model],
-                               currentModel: Model) = {
+                               currentModel: Model
+          ) = {
             action match {
               case SetS(_) =>
                 ActionResult.NoChange
@@ -397,7 +399,8 @@ object CircuitTests extends TestSuite {
           override def process(dispatcher: Dispatcher,
                                action: Any,
                                next: Any => ActionResult[Model],
-                               currentModel: Model) = {
+                               currentModel: Model
+          ) = {
             next(action) match {
               case m: ModelUpdated[Model @unchecked] =>
                 log += m.newModel.s
@@ -418,7 +421,8 @@ object CircuitTests extends TestSuite {
           override def process(dispatcher: Dispatcher,
                                action: Any,
                                next: Any => ActionResult[Model],
-                               currentModel: Model) = {
+                               currentModel: Model
+          ) = {
             action match {
               case Delay(a) =>
                 pending.enqueue((a, dispatcher))

@@ -9,7 +9,8 @@ import scala.language.implicitConversions
 /**
   * Base class for all action handlers.
   *
-  * @param modelRW Model reader/writer for the actions this handler processes.
+  * @param modelRW
+  *   Model reader/writer for the actions this handler processes.
   */
 abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
 
@@ -47,8 +48,8 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
     ModelUpdate(modelRW.updatedWith(currentModel, newValue))
 
   /**
-    * Helper function to create a `ModelUpdateSilent` result from a new value. Being silent, the
-    * update prevents any calls to listeners.
+    * Helper function to create a `ModelUpdateSilent` result from a new value. Being silent, the update prevents any calls to
+    * listeners.
     *
     * @param newValue
     * @return
@@ -67,8 +68,8 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
     ModelUpdateEffect(modelRW.updatedWith(currentModel, newValue), effect)
 
   /**
-    * Helper function to create a `ModelUpdateSilentEffect` result from a new value and an effect. Being silent, the
-    * update prevents any calls to listeners.
+    * Helper function to create a `ModelUpdateSilentEffect` result from a new value and an effect. Being silent, the update
+    * prevents any calls to listeners.
     *
     * @param newValue
     * @param effect
@@ -97,8 +98,10 @@ abstract class ActionHandler[M, T](val modelRW: ModelRW[M, T]) {
   /**
     * Helper function to create a delayed effect.
     *
-    * @param delay How much to delay the effect.
-    * @param f     Result of the effect
+    * @param delay
+    *   How much to delay the effect.
+    * @param f
+    *   Result of the effect
     */
   def runAfter[A: ActionType](delay: FiniteDuration)(f: => A)(implicit runner: RunAfter, ec: ExecutionContext): Effect =
     Effect(runner.runAfter(delay)(f))
