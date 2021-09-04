@@ -8,7 +8,8 @@ final case class StreamValue[K, V](key: K,
                                    value: V,
                                    stream: PotStream[K, V],
                                    prevKey: Option[K] = None,
-                                   nextKey: Option[K] = None) {
+                                   nextKey: Option[K] = None
+) {
   def apply() = value
 
   def prev = stream.get(prevKey)
@@ -46,15 +47,18 @@ class PotStream[K, V](
                       next: Option[K],
                       head: (K, V),
                       tail: Seq[(K, V)],
-                      acc: List[StreamValue[K, V]]): List[StreamValue[K, V]] = {
+                      acc: List[StreamValue[K, V]]
+      ): List[StreamValue[K, V]] = {
         if (tail.isEmpty) {
           StreamValue(head._1, head._2, this, prev, next) :: acc
         } else {
-          buildStream(Some(head._1),
-                      tail.tail.headOption.map(_._1),
-                      tail.head,
-                      tail.tail,
-                      StreamValue(head._1, head._2, this, prev, next) :: acc)
+          buildStream(
+            Some(head._1),
+            tail.tail.headOption.map(_._1),
+            tail.head,
+            tail.tail,
+            StreamValue(head._1, head._2, this, prev, next) :: acc
+          )
         }
       }
 
@@ -80,15 +84,18 @@ class PotStream[K, V](
                       next: Option[K],
                       head: (K, V),
                       tail: Seq[(K, V)],
-                      acc: List[StreamValue[K, V]]): List[StreamValue[K, V]] = {
+                      acc: List[StreamValue[K, V]]
+      ): List[StreamValue[K, V]] = {
         if (tail.isEmpty) {
           StreamValue(head._1, head._2, this, prev, next) :: acc
         } else {
-          buildStream(tail.tail.headOption.map(_._1),
-                      Some(head._1),
-                      tail.head,
-                      tail.tail,
-                      StreamValue(head._1, head._2, this, prev, next) :: acc)
+          buildStream(
+            tail.tail.headOption.map(_._1),
+            Some(head._1),
+            tail.head,
+            tail.tail,
+            StreamValue(head._1, head._2, this, prev, next) :: acc
+          )
         }
       }
 

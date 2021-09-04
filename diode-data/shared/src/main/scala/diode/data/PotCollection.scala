@@ -32,11 +32,13 @@ trait Fetch[K] {
 }
 
 /**
-  * Trait defining common functionality for all potential collections. All values inside the collection are
-  * wrapped in `Pot[V]`
+  * Trait defining common functionality for all potential collections. All values inside the collection are wrapped in
+  * `Pot[V]`
   *
-  * @tparam K Type of the key
-  * @tparam V Type of the potential value
+  * @tparam K
+  *   Type of the key
+  * @tparam V
+  *   Type of the potential value
   */
 trait PotCollection[K, V] {
   def updated(key: K, value: Pot[V]): PotCollection[K, V]

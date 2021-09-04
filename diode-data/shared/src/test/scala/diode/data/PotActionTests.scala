@@ -22,8 +22,8 @@ object PotActionTests extends TestSuite {
   }
 
   case class TestCollAction(state: PotState = PotState.PotEmpty,
-                            result: Try[Set[(String, Pot[String])]] = Failure(new AsyncAction.PendingException))
-      extends AsyncAction[Set[(String, Pot[String])], TestCollAction] {
+                            result: Try[Set[(String, Pot[String])]] = Failure(new AsyncAction.PendingException)
+  ) extends AsyncAction[Set[(String, Pot[String])], TestCollAction] {
     override def next(newState: PotState, newResult: Try[Set[(String, Pot[String])]]) =
       TestCollAction(newState, newResult)
   }
@@ -97,8 +97,10 @@ object PotActionTests extends TestSuite {
       "EffectFail" - {
         val ta = TestAction()
         val eff =
-          ta.effect(Future { if (true) throw new Exception("Oh no!") else 42 })(_.toString,
-                                                                                ex => new Exception(ex.getMessage * 2))
+          ta.effect(Future { if (true) throw new Exception("Oh no!") else 42 })(
+            _.toString,
+            ex => new Exception(ex.getMessage * 2)
+          )
 
         eff.toFuture.map { action =>
           assert(action.potResult.exceptionOption.exists(_.getMessage == "Oh no!Oh no!"))
