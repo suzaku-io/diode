@@ -12,18 +12,19 @@ object TodoView {
                    onUpdateTitle: String => Callback,
                    onCancelEditing: Callback,
                    todo: Todo,
-                   isEditing: Boolean)
+                   isEditing: Boolean
+  )
 
   case class State(editText: String)
 
   class Backend($ : BackendScope[Props, State]) {
     val x = $.props.map(_.isEditing)
     def editFieldSubmit(p: Props): Callback =
-      $.state.flatMap(
-        s =>
-          if (s.editText.trim == "")
-            p.onDelete
-          else p.onUpdateTitle(s.editText.trim))
+      $.state.flatMap(s =>
+        if (s.editText.trim == "")
+          p.onDelete
+        else p.onUpdateTitle(s.editText.trim)
+      )
 
     def resetText(p: Props): Callback =
       $.modState(_.copy(editText = p.todo.title))
@@ -34,7 +35,7 @@ object TodoView {
           case KeyCode.Escape => Some(resetText(p) >> p.onCancelEditing)
           case KeyCode.Enter  => Some(editFieldSubmit(p))
           case _              => None
-      }
+        }
 
     val editFieldChanged: ReactEventFromInput => Callback =
       e => Callback { e.persist() } >> $.modState(_.copy(editText = e.target.value))
@@ -49,7 +50,7 @@ object TodoView {
           ^.className := "view",
           <.input.checkbox(
             ^.className := "toggle",
-            ^.checked := p.todo.isCompleted,
+            ^.checked   := p.todo.isCompleted,
             ^.onChange --> p.onToggle
           ),
           <.label(

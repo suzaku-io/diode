@@ -40,8 +40,8 @@ case class ReplaceNode(path: Seq[String], node: FileNode) extends Action
 case class Select(selected: Seq[String]) extends Action
 
 /**
-  * AppCircuit provides the actual instance of the `RootModel` and all the action
-  * handlers we need. Everything else comes from the `Circuit`
+  * AppCircuit provides the actual instance of the `RootModel` and all the action handlers we need. Everything else comes
+  * from the `Circuit`
   */
 object AppCircuit extends Circuit[RootModel] {
   // define initial value for the application model
@@ -71,14 +71,16 @@ class DirectoryTreeHandler[M](modelRW: ModelRW[M, Directory]) extends ActionHand
   /**
     * Helper function to zoom into the directory hierarchy, delivering the `children` of the last directory.
     *
-    * @param path Sequence of directory identifiers
-    * @param rw Reader/Writer for current directory
+    * @param path
+    *   Sequence of directory identifiers
+    * @param rw
+    *   Reader/Writer for current directory
     * @return
-    * `Some(childrenRW)` if the directory was found or
-    * `None` if something went wrong
+    *   `Some(childrenRW)` if the directory was found or `None` if something went wrong
     */
   @tailrec private def zoomToChildren(path: Seq[String],
-                                      rw: ModelRW[M, Directory]): Option[ModelRW[M, IndexedSeq[FileNode]]] = {
+                                      rw: ModelRW[M, Directory]
+  ): Option[ModelRW[M, IndexedSeq[FileNode]]] = {
     if (path.isEmpty) {
       Some(rw.zoomTo(_.children))
     } else {
@@ -89,9 +91,12 @@ class DirectoryTreeHandler[M](modelRW: ModelRW[M, Directory]) extends ActionHand
           None
         case idx =>
           // zoom into the directory position given by `idx` and continue recursion
-          zoomToChildren(path.tail,
-                         rw.zoomRW(_.children(idx).asInstanceOf[Directory])((m, v) =>
-                           m.copy(children = (m.children.take(idx) :+ v) ++ m.children.drop(idx + 1))))
+          zoomToChildren(
+            path.tail,
+            rw.zoomRW(_.children(idx).asInstanceOf[Directory])((m, v) =>
+              m.copy(children = (m.children.take(idx) :+ v) ++ m.children.drop(idx + 1))
+            )
+          )
       }
     }
   }

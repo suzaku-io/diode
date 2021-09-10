@@ -44,7 +44,7 @@ object TodoList {
         <.header(
           ^.className := "header",
           <.input(
-            ^.className := "new-todo",
+            ^.className   := "new-todo",
             ^.placeholder := "What needs to be done?",
             ^.onKeyDown ==>? handleNewTodoKeyDown(dispatch),
             ^.autoFocus := true
@@ -60,16 +60,16 @@ object TodoList {
         ^.className := "main",
         <.input.checkbox(
           ^.className := "toggle-all",
-          ^.checked := activeCount == 0,
+          ^.checked   := activeCount == 0,
           ^.onChange ==> { e: ReactEventFromInput =>
             dispatch(ToggleAll(e.target.checked))
           }
         ),
         <.ul(
           ^.className := "todo-list",
-          todos.toTagMod(
-            todo =>
-              TodoView(TodoView.Props(
+          todos.toTagMod(todo =>
+            TodoView(
+              TodoView.Props(
                 onToggle = dispatch(ToggleCompleted(todo.id)),
                 onDelete = dispatch(Delete(todo.id)),
                 onStartEditing = startEditing(todo.id),
@@ -77,7 +77,9 @@ object TodoList {
                 onCancelEditing = editingDone(),
                 todo = todo,
                 isEditing = editing.contains(todo.id)
-              )))
+              )
+            )
+          )
         )
       )
 
@@ -85,7 +87,8 @@ object TodoList {
                dispatch: Action => Callback,
                currentFilter: TodoFilter,
                activeCount: Int,
-               completedCount: Int): VdomElement =
+               completedCount: Int
+    ): VdomElement =
       Footer(
         Footer.Props(
           filterLink = p.ctl.link,
@@ -94,7 +97,8 @@ object TodoList {
           currentFilter = currentFilter,
           activeCount = activeCount,
           completedCount = completedCount
-        ))
+        )
+      )
   }
 
   private val component = ScalaComponent
