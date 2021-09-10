@@ -1,5 +1,8 @@
 # Changes
 
+## 1.2.0-RC1
+- Update diode-react to scalajs-react 2.0.0-RC3. This change can break applications that use diode-react if they use older versions of scalajs-react.
+- This version removes the backwards compatibility with Scala 2.12 because of scalajs-react 2.
 
 ## 1.1.8
 - update build/dependencies to support SJS 1.0.0

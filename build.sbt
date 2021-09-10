@@ -11,7 +11,7 @@ publish / skip := true
 
 val commonSettings = Seq(
   organization := "io.suzaku",
-  crossScalaVersions := Seq("2.12.14", "2.13.6"),
+  crossScalaVersions := Seq("2.13.6"),
   ThisBuild / scalaVersion := "2.13.6",
   scalacOptions := Seq(
     "-deprecation",
@@ -119,7 +119,7 @@ lazy val diodeReact: Project = project
   .settings(
     name := "diode-react",
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "core" % "1.7.7"
+      "com.github.japgolly.scalajs-react" %%% "core" % "2.0.0-RC3"
     ),
     scalacOptions ++= sourceMapSetting.value
   )
