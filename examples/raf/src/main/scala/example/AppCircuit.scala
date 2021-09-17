@@ -62,8 +62,8 @@ case class ContinueAnimation(id: Int) extends Action
 case class DeleteAnimation(id: Int) extends Action
 
 /**
-  * AppCircuit provides the actual instance of the `RootModel` and all the action
-  * handlers we need. Everything else comes from the `Circuit`
+  * AppCircuit provides the actual instance of the `RootModel` and all the action handlers we need. Everything else comes
+  * from the `Circuit`
   */
 object AppCircuit extends Circuit[RootModel] {
   // define initial value for the application model

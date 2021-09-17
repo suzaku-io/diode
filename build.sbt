@@ -10,8 +10,8 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 publish / skip := true
 
 val commonSettings = Seq(
-  organization := "io.suzaku",
-  crossScalaVersions := Seq("2.13.6"),
+  organization             := "io.suzaku",
+  crossScalaVersions       := Seq("2.13.6"),
   ThisBuild / scalaVersion := "2.13.6",
   scalacOptions := Seq(
     "-deprecation",
@@ -34,7 +34,7 @@ val commonSettings = Seq(
   Compile / doc / scalacOptions -= "-Xfatal-warnings",
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
-    "com.lihaoyi"            %%% "utest"                  % "0.7.10" % "test",
+    "com.lihaoyi"           %%% "utest"                   % "0.7.10" % "test",
     "org.scala-lang.modules" %% "scala-collection-compat" % "2.5.0"
   )
 )
@@ -44,10 +44,7 @@ inThisBuild(
     homepage := Some(url("https://github.com/suzaku-io/diode")),
     licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
     developers := List(
-      Developer("ochrons",
-                "Otto Chrons",
-                "",
-                url("https://github.com/ochrons"))
+      Developer("ochrons", "Otto Chrons", "", url("https://github.com/ochrons"))
     ),
     scmInfo := Some(
       ScmInfo(
@@ -76,7 +73,7 @@ lazy val diodeCore = crossProject(JSPlatform, JVMPlatform)
   .in(file("diode-core"))
   .settings(commonSettings: _*)
   .settings(
-    name := "diode-core",
+    name                                   := "diode-core",
     libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value % "provided"
   )
   .jsSettings(scalacOptions ++= sourceMapSetting.value)
@@ -124,4 +121,3 @@ lazy val diodeReact: Project = project
     scalacOptions ++= sourceMapSetting.value
   )
   .dependsOn(diode.js)
-

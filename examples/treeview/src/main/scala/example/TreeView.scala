@@ -20,9 +20,14 @@ class TreeView(root: ModelRO[FileNode], parent: Seq[String], selection: ModelRO[
     val isSelected = if (selection().nonEmpty && selection().last == id) "active" else ""
 
     def renderName(name: String) =
-      a(href := "#", cls := isSelected, onclick := { () =>
-        dispatcher(Select(path))
-      }, name)
+      a(
+        href := "#",
+        cls  := isSelected,
+        onclick := { () =>
+          dispatcher(Select(path))
+        },
+        name
+      )
 
     root() match {
       case Directory(id, name, children) =>

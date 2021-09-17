@@ -43,17 +43,30 @@ object SimpleApp extends JSApp {
         div(
           cls := "btn-group",
           if (animated.isRunning)
-            button(cls := "btn btn-warning", "Pause", onclick := { () =>
-              AppCircuit.dispatch(PauseAnimation(animId))
-            })
+            button(
+              cls := "btn btn-warning",
+              "Pause",
+              onclick := { () =>
+                AppCircuit.dispatch(PauseAnimation(animId))
+              }
+            )
           else
-            button(cls := "btn btn-success", "Continue", onclick := { () =>
-              AppCircuit.dispatch(ContinueAnimation(animId))
-            }),
-          button(cls := "btn btn-danger", "Delete", onclick := { () =>
-            AppCircuit.dispatch(DeleteAnimation(animId))
-          })
-        ).render)
+            button(
+              cls := "btn btn-success",
+              "Continue",
+              onclick := { () =>
+                AppCircuit.dispatch(ContinueAnimation(animId))
+              }
+            ),
+          button(
+            cls := "btn btn-danger",
+            "Delete",
+            onclick := { () =>
+              AppCircuit.dispatch(DeleteAnimation(animId))
+            }
+          )
+        ).render
+      )
     }
     if (!prevAnim.exists(_.animation eq animated.animation)) {
       val animation = animated.animation
@@ -61,16 +74,17 @@ object SimpleApp extends JSApp {
       elem.appendChild(
         svg
           .svg(
-            svga.width := 300,
+            svga.width  := 300,
             svga.height := 300,
             svg.circle(
-              svga.cx := animation.position.x * 130 + 150,
-              svga.cy := animation.position.y * 130 + 150,
-              svga.r := animation.scale * 20,
+              svga.cx   := animation.position.x * 130 + 150,
+              svga.cy   := animation.position.y * 130 + 150,
+              svga.r    := animation.scale * 20,
               svga.fill := animation.color
             )
           )
-          .render)
+          .render
+      )
     }
   }
 
@@ -104,9 +118,13 @@ object SimpleApp extends JSApp {
           animGenerators.map {
             case (animName, animGenerator) =>
               li(
-                a(href := "#", onclick := { () =>
-                  AppCircuit.dispatch(AddAnimation(animGenerator(math.random)))
-                }, animName)
+                a(
+                  href := "#",
+                  onclick := { () =>
+                    AppCircuit.dispatch(AddAnimation(animGenerator(math.random)))
+                  },
+                  animName
+                )
               )
           }
         )

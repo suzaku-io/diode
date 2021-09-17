@@ -17,7 +17,8 @@ class RAFBatcher[M <: AnyRef] extends ActionProcessor[M] {
   /**
     * Callback for RAF.
     *
-    * @param time Precise time of the frame
+    * @param time
+    *   Precise time of the frame
     */
   private def nextAnimationFrame(time: Double): Unit = {
     frameRequested = false

@@ -12,20 +12,26 @@ import org.scalajs.dom
 @JSExportTopLevel("SimpleApp")
 object SimpleApp extends JSApp {
   // initial data
-  val data = Directory("/",
-                       "/",
-                       Vector(
-                         Directory("2",
-                                   "My files",
-                                   Vector(
-                                     Directory("3",
-                                               "Documents",
-                                               Vector(
-                                                 File("F3", "HaukiOnKala.doc")
-                                               ))
-                                   )),
-                         File("F1", "boot.sys")
-                       ))
+  val data = Directory(
+    "/",
+    "/",
+    Vector(
+      Directory(
+        "2",
+        "My files",
+        Vector(
+          Directory(
+            "3",
+            "Documents",
+            Vector(
+              File("F3", "HaukiOnKala.doc")
+            )
+          )
+        )
+      ),
+      File("F1", "boot.sys")
+    )
+  )
 
   var id = 0
   def nextId = {
@@ -34,7 +40,7 @@ object SimpleApp extends JSApp {
   }
 
   var currentModel: FileNode = AppCircuit.zoom(_.tree.root).value
-  var treeView               = new TreeView(AppCircuit.zoom(_.tree.root), Seq.empty, AppCircuit.zoom(_.tree.selected), AppCircuit)
+  var treeView = new TreeView(AppCircuit.zoom(_.tree.root), Seq.empty, AppCircuit.zoom(_.tree.selected), AppCircuit)
 
   @JSExport
   override def main(): Unit = {
@@ -73,9 +79,14 @@ object SimpleApp extends JSApp {
           },
           "Create file"
         ),
-        button(if (!selected) disabled else "", cls := "btn", onclick := { () =>
-          AppCircuit(RemoveNode(selectionLoc))
-        }, "Remove")
+        button(
+          if (!selected) disabled else "",
+          cls := "btn",
+          onclick := { () =>
+            AppCircuit(RemoveNode(selectionLoc))
+          },
+          "Remove"
+        )
       )
     }
 
