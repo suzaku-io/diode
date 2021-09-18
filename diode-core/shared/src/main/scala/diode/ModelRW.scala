@@ -1,7 +1,5 @@
 package diode
 
-import diode.macros.GenLens
-
 /**
   * A read-only version of ModelR that doesn't know about the root model.
   *
@@ -125,7 +123,7 @@ trait ModelR[M, S] extends ModelRO[S] {
   * @tparam S
   *   Type of the reader/writer value
   */
-trait ModelRW[M, S] extends ModelR[M, S] {
+trait ModelRW[M, S] extends ModelR[M, S] with ZoomTo[M, S] {
 
   /**
     * Updates the model using the value provided and returns the updated model.
@@ -178,15 +176,6 @@ trait ModelRW[M, S] extends ModelR[M, S] {
       set: (S, F[B]) => S
   )(implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelRW[M, F[B]]
 
-  /**
-    * An easier way to zoom into a RW model by just specifying a single chained accessor for the field. This works for cases
-    * like `zoomTo(_.a.b.c)` but not for more complex cases such as `zoomTo(_.a.b(0))`. Uses a macro to generate appropriate
-    * update function.
-    *
-    * @param field
-    *   Field to access in the model
-    */
-  def zoomTo[T](field: S => T): ModelRW[M, T] = macro GenLens.generate[M, S, T]
 }
 
 /**

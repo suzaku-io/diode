@@ -9,11 +9,7 @@ import scala.concurrent._
 object CircuitTests extends TestSuite {
 
   import AnyAction._
-
-  // model
-  case class Model(s: String, data: Data)
-
-  case class Data(i: Int, b: Boolean)
+  import CircuitTestsModel._
 
   // actions
   case class SetS(s: String)

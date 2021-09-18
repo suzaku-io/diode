@@ -1,7 +1,5 @@
 package diode
 
-import diode.macros.GenLens
-
 import scala.annotation.implicitNotFound
 import scala.collection.immutable.Queue
 
@@ -111,7 +109,7 @@ object ActionResult {
   }
 }
 
-trait Circuit[M <: AnyRef] extends Dispatcher {
+trait Circuit[M <: AnyRef] extends Dispatcher with ZoomTo[M, M] {
 
   type HandlerFunction = (M, Any) => Option[ActionResult[M]]
 
@@ -207,8 +205,6 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
       set: (M, F[B]) => M
   )(implicit monad: Monad[F], feq: FastEq[_ >: B]): ModelRW[M, F[B]] =
     modelRW.zoomFlatMapRW(fa)(f)(set)
-
-  def zoomTo[T](field: M => T): ModelRW[M, T] = macro GenLens.generate[M, M, T]
 
   /**
     * Subscribes to listen to changes in the model. By providing a `cursor` you can limit what part of the model must change
