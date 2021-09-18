@@ -94,9 +94,6 @@ val sourceMapSetting: Def.Initialize[Option[String]] = Def.settingDyn(
 
 val commonJsSettings = Seq(
   scalacOptions += sourceMapSetting.value,
-  scalacOptions += scalaVerDependent {
-    case (3, _) => "-scalajs"
-  }.value
 )
 
 lazy val diodeCore = crossProject(JSPlatform, JVMPlatform)
