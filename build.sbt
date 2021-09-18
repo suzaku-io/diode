@@ -14,7 +14,7 @@ val scala3Version = "3.0.2"
 
 val commonSettings = Seq(
   organization := "io.suzaku",
-  crossScalaVersions := Seq("2.12.14", "2.13.6"),
+  crossScalaVersions := Seq("2.13.6"),
   ThisBuild / scalaVersion := "2.13.6",
   scalacOptions := Seq(
     "-deprecation",
@@ -145,7 +145,7 @@ lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
   )
   .jsSettings(commonJsSettings: _*)
   .jsSettings(
-    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "1.1.0")
+    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "1.2.0"),
   )
   .dependsOn(diodeCore)
 
@@ -157,7 +157,7 @@ lazy val diodeReact: Project = project
   .settings(
     name := "diode-react",
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "core" % "1.7.7"
+      "com.github.japgolly.scalajs-react" %%% "core" % "2.0.0-RC3"
     )
   )
   .dependsOn(diode.js)
