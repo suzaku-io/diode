@@ -35,7 +35,7 @@ class PotVector[V](
     new PotVector(fetcher, length, newElems)
   }
 
-  override def updated(kvs: Iterable[(Int, Pot[V])]) = {
+  override def updated(kvs: Iterable[(Int, Pot[V])]): PotVector[V] = {
     val (minIdx, maxIdx) = kvs.foldLeft((Int.MaxValue, Int.MinValue)) {
       case ((min, max), (idx, _)) =>
         (math.min(min, idx), math.max(max, idx))
@@ -138,7 +138,7 @@ class PotVector[V](
     }
   }
 
-  override def map(f: (Int, Pot[V]) => Pot[V]) = {
+  override def map(f: (Int, Pot[V]) => Pot[V]): PotVector[V] = {
     val newElems = new Array[Option[Pot[V]]](elems.length)
     for (idx <- elems.indices) {
       newElems(idx) = elems(idx) match {

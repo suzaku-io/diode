@@ -101,7 +101,7 @@ abstract class EffectBase(val ec: ExecutionContext) extends Effect { self =>
 class EffectSingle[A] private[diode] (f: () => Future[A], ec: ExecutionContext) extends EffectBase(ec) {
   override def run(dispatch: Any => Unit) = f().map(dispatch)(ec)
 
-  override def toFuture = f()
+  override def toFuture: Future[A] = f()
 }
 
 /**
