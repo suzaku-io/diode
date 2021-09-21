@@ -66,6 +66,7 @@ object TodoMVC extends JSApp {
 
     println("Init")
     AppCircuit.dispatch(InitTodos)
+
     /** The router is itself a React component, which at this point is not mounted */
     val router = Router(baseUrl, routerConfig.logToConsole)
 

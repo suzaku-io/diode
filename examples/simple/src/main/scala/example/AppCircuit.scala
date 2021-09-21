@@ -13,8 +13,8 @@ case class Decrease(amount: Int) extends Action
 case object Reset extends Action
 
 /**
-  * AppCircuit provides the actual instance of the `RootModel` and all the action
-  * handlers we need. Everything else comes from the `Circuit`
+  * AppCircuit provides the actual instance of the `RootModel` and all the action handlers we need. Everything else comes
+  * from the `Circuit`
   */
 object AppCircuit extends Circuit[RootModel] {
   // define initial value for the application model
@@ -39,5 +39,5 @@ object AppCircuit extends Circuit[RootModel] {
         case Reset => Some(ModelUpdate(model.copy(counter = 0)))
         case _ => None
       }
- */
+   */
 }

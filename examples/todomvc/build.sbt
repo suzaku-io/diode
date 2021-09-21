@@ -23,8 +23,6 @@ libraryDependencies ++= Seq(
   "io.suzaku"                         %%% "boopickle"      % "1.3.0"
 )
 
-Compile / npmDependencies ++= Seq(
-  "react" -> "16.7.0",
-  "react-dom" -> "16.7.0")
+Compile / npmDependencies ++= Seq("react" -> "16.7.0", "react-dom" -> "16.7.0")
 
 workbenchDefaultRootObject := Some(("target/scala-2.12/classes/index.html", "target/scala-2.12/"))

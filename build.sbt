@@ -64,10 +64,7 @@ inThisBuild(
     homepage := Some(url("https://github.com/suzaku-io/diode")),
     licenses := List("Apache-2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0")),
     developers := List(
-      Developer("ochrons",
-                "Otto Chrons",
-                "",
-                url("https://github.com/ochrons"))
+      Developer("ochrons", "Otto Chrons", "", url("https://github.com/ochrons"))
     ),
     scmInfo := Some(
       ScmInfo(
