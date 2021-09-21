@@ -12,10 +12,11 @@ publish / skip := true
 
 val scala3Version = "3.0.2"
 
+ThisBuild / scalaVersion := "2.13.6"
+This / crossScalaVersions := Seq("2.13.6", scala3Version)
+
 val commonSettings = Seq(
   organization := "io.suzaku",
-  crossScalaVersions := Seq("2.13.6"),
-  ThisBuild / scalaVersion := "2.13.6",
   scalacOptions := Seq(
     "-deprecation",
     "-encoding",
@@ -93,7 +94,7 @@ val sourceMapSetting: Def.Initialize[Option[String]] = Def.settingDyn(
 )
 
 val commonJsSettings = Seq(
-  scalacOptions += sourceMapSetting.value,
+  scalacOptions += sourceMapSetting.value
 )
 
 lazy val diodeCore = crossProject(JSPlatform, JVMPlatform)
@@ -102,7 +103,6 @@ lazy val diodeCore = crossProject(JSPlatform, JVMPlatform)
   .settings(commonSettings: _*)
   .settings(
     name := "diode-core",
-    crossScalaVersions += scala3Version,
     libraryDependencies += Def.settingDyn {
       val scalaVer = scalaVersion.value
       scalaVerDependent {
@@ -118,7 +118,6 @@ lazy val diodeData = crossProject(JSPlatform, JVMPlatform)
   .settings(commonSettings: _*)
   .settings(
     name := "diode-data",
-    crossScalaVersions += scala3Version
   )
   .jsSettings(commonJsSettings: _*)
   .dependsOn(diodeCore)
