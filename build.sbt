@@ -12,7 +12,7 @@ publish / skip := true
 
 val scala3Version = "3.0.2"
 
-ThisBuild / scalaVersion := "2.13.6"
+ThisBuild / scalaVersion  := "2.13.6"
 This / crossScalaVersions := Seq("2.13.6", scala3Version)
 
 val commonSettings = Seq(
@@ -25,30 +25,32 @@ val commonSettings = Seq(
     "-unchecked"
   ),
   scalacOptions ++= scalaVerDependentSeq {
-    case (2, _) => Seq(
-      "-Xlint",
-      "-Ywarn-dead-code",
-      "-Ywarn-numeric-widen",
-      "-Ywarn-value-discard",
-      "-language:experimental.macros",
-      "-language:existentials"
-    )
+    case (2, _) =>
+      Seq(
+        "-Xlint",
+        "-Ywarn-dead-code",
+        "-Ywarn-numeric-widen",
+        "-Ywarn-value-discard",
+        "-language:experimental.macros",
+        "-language:existentials"
+      )
   }.value,
   scalacOptions ++= scalaVerDependentSeq {
-    case (2, 12) => Seq(
-      "-Xfatal-warnings",
-      "-Xlint:-unused",
-      "-language:higherKinds"
-    )
+    case (2, 12) =>
+      Seq(
+        "-Xfatal-warnings",
+        "-Xlint:-unused",
+        "-language:higherKinds"
+      )
     case (2, 13) => Seq("-Werror")
-    case (3, _) => Seq("-Xfatal-warnings")
+    case (3, _)  => Seq("-Xfatal-warnings")
   }.value,
   Compile / scalacOptions -= scalaVerDependent {
     case (2, _) => "-Ywarn-value-discard"
   }.value,
   Compile / doc / scalacOptions -= scalaVerDependent {
     case (2, 12) | (3, _) => "-Xfatal-warnings"
-    case (2, 13) => "-Werror"
+    case (2, 13)          => "-Werror"
   }.value,
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
@@ -80,8 +82,8 @@ inThisBuild(
 val sourceMapSetting: Def.Initialize[Option[String]] = Def.settingDyn(
   if (isSnapshot.value) Def.setting(None)
   else {
-    val a = baseDirectory.value.toURI.toString.replaceFirst("[^/]+/?$", "")
-    val g = "https://raw.githubusercontent.com/suzaku-io/diode"
+    val a   = baseDirectory.value.toURI.toString.replaceFirst("[^/]+/?$", "")
+    val g   = "https://raw.githubusercontent.com/suzaku-io/diode"
     val uri = s"$a->$g/v${version.value}/${name.value}/"
     scalaVerDependent {
       case (2, _) => s"-P:scalajs:mapSourceURI:$uri"
@@ -114,7 +116,7 @@ lazy val diodeData = crossProject(JSPlatform, JVMPlatform)
   .in(file("diode-data"))
   .settings(commonSettings: _*)
   .settings(
-    name := "diode-data",
+    name := "diode-data"
   )
   .jsSettings(commonJsSettings: _*)
   .dependsOn(diodeCore)
@@ -138,7 +140,7 @@ lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
   )
   .jsSettings(commonJsSettings: _*)
   .jsSettings(
-    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "1.2.0"),
+    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "1.2.0")
   )
   .dependsOn(diodeCore)
 
