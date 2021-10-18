@@ -10,7 +10,7 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 publish / skip := true
 
-val scala3Version = "3.0.2"
+val scala3Version = "3.1.0"
 
 ThisBuild / scalaVersion  := "2.13.6"
 This / crossScalaVersions := Seq("2.13.6", scala3Version)
