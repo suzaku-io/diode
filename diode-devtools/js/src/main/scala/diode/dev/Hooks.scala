@@ -2,7 +2,7 @@ package diode.dev
 
 import diode.Dispatcher
 import org.scalajs.dom
-import org.scalajs.dom.raw.KeyboardEvent
+import org.scalajs.dom.KeyboardEvent
 
 object Hooks {
   def hookPersistState(id: String, dispatch: Dispatcher) = {

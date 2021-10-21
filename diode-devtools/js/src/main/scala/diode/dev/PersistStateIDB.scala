@@ -1,7 +1,7 @@
 package diode.dev
 
 import org.scalajs.dom
-import org.scalajs.dom.raw.{Event, IDBDatabase, IDBObjectStore}
+import org.scalajs.dom.{Event, IDBDatabase, IDBObjectStore, IDBTransactionMode}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent._
@@ -35,7 +35,7 @@ class PersistStateIDB[M <: AnyRef, P <: js.Any](pickleF: M => P, unpickleF: P =>
 
   private def withStore[A](f: IDBObjectStore => Future[A]) = {
     dbF.flatMap { db =>
-      val tx    = db.transaction(storeName, "readwrite")
+      val tx    = db.transaction(storeName, IDBTransactionMode.readwrite)
       val store = tx.objectStore(storeName)
       f(store)
     }
