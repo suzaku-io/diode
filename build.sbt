@@ -12,8 +12,8 @@ publish / skip := true
 
 val scala3Version = "3.1.0"
 
-ThisBuild / scalaVersion  := "2.13.6"
-This / crossScalaVersions := Seq("2.13.6", scala3Version)
+ThisBuild / scalaVersion  := "2.13.7"
+This / crossScalaVersions := Seq("2.13.7", scala3Version)
 
 val commonSettings = Seq(
   organization := "io.suzaku",
