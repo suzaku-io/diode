@@ -16,7 +16,6 @@ ThisBuild / scalaVersion  := "2.13.7"
 This / crossScalaVersions := Seq("2.13.7", scala3Version)
 
 val commonSettings = Seq(
-  organization := "io.suzaku",
   scalacOptions := Seq(
     "-deprecation",
     "-encoding",
@@ -69,6 +68,7 @@ inThisBuild(
     developers := List(
       Developer("ochrons", "Otto Chrons", "", url("https://github.com/ochrons"))
     ),
+    organization := "io.suzaku",
     scmInfo := Some(
       ScmInfo(
         url("https://github.com/suzaku-io/diode"),
