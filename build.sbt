@@ -10,8 +10,8 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 publish / skip := true
 
-ThisBuild / scalaVersion  := "2.13.7"
-This / crossScalaVersions := Seq("2.13.7", "3.1.0")
+ThisBuild / scalaVersion  := "2.13.8"
+This / crossScalaVersions := Seq("2.13.8", "3.1.0")
 
 val commonSettings = Seq(
   scalacOptions := Seq(
