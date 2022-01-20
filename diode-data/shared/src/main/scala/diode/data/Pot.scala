@@ -173,7 +173,7 @@ sealed abstract class Pot[+A] extends Product with Serializable { self =>
     * Tests whether the pot contains a given value as an element.
     *
     * @example
-    * {{{
+    *   {{{
     *   // Returns true because Ready instance contains string "something" which equals "something".
     *   Ready("something") contains "something"
     *
@@ -182,7 +182,7 @@ sealed abstract class Pot[+A] extends Product with Serializable { self =>
     *
     *   // Returns false when method called on Empty.
     *   Empty contains "anything"
-    * }}}
+    *   }}}
     * @param elem
     *   the element to test.
     * @return
@@ -228,7 +228,7 @@ sealed abstract class Pot[+A] extends Product with Serializable { self =>
     * '''and''' `pf` is defined for that value. Returns Empty otherwise.
     *
     * @example
-    * {{{
+    *   {{{
     * // Returns Ready(HTTP) because the partial function covers the case.
     * Ready("http") collect {case "http" => "HTTP"}
     *
@@ -237,7 +237,7 @@ sealed abstract class Pot[+A] extends Product with Serializable { self =>
     *
     * // Returns Empty because Empty is passed to the collect method.
     * Empty collect {case value => value}
-    * }}}
+    *   }}}
     * @param pf
     *   the partial function.
     * @return
