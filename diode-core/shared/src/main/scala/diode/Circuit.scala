@@ -280,9 +280,9 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
       case NoAction =>
         // ignore
         ActionResult.NoChange
-      case a: Action =>
-        actionHandler(model, a).getOrElse {
-          handleError(s"Action $a was not handled by any action handler")
+      case _ =>
+        actionHandler(model, action).getOrElse {
+          handleError(s"Action $action was not handled by any action handler")
           ActionResult.NoChange
         }
     }
