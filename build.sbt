@@ -151,7 +151,7 @@ lazy val diodeReact: Project = project
   .settings(
     name := "diode-react",
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "core" % "2.0.0"
+      "com.github.japgolly.scalajs-react" %%% "core" % "2.0.1"
     )
   )
   .dependsOn(diode.js)
