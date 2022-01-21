@@ -151,20 +151,6 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
       (next, processor) => (action: Any) => processor.process(this, action, next, model))
   }
 
-  private def baseHandler(action: Any) = action match {
-    case batch: ActionBatch =>
-      // dispatch all actions in the sequence using internal dispatchBase to prevent
-      // additional calls to subscribed listeners
-      batch.actions.foreach(a => dispatchBase(a))
-      ActionResult.NoChange
-    case NoAction =>
-      // ignore
-      ActionResult.NoChange
-    case unknown =>
-      handleError(s"Action $unknown was not handled by any action handler")
-      ActionResult.NoChange
-  }
-
   /**
     * Zoom into the model using the `get` function
     *
@@ -284,9 +270,22 @@ trait Circuit[M <: AnyRef] extends Dispatcher {
     * @param action Action to be handled
     * @return
     */
-  private def process(action: Any): ActionResult[M] = {
-    actionHandler(model, action).getOrElse(baseHandler(action))
-  }
+  private def process(action: Any): ActionResult[M] =
+    action match {
+      case b: ActionBatch =>
+        // dispatch all actions in the sequence using internal dispatchBase to prevent
+        // additional calls to subscribed listeners
+        b.actions.foreach(a => dispatchBase(a))
+        ActionResult.NoChange
+      case NoAction =>
+        // ignore
+        ActionResult.NoChange
+      case a: Action =>
+        actionHandler(model, a).getOrElse {
+          handleError(s"Action $a was not handled by any action handler")
+          ActionResult.NoChange
+        }
+    }
 
   /**
     * Composes multiple handlers into a single handler. Processing stops as soon as a handler is able to handle
