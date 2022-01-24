@@ -153,20 +153,6 @@ trait Circuit[M <: AnyRef] extends Dispatcher with ZoomTo[M, M] {
     )
   }
 
-  private def baseHandler(action: Any) = action match {
-    case batch: ActionBatch =>
-      // dispatch all actions in the sequence using internal dispatchBase to prevent
-      // additional calls to subscribed listeners
-      batch.actions.foreach(a => dispatchBase(a))
-      ActionResult.NoChange
-    case NoAction =>
-      // ignore
-      ActionResult.NoChange
-    case unknown =>
-      handleError(s"Action $unknown was not handled by any action handler")
-      ActionResult.NoChange
-  }
-
   /**
     * Zoom into the model using the `get` function
     *
@@ -294,9 +280,22 @@ trait Circuit[M <: AnyRef] extends Dispatcher with ZoomTo[M, M] {
     *   Action to be handled
     * @return
     */
-  private def process(action: Any): ActionResult[M] = {
-    actionHandler(model, action).getOrElse(baseHandler(action))
-  }
+  private def process(action: Any): ActionResult[M] =
+    action match {
+      case b: ActionBatch =>
+        // dispatch all actions in the sequence using internal dispatchBase to prevent
+        // additional calls to subscribed listeners
+        b.actions.foreach(a => dispatchBase(a))
+        ActionResult.NoChange
+      case NoAction =>
+        // ignore
+        ActionResult.NoChange
+      case _ =>
+        actionHandler(model, action).getOrElse {
+          handleError(s"Action $action was not handled by any action handler")
+          ActionResult.NoChange
+        }
+    }
 
   /**
     * Composes multiple handlers into a single handler. Processing stops as soon as a handler is able to handle the action.
