@@ -8,10 +8,8 @@ ThisBuild / scalafmtOnCompile := true
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-publish / skip := true
-
 ThisBuild / scalaVersion  := "2.13.8"
-This / crossScalaVersions := Seq("2.13.8", "3.1.0")
+ThisBuild / crossScalaVersions := Seq("2.13.8", "3.1.0")
 
 val commonSettings = Seq(
   scalacOptions := Seq(
@@ -33,12 +31,6 @@ val commonSettings = Seq(
       )
   }.value,
   scalacOptions ++= scalaVerDependentSeq {
-    case (2, 12) =>
-      Seq(
-        "-Xfatal-warnings",
-        "-Xlint:-unused",
-        "-language:higherKinds"
-      )
     case (2, 13) => Seq("-Werror")
     case (3, _)  => Seq("-Xfatal-warnings")
   }.value,
@@ -46,7 +38,7 @@ val commonSettings = Seq(
     case (2, _) => "-Ywarn-value-discard"
   }.value,
   Compile / doc / scalacOptions -= scalaVerDependent {
-    case (2, 12) | (3, _) => "-Xfatal-warnings"
+    case (3, _) => "-Xfatal-warnings"
     case (2, 13)          => "-Werror"
   }.value,
   testFrameworks += new TestFramework("utest.runner.Framework"),
