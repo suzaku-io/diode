@@ -92,7 +92,8 @@ val sourceMapSetting: Def.Initialize[Option[String]] = Def.settingDyn(
 )
 
 val commonJsSettings = Seq(
-  scalacOptions += sourceMapSetting.value
+  scalacOptions += sourceMapSetting.value,
+  scalacOptions += "-P:scalajs:nowarnGlobalExecutionContext"
 )
 
 lazy val diodeCore = crossProject(JSPlatform, JVMPlatform)
@@ -139,7 +140,7 @@ lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
   )
   .jsSettings(commonJsSettings: _*)
   .jsSettings(
-    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "2.0.0")
+    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "2.1.0")
   )
   .dependsOn(diodeCore)
 
