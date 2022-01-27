@@ -23,10 +23,10 @@ private[macros] class CaseClass[Q <: Quotes] private (using val q: Q)(obj: q.ref
 
   private def memberMethod(name: String): Symbol = {
     typeSymbol
-      .memberMethod(name)
+      .methodMember(name)
       .headOption
       .getOrElse(
-        report.throwError(s"Expected a case class ${typeSymbol.fullName} to have '${name}' member.")
+        report.errorAndAbort(s"Expected a case class ${typeSymbol.fullName} to have '${name}' member.")
       )
   }
 

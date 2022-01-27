@@ -8,7 +8,7 @@ ThisBuild / scalafmtOnCompile := true
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-ThisBuild / scalaVersion  := "2.13.8"
+ThisBuild / scalaVersion       := "2.13.8"
 ThisBuild / crossScalaVersions := Seq("2.13.8", "3.1.0")
 
 val commonSettings = Seq(
@@ -38,8 +38,8 @@ val commonSettings = Seq(
     case (2, _) => "-Ywarn-value-discard"
   }.value,
   Compile / doc / scalacOptions -= scalaVerDependent {
-    case (3, _) => "-Xfatal-warnings"
-    case (2, 13)          => "-Werror"
+    case (3, _)  => "-Xfatal-warnings"
+    case (2, 13) => "-Werror"
   }.value,
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
@@ -85,7 +85,10 @@ val sourceMapSetting: Def.Initialize[Option[String]] = Def.settingDyn(
 
 val commonJsSettings = Seq(
   scalacOptions += sourceMapSetting.value,
-  scalacOptions += "-P:scalajs:nowarnGlobalExecutionContext"
+  scalacOptions ++= scalaVerDependent {
+    case (2, _) => "-P:scalajs:nowarnGlobalExecutionContext"
+    case (3, _) => "-scalajs:nowarnGlobalExecutionContext"
+  }.value
 )
 
 lazy val diodeCore = crossProject(JSPlatform, JVMPlatform)

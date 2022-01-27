@@ -23,7 +23,7 @@ private[diode] object GenLens {
     }
 
     def copyLoop(obj: Term, fieldName: String, tail: List[String], value: Term): Term = {
-      val caseClass = CaseClass(obj).fold(msg => report.throwError(msg, field), identity)
+      val caseClass = CaseClass(obj).fold(msg => report.errorAndAbort(msg, field), identity)
 
       val fieldValue = {
         if (tail.isEmpty) value
@@ -34,7 +34,7 @@ private[diode] object GenLens {
     }
 
     def reportIllegalFieldReference(): Nothing = {
-      report.throwError("Illegal field reference, please use _.field1.field2... instead.", field)
+      report.errorAndAbort("Illegal field reference, please use _.field1.field2... instead.", field)
     }
 
     def generateSetExpression(fieldChain: Term): Expr[(Model, Field) => Model] = {
