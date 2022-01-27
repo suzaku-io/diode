@@ -10,8 +10,8 @@ Global / onChangedBuildSource := ReloadOnSourceChanges
 
 publish / skip := true
 
-ThisBuild / scalaVersion  := "2.13.7"
-ThisBuild / crossScalaVersions := Seq("2.13.7", "3.0.0")
+ThisBuild / scalaVersion  := "2.13.8"
+This / crossScalaVersions := Seq("2.13.8", "3.1.0")
 
 val commonSettings = Seq(
   scalacOptions := Seq(
@@ -51,7 +51,7 @@ val commonSettings = Seq(
   }.value,
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %%% "utest" % "0.7.10" % "test"
+    "com.lihaoyi" %%% "utest" % "0.7.11" % "test"
   ),
   libraryDependencies += scalaVerDependent {
     case (2, _) => "org.scala-lang.modules" %% "scala-collection-compat" % "2.6.0"
@@ -151,7 +151,7 @@ lazy val diodeReact: Project = project
   .settings(
     name := "diode-react",
     libraryDependencies ++= Seq(
-      "com.github.japgolly.scalajs-react" %%% "core" % "2.0.0"
+      "com.github.japgolly.scalajs-react" %%% "core" % "2.0.1"
     )
   )
   .dependsOn(diode.js)
