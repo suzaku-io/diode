@@ -109,7 +109,7 @@ trait ReactConnector[M <: AnyRef] { circuit: Circuit[M] =>
     * @return
     *   A ReactConnectProxy
     */
-  def connect[S <: AnyRef](modelReader: ModelRO[S], key: js.UndefOr[js.Any] = js.undefined): ReactConnectProxy[S] = {
+  def connect[S <: AnyRef](modelReader: ModelRO[S], key: js.Any = js.undefined): ReactConnectProxy[S] = {
 
     class Backend(t: BackendScope[ReactConnectProps[S], S]) {
       private var unsubscribe = Option.empty[() => Unit]
