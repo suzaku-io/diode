@@ -46,7 +46,7 @@ val commonSettings = Seq(
     "com.lihaoyi" %%% "utest" % "0.7.11" % "test"
   ),
   libraryDependencies += scalaVerDependent {
-    case (2, _) => "org.scala-lang.modules" %% "scala-collection-compat" % "2.6.0"
+    case (2, _) => "org.scala-lang.modules" %% "scala-collection-compat" % "2.7.0"
   }.value
 )
 
