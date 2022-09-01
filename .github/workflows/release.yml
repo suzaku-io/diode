@@ -11,13 +11,13 @@ jobs:
       - uses: olafurpg/setup-scala@v13
       - uses: olafurpg/setup-gpg@v3
       - name: Cache dependencies
-        uses: actions/cache@v3.0.1
+        uses: actions/cache@v3.0.8
         with:
           path: ~/.cache/coursier/v1
           key: ${{ runner.os }}-coursier-${{ hashFiles('build.sbt') }}-${{ hashFiles('project/*.scala') }}
           restore-keys: ${{ runner.os }}-coursier-
       - name: Cache .sbt
-        uses: actions/cache@v3.0.1
+        uses: actions/cache@v3.0.8
         with:
           path: ~/.sbt
           key: ${{ runner.os }}-sbt-${{ hashFiles('build.sbt') }}-${{ hashFiles('project/*.scala') }}
