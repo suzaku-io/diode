@@ -43,7 +43,7 @@ val commonSettings = Seq(
   }.value,
   testFrameworks += new TestFramework("utest.runner.Framework"),
   libraryDependencies ++= Seq(
-    "com.lihaoyi" %%% "utest" % "0.8.0" % "test"
+    "com.lihaoyi" %%% "utest" % "0.8.1" % "test"
   ),
   libraryDependencies += scalaVerDependent {
     case (2, _) => "org.scala-lang.modules" %% "scala-collection-compat" % "2.8.1"
