@@ -13,7 +13,7 @@ jobs:
       - name: Fetch tags
         run: git fetch --depth=100 origin +refs/tags/*:refs/tags/*
       - name: Setup Scala
-        uses: olafurpg/setup-scala@v13
+        uses: olafurpg/setup-scala@v14
       - name: Checking your code format
         run: sbt +scalafmtCheck
       - name: Cache dependencies
