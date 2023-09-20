@@ -135,7 +135,7 @@ lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
   )
   .jsSettings(commonJsSettings: _*)
   .jsSettings(
-    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "2.2.0")
+    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "2.7.0")
   )
   .dependsOn(diodeCore)
 
