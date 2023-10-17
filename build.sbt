@@ -8,8 +8,8 @@ ThisBuild / scalafmtOnCompile := true
 
 Global / onChangedBuildSource := ReloadOnSourceChanges
 
-ThisBuild / scalaVersion       := "2.13.8"
-ThisBuild / crossScalaVersions := Seq("2.13.8", "3.1.3")
+ThisBuild / scalaVersion       := "2.13.12"
+ThisBuild / crossScalaVersions := Seq("2.13.12", "3.3.1")
 
 val commonSettings = Seq(
   scalacOptions := Seq(
@@ -135,7 +135,7 @@ lazy val diodeDevtools = crossProject(JSPlatform, JVMPlatform)
   )
   .jsSettings(commonJsSettings: _*)
   .jsSettings(
-    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "2.2.0")
+    libraryDependencies ++= Seq("org.scala-js" %%% "scalajs-dom" % "2.8.0")
   )
   .dependsOn(diodeCore)
 
