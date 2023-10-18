@@ -15,6 +15,8 @@ object EffectTests extends TestSuite {
     def efA = Effect(Future("A"))
     def efB = Effect(Future("B"))
     def efC = Effect(Future("C"))
+    def efD = Effect.action("D")
+    def efE = Effect.action("E")
 
     "Effect" - {
       "run" - {
@@ -113,6 +115,57 @@ object EffectTests extends TestSuite {
         assert(e.size == 3)
         e.map(x => s"$x$x").toFuture.map { z =>
           assert(z == Set("BB", "CC"))
+        }
+      }
+    }
+    "EffectAction" - {
+      "run" - {
+        var x = ""
+        efD.run(y => x = y.asInstanceOf[String]).map { _ =>
+          assert(x == "D")
+        }
+      }
+      "toFuture" - {
+        efD.toFuture.map { z =>
+          assert(z == "D")
+        }
+      }
+      "map" - {
+        efD.map(x => s"$x$x").toFuture.map { z =>
+          assert(z == "DD")
+        }
+      }
+      "flatMap" - {
+        efD.flatMap(x => Future(s"$x$x")).toFuture.map { z =>
+          assert(z == "DD")
+        }
+      }
+      "after" - {
+        val now = System.currentTimeMillis()
+        efD.after(100.milliseconds)(diode.Implicits.runAfterImpl).map(x => s"$x$x").toFuture.map { z =>
+          assert(z == "DD")
+          assert(System.currentTimeMillis() - now > 80)
+        }
+      }
+      "+" - {
+        val e  = efA + efD
+        val ai = new AtomicInteger(0)
+        e.run(x => ai.incrementAndGet()).map { _ =>
+          assert(ai.intValue() == 2)
+        }
+      }
+      ">>" - {
+        val e = efA >> efB >> efC >> efD >> efE
+        var r = List.empty[String]
+        e.run(x => r = r :+ x.asInstanceOf[String]).map { _ =>
+          assert(r == List("A", "B", "C", "D", "E"))
+        }
+      }
+      "<<" - {
+        val e = efA << efB << efC << efD << efE
+        var r = List.empty[String]
+        e.run(x => r = r :+ x.asInstanceOf[String]).map { _ =>
+          assert(r == List("E", "D", "C", "B", "A"))
         }
       }
     }

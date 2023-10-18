@@ -12,19 +12,25 @@ object CircuitTests extends TestSuite {
   import CircuitTestsModel._
 
   // actions
-  case class SetS(s: String)
+  case object NoChange extends diode.Action
 
-  case class SetSSilent(s: String)
+  case class SetS(s: String) extends diode.Action
 
-  case class SetD(d: Data)
+  case class SetSSilent(s: String) extends diode.Action
 
-  case class SetEffect(s: String, effect: () => Future[AnyRef])
+  case class SetD(d: Data) extends diode.Action
 
-  case class SetEffectOnly(effect: () => Future[AnyRef])
+  case class SetEffect(s: String, effect: () => Future[AnyRef]) extends diode.Action
 
-  case class Delay(action: Any)
+  case class SetEffectOnly(effect: () => Future[AnyRef]) extends diode.Action
 
-  case class ThrowAction(ex: Throwable)
+  case class SetEffectActionOnly(action: Action) extends diode.Action
+
+  case class SetEffectActionBatchOnly(effect: ActionBatch) extends diode.Action
+
+  case class Delay(action: Any) extends diode.Action
+
+  case class ThrowAction(ex: Throwable) extends diode.Action
 
   class AppCircuit(implicit val ec: ExecutionContext) extends Circuit[Model] {
     import diode.ActionResult._
@@ -37,7 +43,11 @@ object CircuitTests extends TestSuite {
           case SetSSilent(s) =>
             ModelUpdateSilent(model.copy(s = s))
           case SetEffectOnly(effect) =>
-            ModelUpdateEffect(model, effect)
+            EffectOnly(effect)
+          case SetEffectActionOnly(action) =>
+            EffectOnly(Effect.action(action))
+          case SetEffectActionBatchOnly(actionBatch) =>
+            EffectOnly(Effect.action(actionBatch))
           case SetD(d) =>
             ModelUpdate(model.copy(data = d))
           case SetEffect(s, effect) =>
@@ -77,8 +87,8 @@ object CircuitTests extends TestSuite {
       }
       "ActionBatch" - {
         val c = circuit
-        c.dispatch(ActionBatch(SetS("First"), SetD(Data(43, false))))
-        assert(c.model.s == "First")
+        c.dispatch(ActionBatch(SetS("First"), SetD(Data(43, false)), SetS("Second")))
+        assert(c.model.s == "Second")
         assert(c.model.data.i == 43)
         assert(c.model.data.b == false)
       }
@@ -344,6 +354,28 @@ object CircuitTests extends TestSuite {
         val effect    = SetEffectOnly(() => { effectRun += 1; Future.successful(None) })
         c.dispatch(effect)
         assert(effectRun == 1)
+      }
+      "EffectActionOnly" - {
+        val c = circuit
+        val effect = SetEffectActionOnly(SetS("Action1"))
+        c.dispatch(effect)
+        assert(c.model.s == "Action1")
+      }
+      "EffectActionBatchOnly" - {
+        val c = circuit
+        val ab = ActionBatch(SetS("Action2"), SetD(Data(100, true)))
+        val effect = SetEffectActionBatchOnly(ab)
+        c.dispatch(effect)
+        assert(c.model.s == "Action2")
+        assert(c.model.data.i == 100)
+      }
+      "EffectActionBatchOnlyNoChange" - {
+        val c = circuit
+        val ab = ActionBatch(NoChange, SetS("Action2"), SetD(Data(100, true)))
+        val effect = SetEffectActionBatchOnly(ab)
+        c.dispatch(effect)
+        assert(c.model.s == "Action2")
+        assert(c.model.data.i == 100)
       }
     }
     "Processor" - {
