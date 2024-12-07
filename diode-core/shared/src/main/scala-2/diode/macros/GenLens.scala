@@ -47,12 +47,12 @@ object GenLens {
       */
     object SelectChain {
       def unapply(tree: Tree): Option[(Name, Seq[(Type, TermName)])] = tree match {
-        case Select(tail @ Ident(termUseName), field: TermName) =>
-          Some((termUseName, Seq(tail.tpe.widen -> field)))
-        case Select(tail, field: TermName) =>
+        case Select(tail @ Ident(termUseName), termName: TermName) =>
+          Some((termUseName, Seq(tail.tpe.widen -> termName)))
+        case Select(tail, termName: TermName) =>
           SelectChain
             .unapply(tail)
-            .map(t => t.copy(_2 = t._2 :+ (tail.tpe.widen -> field)))
+            .map(t => t.copy(_2 = t._2 :+ (tail.tpe.widen -> termName)))
         case _ => None
       }
     }
